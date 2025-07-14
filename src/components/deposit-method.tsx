@@ -4,27 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Wallet, Building2, Copy, CheckCircle } from "lucide-react";
-import type { FormData } from "@/app/page";
+import type { FormData } from "@/page";
 
 interface DepositMethodProps {
   formData: FormData;
   onFormDataChange: (updates: Partial<FormData>) => void;
 }
-
-const getWalletName = (network: string) => {
-  const walletMap: Record<string, string> = {
-    solana: "Phantom/Solflare",
-    ton: "TON Wallet",
-    near: "NEAR Wallet",
-    ethereum: "MetaMask",
-    bsc: "MetaMask",
-    polygon: "MetaMask",
-    avalanche: "MetaMask",
-    optimism: "MetaMask",
-    base: "MetaMask",
-  };
-  return walletMap[network] || "Wallet";
-};
 
 export function DepositMethod({
   formData,
@@ -114,19 +99,7 @@ export function DepositMethod({
                       : "bg-gray-700 text-white hover:bg-gray-600"
                   }`}
                   disabled={!formData.network}
-                >
-                  {formData.sourceWalletConnected ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Connected to {getWalletName(formData.network)}
-                    </>
-                  ) : (
-                    <>
-                      <Wallet className="w-4 h-4 mr-2" />
-                      Connect {getWalletName(formData.network)}
-                    </>
-                  )}
-                </Button>
+                ></Button>
               </div>
 
               <div className="space-y-3">
@@ -207,8 +180,8 @@ export function DepositMethod({
                   </Button>
                 </div>
                 <p className="text-xs text-gray-400">
-                  Send your {formData.asset?.toUpperCase()} from your exchange
-                  to this address
+                  Send your {formData.asset.symbol} from your exchange to this
+                  address
                 </p>
               </div>
             </div>
