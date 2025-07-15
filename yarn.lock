@@ -664,6 +664,21 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.10.tgz#a2a1e3812d14525f725d011a73eceb41fef5bc1c"
   integrity sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==
 
+"@fontsource/dm-sans@^5.2.6":
+  version "5.2.6"
+  resolved "https://registry.yarnpkg.com/@fontsource/dm-sans/-/dm-sans-5.2.6.tgz#f2b90ee854566afa94c56721c1d8f1e39230c5e7"
+  integrity sha512-3AmJcX93hqmevsC2ixNwHj3iO3sNY/YHBqGhg0MjIyfhk6aZLNv1s2HqJ6xf8yf1rXXK3yR56rzyA3O21htKkg==
+
+"@fontsource/inter@^5.2.6":
+  version "5.2.6"
+  resolved "https://registry.yarnpkg.com/@fontsource/inter/-/inter-5.2.6.tgz#2c705ea57d7af283a05bb1ca59fb0f06fc5de3be"
+  integrity sha512-CZs9S1CrjD0jPwsNy9W6j0BhsmRSQrgwlTNkgQXTsAeDRM42LBRLo3eo9gCzfH4GvV7zpyf78Ozfl773826csw==
+
+"@fontsource/poppins@^5.2.6":
+  version "5.2.6"
+  resolved "https://registry.yarnpkg.com/@fontsource/poppins/-/poppins-5.2.6.tgz#49a297bbec25419469dbb75f61788feac97cea63"
+  integrity sha512-NFr0121+vWCfzLDVvSZOzwAjRUaNj6QHA9gtUh/KHHoWf1Qn23EkwVFs63XZ6UtF5K1b3UNmCx77YEMGgV7BOQ==
+
 "@fractalwagmi/popup-connection@^1.0.18":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@fractalwagmi/popup-connection/-/popup-connection-1.1.1.tgz#2dfff4f3bb89d17947adae597f355faf46c194a9"

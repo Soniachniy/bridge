@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Wallet, Building2, Copy, CheckCircle } from "lucide-react";
-import { EDepositMethod, FormData } from "@/page";
+import { EDepositMethod, FormData } from "@/pages/Form";
 import useNetworkHandler from "@/hooks/useNetworkHandler";
 
 interface DepositMethodProps {

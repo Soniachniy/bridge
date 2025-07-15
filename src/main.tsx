@@ -1,10 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import HyperliquidBridge from "./page.tsx";
+
 import { Providers } from "@/providers";
 import { WalletSelector } from "@near-wallet-selector/core";
 import { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
+import Layout from "./pages/Layout";
+import Form from "./pages/Form";
 
 declare global {
   interface Window {
@@ -16,7 +18,9 @@ declare global {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Providers>
-      <HyperliquidBridge />
+      <Layout>
+        <Form />
+      </Layout>
     </Providers>
   </StrictMode>
 );
