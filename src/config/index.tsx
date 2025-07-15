@@ -80,3 +80,33 @@ export enum Network {
   XRP = "XRP",
   ZEC = "ZEC",
 }
+
+export const networkAddresses = {
+  [Network.ARBITRUM]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.ETHEREUM]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.SOLANA]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.TON]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.TRON]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.XRP]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.ZEC]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.NEAR]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+  [Network.POLYGON]: {
+    bridge: "0x0000000000000000000000000000000000000000",
+  },
+};

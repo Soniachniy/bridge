@@ -16,10 +16,15 @@ import { ArrowRight, CheckCircle, Zap } from "lucide-react";
 import { Asset } from "@/lib/1clickHelper";
 import { Network } from "@/config";
 
+export enum EDepositMethod {
+  WALLET = "wallet",
+  EXCHANGE = "exchange",
+}
+
 export interface FormData {
   asset: Asset;
   network: Network | null;
-  depositMethod: "wallet" | "exchange";
+  depositMethod: EDepositMethod;
   amount: string;
   sourceWalletConnected: boolean;
   arbitrumWalletConnected: boolean;
@@ -39,7 +44,7 @@ export default function HyperliquidBridge() {
       contractAddress: "",
     },
     network: null,
-    depositMethod: "wallet",
+    depositMethod: EDepositMethod.WALLET,
     amount: "",
     sourceWalletConnected: false,
     arbitrumWalletConnected: false,
@@ -55,7 +60,7 @@ export default function HyperliquidBridge() {
     formData.asset &&
     formData.network &&
     formData.amount &&
-    (formData.depositMethod === "exchange"
+    (formData.depositMethod === EDepositMethod.EXCHANGE
       ? formData.arbitrumWalletConnected
       : formData.sourceWalletConnected && formData.arbitrumWalletConnected);
 
@@ -205,7 +210,7 @@ export default function HyperliquidBridge() {
                   <div>Amount: {formData.amount}</div>
                   <div>
                     Method:{" "}
-                    {formData.depositMethod === "wallet"
+                    {formData.depositMethod === EDepositMethod.WALLET
                       ? "Wallet"
                       : "Exchange"}
                   </div>

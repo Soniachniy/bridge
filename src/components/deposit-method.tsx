@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Wallet, Building2, Copy, CheckCircle } from "lucide-react";
-import type { FormData } from "@/page";
+import { EDepositMethod, FormData } from "@/page";
+import useNetworkHandler from "@/hooks/useNetworkHandler";
 
 interface DepositMethodProps {
   formData: FormData;
@@ -32,24 +33,29 @@ export function DepositMethod({
     });
   };
 
+  const { isConnected, connectWallet: ConnectWalletButton } = useNetworkHandler(
+    formData.network
+  );
+
   return (
     <div className="space-y-4">
-      <div className="space-y-3">
-        <Label className="text-white">Amount</Label>
-        <Input
-          type="number"
-          placeholder="Enter amount"
-          value={formData.amount}
-          onChange={(e) => onFormDataChange({ amount: e.target.value })}
-          className="bg-black border-white text-white placeholder:text-gray-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        />
-      </div>
-
+      {formData.depositMethod === EDepositMethod.WALLET && (
+        <div className="space-y-3">
+          <Label className="text-white">Amount</Label>
+          <Input
+            type="number"
+            placeholder="Enter amount"
+            value={formData.amount}
+            onChange={(e) => onFormDataChange({ amount: e.target.value })}
+            className="bg-black border-white text-white placeholder:text-gray-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
+      )}
       <div className="space-y-3">
         <Label className="text-white">Deposit Method</Label>
         <RadioGroup
           value={formData.depositMethod}
-          onValueChange={(value: "wallet" | "exchange") =>
+          onValueChange={(value: EDepositMethod) =>
             onFormDataChange({ depositMethod: value })
           }
           className="grid grid-cols-2 gap-4"
@@ -85,11 +91,12 @@ export function DepositMethod({
         </RadioGroup>
       </div>
 
-      {formData.depositMethod === "wallet" && (
+      {formData.depositMethod === EDepositMethod.WALLET && (
         <Card className="bg-gray-800 border-gray-600">
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="space-y-3">
+                <ConnectWalletButton />
                 <Label className="text-white">Source Network Wallet</Label>
                 <Button
                   onClick={handleSourceWalletConnect}
@@ -132,7 +139,7 @@ export function DepositMethod({
         </Card>
       )}
 
-      {formData.depositMethod === "exchange" && (
+      {formData.depositMethod === EDepositMethod.EXCHANGE && (
         <Card className="bg-gray-800 border-gray-600">
           <CardContent className="pt-6">
             <div className="space-y-4">

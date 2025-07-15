@@ -51,7 +51,7 @@ export function AssetSelection({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between bg-black border-white text-white hover:bg-gray-500"
+            className="w-full justify-between bg-black border-white text-white hover:bg-white"
           >
             {selectedAsset?.assetId ? (
               <span className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export function AssetSelection({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0 bg-gray-800 border-gray-600">
-          <Command className="bg-gray-800">
+          <Command className="bg-gray-800 w-full border-white">
             <CommandInput
               placeholder="Search assets..."
               className="text-white"
@@ -88,7 +88,7 @@ export function AssetSelection({
                         onAssetChange(asset);
                         setOpen(false);
                       }}
-                      className="text-white hover:bg-white"
+                      className="text-white hover:bg-white hover:text-black"
                     >
                       <span className="flex items-center gap-2">
                         <img

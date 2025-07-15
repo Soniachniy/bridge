@@ -13,5 +13,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    global: {},
+    "process.env": {},
+  },
   plugins: [react(), tsconfigPaths(), svgr(), tailwindcss(), nodePolyfills()],
 });

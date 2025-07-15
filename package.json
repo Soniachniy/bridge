@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@tailwindcss/vite": "^4.1.11",
+    "@types/big.js": "^6.2.2",
+    "big.js": "^7.0.1",
+    "connectkit": "^1.9.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "shadcn": "^2.9.0",

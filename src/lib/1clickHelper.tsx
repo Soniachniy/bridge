@@ -26,15 +26,19 @@ export const NetworkIconMap = {
   [Network.SOLANA]: <SolanaIcon />,
   [Network.ARBITRUM]: <ArbitrumIcon />,
   [Network.ETHEREUM]: <EthereumIcon />,
-  [Network.AURORA]: <AuroraIcon />,
-  [Network.BEREA]: <BeraIcon />,
-  [Network.BITCOIN]: <BitcoinIcon />,
-  [Network.DOGE]: <DogeIcon />,
-  [Network.XRP]: <XrpIcon />,
-  [Network.GNOSIS]: <GnosisIcon />,
-  [Network.POLYGON]: <PolygonIcon />,
-  [Network.TRON]: <TronIcon />,
-  [Network.ZEC]: <ZecIcon />,
+  [Network.AURORA]: <img src={AuroraIcon} alt="Aurora" className="w-6 h-6" />,
+  [Network.BEREA]: <img src={BeraIcon} alt="Berea" className="w-6 h-6" />,
+  [Network.BITCOIN]: (
+    <img src={BitcoinIcon} alt="Bitcoin" className="w-6 h-6" />
+  ),
+  [Network.DOGE]: <img src={DogeIcon} alt="Doge" className="w-6 h-6" />,
+  [Network.XRP]: <img src={XrpIcon} alt="XRP" className="w-6 h-6" />,
+  [Network.GNOSIS]: <img src={GnosisIcon} alt="Gnosis" className="w-6 h-6" />,
+  [Network.POLYGON]: (
+    <img src={PolygonIcon} alt="Polygon" className="w-6 h-6" />
+  ),
+  [Network.TRON]: <img src={TronIcon} alt="Tron" className="w-6 h-6" />,
+  [Network.ZEC]: <img src={ZecIcon} alt="ZEC" className="w-6 h-6" />,
 };
 
 export interface Asset {

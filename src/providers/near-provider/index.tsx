@@ -1,132 +1,269 @@
-import "@near-wallet-selector/modal-ui/styles.css";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
+import { map, distinctUntilChanged } from "rxjs/operators";
+import {
+  FinalExecutionOutcome,
+  NetworkId,
+  setupWalletSelector,
+  Transaction,
+  WalletSelectorState,
+} from "@near-wallet-selector/core";
 import type {
+  WalletSelector,
   AccountState,
   WalletModuleFactory,
-  WalletSelector,
+  BrowserWallet,
 } from "@near-wallet-selector/core";
-import { setupWalletSelector } from "@near-wallet-selector/core";
-import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { setupModal } from "@near-wallet-selector/modal-ui";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import { distinctUntilChanged, map } from "rxjs";
-import { nearConfig } from "../../config";
+import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
+import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
+import { setupSender } from "@near-wallet-selector/sender";
+import { providers } from "near-api-js";
 
-declare global {
-  interface Window {
-    selector: WalletSelector;
-    modal: WalletSelectorModal;
+import { AccountView, CodeResult } from "near-api-js/lib/providers/provider";
+import "@near-wallet-selector/modal-ui/styles.css";
+import { setupHotWallet } from "@hot-wallet/sdk/adapter/near";
+import { getGas, getAmount } from "@/lib/providerHelpers";
+
+export interface ITransaction {
+  receiverId: string;
+  functionCalls: {
+    gas?: string;
+    amount?: string;
+    methodName: string;
+    args?: object;
+  }[];
+}
+
+export interface IRPCProviderService {
+  viewFunction: (method: string, accountId: string, args?: any) => Promise<any>;
+  viewAccount: (accountId: string) => Promise<any>;
+}
+
+enum RPCProviderMethods {
+  CALL_FUNCTION = "call_function",
+  VIEW_ACCOUNT = "view_account",
+}
+
+const FINALITY_FINAL = "final";
+
+export default class RPCProviderService implements IRPCProviderService {
+  private provider?: providers.JsonRpcProvider;
+
+  constructor(provider?: providers.JsonRpcProvider) {
+    this.provider = provider;
+  }
+
+  async viewFunction(method: string, accountId: string, args: any = {}) {
+    try {
+      if (!this.provider) return console.warn("No Provider selected");
+
+      const response = await this.provider.query<CodeResult>({
+        request_type: RPCProviderMethods.CALL_FUNCTION,
+        account_id: accountId,
+        method_name: method,
+        args_base64: btoa(JSON.stringify(args || {})),
+        finality: FINALITY_FINAL,
+      });
+
+      const result = JSON.parse(Buffer.from(response.result).toString());
+      return result;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
+  }
+
+  async viewAccount(accountId: string) {
+    try {
+      if (!this.provider) return console.warn("No Provider selected");
+      const response = await this.provider.query<AccountView>({
+        request_type: RPCProviderMethods.VIEW_ACCOUNT,
+        finality: FINALITY_FINAL,
+        account_id: accountId,
+      });
+
+      return response;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
   }
 }
 
+const NETWORK_ID = "mainnet";
+
 interface WalletSelectorContextValue {
-  selector: WalletSelector;
-  modal: WalletSelectorModal;
-  accounts: Array<AccountState>;
-  accountId: string | null;
+  openModal: () => void;
+  selector: WalletSelector | null;
+  requestSignTransactions: (
+    t: ITransaction[]
+  ) => Promise<void | FinalExecutionOutcome[]>;
+  accountId: string;
+  RPCProvider: IRPCProviderService;
+  signOut: () => Promise<void>;
+  lastTransaction: number;
 }
 
-const WalletSelectorContext = createContext<WalletSelectorContextValue | null>(
-  null
+const WalletSelectorContext = React.createContext<WalletSelectorContextValue>(
+  {} as WalletSelectorContextValue
 );
 
-export const WalletSelectorContextProvider: React.FC<{
-  children: ReactNode;
-}> = ({ children }) => {
+export const WalletSelectorContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
-  const [accounts, setAccounts] = useState<Array<AccountState>>([]);
+  const [accountId, setAccountId] = useState<string>("");
+  const [RPCProvider, setRPCProvider] = useState<IRPCProviderService>(
+    new RPCProviderService()
+  );
+  const [lastTransaction, setLastTransaction] = useState<number>(Date.now());
 
-  const initSelector = async () => {
-    try {
-      const selector = await setupWalletSelector({
-        modules: nearConfig.modules.map(
-          (moduleFactory) => moduleFactory() as WalletModuleFactory
-        ),
-        network: nearConfig.network,
-        fallbackRpcUrls: nearConfig.fallbackRpcUrls,
-      });
-      const modal = setupModal(selector, { contractId: nearConfig.contractId });
-      setSelector(selector);
-      setModal(modal);
-      return { selector, modal };
-    } catch (e) {
-      console.log("warn here", e);
+  const syncAccountState = (
+    currentAccountId: string | null,
+    newAccounts: Array<AccountState>
+  ) => {
+    if (!newAccounts.length) {
+      localStorage.removeItem("accountId");
+      setAccountId("");
+
+      return;
     }
+
+    const validAccountId =
+      currentAccountId &&
+      newAccounts.some((x) => x.accountId === currentAccountId);
+    const newAccountId = validAccountId
+      ? currentAccountId
+      : newAccounts[0].accountId;
+
+    localStorage.setItem("accountId", newAccountId);
+    setAccountId(newAccountId);
   };
 
-  useEffect(() => {
-    const init = async () => {
-      const initializedSelector = await initSelector();
-      if (!initializedSelector) return;
+  const init = useCallback(async () => {
+    const selectorInstance = await setupWalletSelector({
+      network: NETWORK_ID as NetworkId,
+      debug: true,
+      modules: [
+        setupMyNearWallet(),
+        setupHotWallet() as WalletModuleFactory<BrowserWallet>,
+        setupSender(),
+      ],
+    });
+    const modalInstance = setupModal(selectorInstance, {
+      contractId: "" as string,
+    });
+    const state = selectorInstance.store.getState();
+    syncAccountState(localStorage.getItem("accountId"), state.accounts);
 
-      const wallet = await initializedSelector.selector.wallet();
-      const accounts = await wallet.getAccounts();
+    window.selector = selectorInstance;
+    window.modal = modalInstance;
 
-      initializedSelector.selector.on("signedIn", async (t) => {
-        const wallet = await initializedSelector.selector.wallet();
-
-        return { account: t.accounts[0].accountId, hot: wallet };
-      });
-
-      initializedSelector.selector.on("signedOut", async () => {
-        throw Error("Not connected");
-      });
-      return { account: accounts[0].accountId, hot: wallet };
-    };
-    init();
+    const { network } = selectorInstance.options;
+    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+    const providerService = new RPCProviderService(provider);
+    setRPCProvider(providerService);
+    setSelector(selectorInstance);
+    setModal(modalInstance);
   }, []);
+
+  useEffect(() => {
+    init().catch((err) => {
+      console.error(err);
+    });
+  }, [init]);
 
   useEffect(() => {
     if (!selector) {
       return;
     }
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subscription = (selector.store.observable as any)
       .pipe(
-        map((state: any) => state.accounts),
+        map((state: WalletSelectorState) => state.accounts),
         distinctUntilChanged()
       )
-      .subscribe((nextAccounts: Array<AccountState>) => {
-        setAccounts(nextAccounts);
+      .subscribe((nextAccounts: AccountState[]) => {
+        syncAccountState(accountId, nextAccounts);
       });
 
-    const onHideSubscription = modal!.on("onHide", ({ hideReason }) => {
-      console.log(`The reason for hiding the modal ${hideReason}`);
-    });
+    // eslint-disable-next-line consistent-return
+    return () => subscription.unsubscribe();
+  }, [selector, accountId]);
 
-    return () => {
-      subscription.unsubscribe();
-      onHideSubscription.remove();
-    };
-  }, [selector, modal]);
+  const requestSignTransactions = useCallback(
+    async (transactions: ITransaction[]) => {
+      if (!selector) return console.warn("No wallet selected");
 
-  const walletSelectorContextValue = useMemo<WalletSelectorContextValue>(
-    () => ({
-      selector: selector!,
-      modal: modal!,
-      accounts,
-      accountId: accounts.find((account) => account.active)?.accountId || null,
-    }),
-    [selector, modal, accounts]
+      const nearTransactions: Transaction[] = transactions.map(
+        (transaction: ITransaction) => ({
+          signerId: accountId,
+          receiverId: transaction.receiverId,
+          actions: transaction.functionCalls.map((fc) => ({
+            type: "FunctionCall",
+            params: {
+              methodName: fc.methodName,
+              args: fc.args || {},
+              gas: getGas(fc.gas).toString(),
+              deposit: getAmount(fc.amount).toString(),
+            },
+          })),
+        })
+      );
+
+      const walletInstance = await selector.wallet();
+      const result = await walletInstance.signAndSendTransactions({
+        transactions: nearTransactions,
+      });
+      setLastTransaction(Date.now());
+      return result;
+    },
+    [selector, accountId]
   );
 
+  const openModal = useCallback(() => {
+    if (!modal) return;
+
+    modal.show();
+  }, [modal]);
+
+  const signOut = useCallback(async () => {
+    try {
+      if (!selector) return;
+      const wallet = await selector.wallet();
+
+      await wallet.signOut();
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  }, [selector]);
+
+  if (!selector || !modal) {
+    return null;
+  }
+
   return (
-    <WalletSelectorContext.Provider value={walletSelectorContextValue}>
+    <WalletSelectorContext.Provider
+      value={{
+        selector,
+        accountId,
+        openModal,
+        requestSignTransactions,
+        RPCProvider,
+        signOut,
+        lastTransaction,
+      }}
+    >
       {children}
     </WalletSelectorContext.Provider>
   );
 };
 
 export function useWalletSelector() {
-  const context = useContext(WalletSelectorContext);
-
-  if (!context) {
-    throw new Error(
-      "useWalletSelector must be used within a WalletSelectorContextProvider"
-    );
-  }
-
-  return context;
+  return useContext(WalletSelectorContext);
 }
