@@ -6,6 +6,8 @@ import { Network } from "@/config";
 import { enforcer } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery } from "@tanstack/react-query";
+import { useForm, useFormContext, useWatch } from "react-hook-form";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -22,8 +24,29 @@ export interface FormData {
   arbitrumAddress: string;
 }
 
+export interface FormInterface {
+  selectedToken: TokenResponse | null;
+  amount: string;
+}
+
 export default function Form() {
-  const [amount, setAmount] = useState<string>("");
+  const { control, setValue } = useForm<FormInterface>({
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+    defaultValues: {
+      amount: "",
+      selectedToken: null,
+    },
+  });
+
+  const amountIn = useWatch({ control: control, name: "amount" });
+
+  const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
+  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 1000 : 0, [
+    amountIn,
+  ]);
+
+  const selectedToken = useWatch({ control, name: "selectedToken" });
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -51,8 +74,8 @@ export default function Form() {
       <div className="flex flex-col justify-center items-center mb-10">
         <SelectTokenDialog
           allTokens={data ?? []}
-          selectToken={() => {}}
-          selectedToken={null}
+          selectToken={(token) => setValue("selectedToken", token)}
+          selectedToken={selectedToken}
         />
       </div>
       <div className="flex flex-col justify-center items-center">
@@ -60,13 +83,17 @@ export default function Form() {
           <label htmlFor="from" className="text-white font-thin text-sm">
             Amount
           </label>
-          <div className="bg-[#1B2429] rounded-2xl p-4 flex flex-col items-start gap-2  w-[480px]">
+          <div className="bg-[#1B2429] rounded-2xl p-4 flex flex-col items-start gap-2 hover:bg-[#29343a] w-[480px]">
             <input
               type="text"
               pattern="^[0-9]*[.,]?[0-9]*$"
-              className="text-[#9DB2BD] border-none outline-none text-2xl w-full font-light"
-              value={amount}
-              onChange={(e) => enforcer(e, setAmount)}
+              className="text-[#9DB2BD] border-none outline-none text-2xl w-full font-light  "
+              value={amountIn ?? ""}
+              onChange={(e) => {
+                const enforcedValue = enforcer(e.target.value);
+                if (enforcedValue === null) return;
+                setValue("amount", enforcedValue);
+              }}
               placeholder="0"
               inputMode="decimal"
               autoComplete="off"

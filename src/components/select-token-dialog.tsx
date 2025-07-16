@@ -90,14 +90,11 @@ const SelectTokenDialog: FC<Props> = ({
           className="flex flex-row gap-2 bg-[#1B2429] rounded-2xl p-4 h-auto items-center border-none gap-2  w-[480px] "
         >
           {selectedToken ? (
-            <div className="relative">
+            <div className="relative h-[55px] flex items-center">
               <img
-                src={
-                  TOKEN_ICON_BY_DEFUSE_ASSET_ID[selectedToken.assetId] ??
-                  "/static/icons/empty.svg"
-                }
+                src={TOKEN_ICON_BY_DEFUSE_ASSET_ID[selectedToken.assetId]}
                 alt={selectedToken?.symbol ?? "token"}
-                className="size-7 rounded-full"
+                className="size-12 rounded-full"
               />
               <img
                 src={CHAIN_ICON[selectedToken?.blockchain]}
