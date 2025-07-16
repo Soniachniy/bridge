@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Asset, fetchTokens, getTokenIcon } from "@/lib/1clickHelper";
+import { fetchTokens, getTokenIcon } from "@/lib/1clickHelper";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 interface AssetSelectionProps {
-  selectedAsset: Asset;
-  onAssetChange: (asset: Asset) => void;
+  selectedAsset: TokenResponse;
+  onAssetChange: (asset: TokenResponse) => void;
 }
 
 export function AssetSelection({
@@ -37,7 +38,7 @@ export function AssetSelection({
     ? data.reduce((acc, asset) => {
         acc[asset.symbol] = asset;
         return acc;
-      }, {} as Record<string, Asset>)
+      }, {} as Record<string, TokenResponse>)
     : {};
 
   return (

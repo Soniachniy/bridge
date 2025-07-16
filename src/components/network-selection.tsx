@@ -15,9 +15,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import {
-  Asset,
   fetchTokens,
   getNetworkIcon,
   NetworkIconMap,
@@ -27,7 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Network } from "@/config";
 
 interface NetworkSelectionProps {
-  selectedAsset: Asset;
+  selectedAsset: TokenResponse;
   selectedNetwork: Network | null;
   onNetworkChange: (network: Network | null) => void;
 }

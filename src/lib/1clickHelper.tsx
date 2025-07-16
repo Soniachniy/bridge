@@ -17,6 +17,7 @@ import TronIcon from "@/assets/networks/tron.png";
 import ZecIcon from "@/assets/networks/zec.png";
 
 import { Network, oneClickConfig } from "@/config";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 export const NetworkIconMap = {
   [Network.NEAR]: <NearIcon />,
@@ -41,21 +42,33 @@ export const NetworkIconMap = {
   [Network.ZEC]: <img src={ZecIcon} alt="ZEC" className="w-6 h-6" />,
 };
 
-export interface Asset {
-  assetId: string;
-  decimals: number;
-  blockchain: string;
-  symbol: string;
-  price: number;
-  priceUpdatedAt: string;
-  contractAddress: string;
-}
+export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
+  [TokenResponse.blockchain.NEAR]: "Near",
+
+  [TokenResponse.blockchain.ETH]: "Ethereum Mainnet",
+  [TokenResponse.blockchain.BASE]: "Base",
+  [TokenResponse.blockchain.ARB]: "Arbitrum One",
+  [TokenResponse.blockchain.GNOSIS]: "Gnosis",
+  [TokenResponse.blockchain.BERA]: "Berachain",
+  [TokenResponse.blockchain.BSC]: "BNB Smart Chain Mainnet",
+  [TokenResponse.blockchain.POL]: "Polygon Mainnet",
+
+  [TokenResponse.blockchain.SOL]: "Solana",
+
+  [TokenResponse.blockchain.BTC]: "Bitcoin",
+  [TokenResponse.blockchain.TON]: "Ton",
+  [TokenResponse.blockchain.DOGE]: "Dogecoin",
+  [TokenResponse.blockchain.XRP]: "XRP",
+  [TokenResponse.blockchain.ZEC]: "Zcash",
+
+  [TokenResponse.blockchain.TRON]: "Tron",
+};
 
 export const onClickRoutes = {
   tokens: `${oneClickConfig.baseUrl}/tokens`,
 };
 
-export const fetchTokens = async (): Promise<Asset[]> => {
+export const fetchTokens = async (): Promise<TokenResponse[]> => {
   try {
     const response = await fetch(onClickRoutes.tokens);
     return response.json();
@@ -67,6 +80,23 @@ export const fetchTokens = async (): Promise<Asset[]> => {
 
 export const getTokenIcon = (assetId: string) => {
   return TOKEN_ICON_BY_DEFUSE_ASSET_ID[assetId];
+};
+export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
+  [TokenResponse.blockchain.NEAR]: "src/assets/networks/near.svg",
+  [TokenResponse.blockchain.ETH]: "src/assets/networks/evm.svg",
+  [TokenResponse.blockchain.BASE]: "src/assets/networks/base.svg",
+  [TokenResponse.blockchain.ARB]: "src/assets/networks/arbitrum.svg",
+  [TokenResponse.blockchain.GNOSIS]: "src/assets/networks/gnosis.png",
+  [TokenResponse.blockchain.BERA]: "src/assets/networks/berachain.png",
+  [TokenResponse.blockchain.BSC]: "src/assets/networks/bsc.svg",
+  [TokenResponse.blockchain.POL]: "src/assets/networks/polygon.png",
+  [TokenResponse.blockchain.SOL]: "src/assets/networks/solana.svg",
+  [TokenResponse.blockchain.BTC]: "src/assets/networks/bitcoin.png",
+  [TokenResponse.blockchain.TON]: "src/assets/networks/ton.svg",
+  [TokenResponse.blockchain.DOGE]: "src/assets/networks/doge.png",
+  [TokenResponse.blockchain.XRP]: "src/assets/networks/xrp.png",
+  [TokenResponse.blockchain.ZEC]: "src/assets/networks/zec.png",
+  [TokenResponse.blockchain.TRON]: "src/assets/networks/tron.png",
 };
 
 export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
@@ -234,7 +264,7 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     "https://s2.coinmarketcap.com/static/img/coins/128x128/32994.png",
 };
 
-export function translateNetwork(network: string): Network | null {
+export function translateNetwork(network: string): Network {
   switch (network) {
     case "arb":
       return Network.ARBITRUM;
@@ -261,7 +291,7 @@ export function translateNetwork(network: string): Network | null {
     case "tron":
       return Network.TRON;
   }
-  return null;
+  return Network.NEAR;
 }
 
 export function getNetworkIcon(network: string): React.ReactNode | null {

@@ -1,21 +1,11 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { AssetSelection } from "@/components/asset-selection";
-import { NetworkSelection } from "@/components/network-selection";
-import { DepositMethod } from "@/components/deposit-method";
-import { BridgeModal } from "@/components/bridge-modal";
-import { ArrowRight, CheckCircle, ChevronDown, Zap } from "lucide-react";
-import { Asset } from "@/lib/1clickHelper";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+
+import { fetchTokens } from "@/lib/1clickHelper";
 import { Network } from "@/config";
 import { enforcer } from "@/lib/utils";
+import SelectTokenDialog from "@/components/select-token-dialog";
+import { useQuery } from "@tanstack/react-query";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -23,7 +13,7 @@ export enum EDepositMethod {
 }
 
 export interface FormData {
-  asset: Asset;
+  asset: TokenResponse;
   network: Network | null;
   depositMethod: EDepositMethod;
   amount: string;
@@ -34,6 +24,18 @@ export interface FormData {
 
 export default function Form() {
   const [amount, setAmount] = useState<string>("");
+
+  const { data } = useQuery({
+    queryKey: ["one-click-tokens"],
+    queryFn: async () => {
+      const response = await fetchTokens();
+      return response;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
 
   return (
     <div className="p-4 w-full min-h-96">
@@ -47,18 +49,11 @@ export default function Form() {
         </span>
       </div>
       <div className="flex flex-col justify-center items-center mb-10">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="from" className="text-white font-thin text-sm">
-            From
-          </label>
-          <div className="bg-[#1B2429] rounded-2xl p-4 flex items-center gap-2  w-[480px]">
-            <img src="/src/assets/empty-state.svg" alt="empty-state" />
-            <span className="grow-2 size-base text-white text-sm font-light">
-              Select chain and token
-            </span>
-            <ChevronDown color="white" className="w-4 h-4 " />
-          </div>
-        </div>
+        <SelectTokenDialog
+          allTokens={data ?? []}
+          selectToken={() => {}}
+          selectedToken={null}
+        />
       </div>
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-col gap-2">
