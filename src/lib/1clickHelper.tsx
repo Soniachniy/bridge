@@ -264,7 +264,7 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     "https://s2.coinmarketcap.com/static/img/coins/128x128/32994.png",
 };
 
-export function translateNetwork(network: string): Network {
+export function translateNetwork(network?: string): Network {
   switch (network) {
     case "arb":
       return Network.ARBITRUM;

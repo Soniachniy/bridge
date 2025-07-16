@@ -4,7 +4,8 @@ import { setupSender } from "@near-wallet-selector/sender";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
 import { Adapter } from "@solana/wallet-adapter-base";
-import { mainnet, sepolia } from "wagmi/chains";
+import { arbitrum, mainnet, sepolia } from "wagmi/chains";
+import { injected, metaMask, safe } from "wagmi/connectors";
 
 export const oneClickConfig = {
   baseUrl: "https://1click.chaindefuser.com/v0",
@@ -12,7 +13,8 @@ export const oneClickConfig = {
 
 // EVM Configuration
 export const evmConfig = {
-  chains: [mainnet, sepolia] as const,
+  chains: [mainnet, sepolia, arbitrum] as const,
+  connectors: [injected(), metaMask(), safe()],
   transports: {
     [mainnet.id]: "http",
     [sepolia.id]: "http",

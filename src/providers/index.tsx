@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 
-import { queryClient, config } from "./evm-provider";
+import { queryClient, wagmiAdapter } from "./evm-provider";
 import { ConnectKitProvider } from "connectkit";
 
 import { WalletSelectorContextProvider } from "./near-provider";
@@ -15,7 +15,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <>
       <TonProvider>
         <WalletSelectorContextProvider>
-          <WagmiProvider config={config}>
+          <WagmiProvider config={wagmiAdapter.wagmiConfig}>
             <QueryClientProvider client={queryClient}>
               <ConnectKitProvider>
                 <SolanaProvider>

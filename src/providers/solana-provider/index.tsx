@@ -1,16 +1,13 @@
-import { Adapter } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { PropsWithChildren, useMemo } from "react";
 import { solanaConfig } from "../../config";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 
 export const SolanaProvider = ({ children }: PropsWithChildren) => {
-  const wallets = useMemo(
-    () => solanaConfig.wallets.map((walletFactory) => walletFactory()),
-    []
-  );
+  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   return (
     <ConnectionProvider endpoint={solanaConfig.endpoint}>

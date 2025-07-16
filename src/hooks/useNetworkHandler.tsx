@@ -1,20 +1,22 @@
 import { Network } from "@/config";
-import { ConnectKitButton } from "connectkit";
+
 import { useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
-
-import { useCallback, useEffect, useState } from "react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useCallback, useEffect, useState } from "react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+
+import { useAppKit } from "@reown/appkit/react";
 
 import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
 
 const useNetwork = (network: Network | null) => {
   const { openModal, selector } = useWalletSelector();
   const { isConnected } = useAccount();
-
+  const { setVisible } = useWalletModal();
   const { publicKey } = useWallet();
 
+  const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
 
   const tonWallet = useTonWallet();
@@ -64,11 +66,10 @@ const useNetwork = (network: Network | null) => {
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
-          return <ConnectKitButton />;
-        case Network.NEAR:
-          return <button onClick={openModal}>Connect</button>;
         case Network.SOLANA:
-          return <WalletMultiButton />;
+          return open();
+        case Network.NEAR:
+          return openModal();
         case Network.TON:
           return <TonConnectButton />;
         default:

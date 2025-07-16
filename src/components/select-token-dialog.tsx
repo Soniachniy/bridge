@@ -129,13 +129,17 @@ const SelectTokenDialog: FC<Props> = ({
       <Dialog.Content
         minWidth={{ initial: "300px", xs: "330px" }}
         minHeight={{ initial: "500px" }}
-        className="mt-1 md:mr-[48px] max-w-xs dark:bg-black-800 rounded-2xl !px-0 !pb-0"
+        className="mt-1 md:mr-[48px] max-w-xs border-none outline-none bg-main_dark  flex rounded-2xl !px-0 !pb-0 !pt-0"
       >
-        <div className="flex flex-col gap-5">
-          <Dialog.Title className="px-3">Select Token & Network</Dialog.Title>
+        <div className="flex flex-col border-none outline-none grow bg-main_dark  p-6  gap-5">
+          <Dialog.Title className="text-white">
+            Select Token & Network
+          </Dialog.Title>
           <Dialog.Description className="sr-only" />
-          <div className="grid w-full items-center gap-1.5 px-3">
-            <Label htmlFor="network">Select Network</Label>
+          <div className="grid w-full text-white items-center border-element  focus:outline-none focus:ring-0 focus:border-element active:outline-none active:ring-0 active:border-none outline-none bg-main_dark">
+            <Label htmlFor="network" className="text-white mb-2">
+              Select Network
+            </Label>
             <Select
               onValueChange={(val) =>
                 setSelectedBlockchain(val as TokenResponse.blockchain)
@@ -143,38 +147,47 @@ const SelectTokenDialog: FC<Props> = ({
               value={currentSelectedBlockchains}
               disabled={blockchains.length === 1}
             >
-              <SelectTrigger className="w-full min-h-[42px]">
+              <SelectTrigger className="w-full min-h-[42px] bg-main_dark text-white    outline-1 hover:outline-main_light focus:outline-none focus:ring-0 focus:border-none active:outline-none active:ring-0 active:border-none">
                 <SelectValue
                   id="network"
+                  asChild
                   placeholder="Select Network"
-                  className="text-sm font-medium leading-5"
+                  className="text-sm font-medium outline-none bg-main_dark leading-5 border-10 border-white"
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-main_dark text-white ">
                 {blockchains.map(({ blockchain, title, icon }) => (
-                  <SelectItem key={blockchain} value={blockchain}>
-                    <img
-                      src={icon}
-                      alt={title}
-                      className="size-[22px] rounded-full"
-                    />
-                    {title}
+                  <SelectItem
+                    key={blockchain}
+                    value={blockchain}
+                    className="hover:bg-element"
+                  >
+                    <div className="text-white flex flex-row gap-2 ">
+                      <img
+                        src={icon}
+                        alt={title}
+                        className="size-[22px] rounded-full"
+                      />
+                      {title}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="grid w-full items-center gap-1.5 px-3">
-            <Label htmlFor="token">Select Token</Label>
+          <div className="grid w-full items-center">
+            <Label htmlFor="token" className="text-white mb-2">
+              Select Token
+            </Label>
 
-            <div className="flex items-center gap-2 border border-border bg-background p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
-              <SearchIcon className="size-4 text-muted-foreground" />
+            <div className="flex items-center gap-2  bg-main_dark outline-1 hover:outline-main_light p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
+              <SearchIcon className="size-4  text-muted-foreground bg-main_dark hover:outline-main_light" />
               <input
                 type="token"
                 id="token"
                 placeholder="Search token"
-                className="text-base font-normal leading-6 placeholder:text-muted-foreground outline-none w-full"
+                className="text-base font-normal  text-white outline-none leading-6 placeholder:text-muted-foreground  w-full"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -188,16 +201,16 @@ const SelectTokenDialog: FC<Props> = ({
           </div>
 
           <Dialog.Close>
-            <div className="flex flex-col overflow-y-auto max-h-80 px-3 pb-3">
+            <div className="flex flex-col overflow-y-auto max-h-80  pb-3">
               {filteredTokens.map((token) => (
                 <Button
                   key={token.assetId}
                   variant="ghost"
                   size="nosize"
-                  className="justify-start px-3 py-2 rounded-md gap-4"
+                  className="justify-start  py-2 rounded-md gap-4 hover:bg-element"
                   onClick={() => selectToken(token)}
                 >
-                  <div className="relative shrink-0">
+                  <div className="relative shrink-0 mx-2  ">
                     <img
                       src={
                         TOKEN_ICON_BY_DEFUSE_ASSET_ID[token.assetId] ??
@@ -213,7 +226,7 @@ const SelectTokenDialog: FC<Props> = ({
                     />
                   </div>
                   <div>
-                    <p className="text-left text-base font-semibold leading-[120%]">
+                    <p className="text-left text-base text-white font-semibold leading-[120%]">
                       {token.symbol}
                     </p>
                     <p className="text-left text-muted-foreground text-sm font-normal leading-[120%]">

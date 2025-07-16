@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
-import { fetchTokens } from "@/lib/1clickHelper";
+import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
 import { Network } from "@/config";
 import { enforcer } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { useForm, useFormContext, useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useDebounce } from "@/hooks/useDebounce";
+import useNetwork from "@/hooks/useNetworkHandler";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -47,6 +48,9 @@ export default function Form() {
   ]);
 
   const selectedToken = useWatch({ control, name: "selectedToken" });
+  const { connectWallet } = useNetwork(
+    translateNetwork(selectedToken?.blockchain)
+  );
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -106,6 +110,18 @@ export default function Form() {
           </div>
         </div>
       </div>
+      {selectedToken && (
+        <div className="self-stretch inline-flex justify-center items-start w-full mt-10">
+          <div className="flex-1 px-4 py-3 bg-main_light rounded-xl flex justify-center items-center overflow-hidden max-w-[480px]">
+            <div
+              onClick={connectWallet}
+              className="text-center justify-center text-main text-base font-normal font-['Inter'] leading-normal"
+            >
+              Connect wallet
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
