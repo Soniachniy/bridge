@@ -53,7 +53,8 @@ const SelectTokenDialog: FC<Props> = ({
           title: CHAIN_TITLE[blockchain],
         };
       })
-      .filter((item) => !!item);
+      .filter((item) => !!item)
+      .filter((item) => item.icon);
 
     return { blockchains };
   }, [allTokens]);
@@ -158,11 +159,14 @@ const SelectTokenDialog: FC<Props> = ({
               <SelectContent className="bg-main_dark text-white ">
                 {blockchains.map(({ blockchain, title, icon }) => (
                   <SelectItem
-                    key={blockchain}
+                    key={`${blockchain}-${title}`}
                     value={blockchain}
                     className="hover:bg-element"
                   >
-                    <div className="text-white flex flex-row gap-2 ">
+                    <div
+                      key={`${blockchain}-${title}`}
+                      className="text-white flex flex-row gap-2 "
+                    >
                       <img
                         src={icon}
                         alt={title}
@@ -204,7 +208,7 @@ const SelectTokenDialog: FC<Props> = ({
             <div className="flex flex-col overflow-y-auto max-h-80  pb-3">
               {filteredTokens.map((token) => (
                 <Button
-                  key={token.assetId}
+                  key={`${token.assetId}-${token.blockchain}-${token.symbol}`}
                   variant="ghost"
                   size="nosize"
                   className="justify-start  py-2 rounded-md gap-4 hover:bg-element"

@@ -290,8 +290,10 @@ export function translateNetwork(network?: string): Network {
       return Network.BASE;
     case "tron":
       return Network.TRON;
+    case "ton":
+      return Network.TON;
   }
-  return Network.NEAR;
+  return Network.ARBITRUM;
 }
 
 export function getNetworkIcon(network: string): React.ReactNode | null {

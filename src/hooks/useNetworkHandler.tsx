@@ -4,21 +4,27 @@ import { useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 import { useAppKit } from "@reown/appkit/react";
+import { Account } from "@near-wallet-selector/core";
 
-import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
+import {
+  TonConnectButton,
+  useTonConnectModal,
+  useTonConnectUI,
+  useTonWallet,
+} from "@tonconnect/ui-react";
 
 const useNetwork = (network: Network | null) => {
+  const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const { openModal, selector } = useWalletSelector();
-  const { isConnected } = useAccount();
-  const { setVisible } = useWalletModal();
+  const { isConnected, address } = useAccount();
+  const [tonConnectUI, setTonConnectUI] = useTonConnectUI();
   const { publicKey } = useWallet();
 
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
-
+  const { state, open: openTon, close } = useTonConnectModal();
   const tonWallet = useTonWallet();
 
   const updateIsNearConnected = useCallback(async () => {
@@ -26,6 +32,7 @@ const useNetwork = (network: Network | null) => {
       try {
         const wallet = await selector.wallet();
         const accounts = await wallet?.getAccounts();
+        setNearAddress(accounts?.[0] ?? null);
         setIsNearConnected(accounts && accounts.length > 0);
       } catch (e) {
         console.warn("Error updating near connected", e);
@@ -59,6 +66,7 @@ const useNetwork = (network: Network | null) => {
       }
     },
     connectWallet: () => {
+      console.log("connectWallet", tonWallet, network, state);
       switch (network) {
         case Network.BASE:
         case Network.AURORA:
@@ -71,7 +79,11 @@ const useNetwork = (network: Network | null) => {
         case Network.NEAR:
           return openModal();
         case Network.TON:
-          return <TonConnectButton />;
+          return async () => {
+            // await tonConnectUI.disconnect();
+            // tonConnectUI.openModal();
+            openTon();
+          };
         default:
           return null;
       }
@@ -80,6 +92,24 @@ const useNetwork = (network: Network | null) => {
       switch (network) {
         case Network.BASE:
           return console.log("base");
+      }
+    },
+    getPublicKey: () => {
+      switch (network) {
+        case Network.BASE:
+        case Network.AURORA:
+        case Network.BNB:
+        case Network.ARBITRUM:
+        case Network.POLYGON:
+        case Network.ETHEREUM:
+        case Network.SOLANA:
+          return address;
+        case Network.NEAR:
+          return nearAddress?.accountId;
+        case Network.TON:
+          return tonWallet?.account?.address;
+        default:
+          return null;
       }
     },
   };

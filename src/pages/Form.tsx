@@ -3,7 +3,7 @@ import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
 import { Network } from "@/config";
-import { enforcer } from "@/lib/utils";
+import { enforcer, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
@@ -21,8 +21,6 @@ export interface FormData {
   depositMethod: EDepositMethod;
   amount: string;
   sourceWalletConnected: boolean;
-  arbitrumWalletConnected: boolean;
-  arbitrumAddress: string;
 }
 
 export interface FormInterface {
@@ -48,7 +46,7 @@ export default function Form() {
   ]);
 
   const selectedToken = useWatch({ control, name: "selectedToken" });
-  const { connectWallet } = useNetwork(
+  const { connectWallet, getPublicKey, isConnected } = useNetwork(
     translateNetwork(selectedToken?.blockchain)
   );
 
@@ -76,11 +74,29 @@ export default function Form() {
         </span>
       </div>
       <div className="flex flex-col justify-center items-center mb-10">
-        <SelectTokenDialog
-          allTokens={data ?? []}
-          selectToken={(token) => setValue("selectedToken", token)}
-          selectedToken={selectedToken}
-        />
+        <div className="flex flex-col gap-2 justify-center items-center">
+          <div className="flex flex-row gap-2 justify-between w-[480px]">
+            <label
+              htmlFor="from"
+              className="text-white font-thin text-sm text-left  w-[480px]"
+            >
+              From
+            </label>
+            {isConnected() && (
+              <label
+                htmlFor="from"
+                className="text-white font-thin text-sm text-left  w-[480px] text-right"
+              >
+                {truncateAddress(getPublicKey())}
+              </label>
+            )}
+          </div>
+          <SelectTokenDialog
+            allTokens={data ?? []}
+            selectToken={(token) => setValue("selectedToken", token)}
+            selectedToken={selectedToken}
+          />
+        </div>
       </div>
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-col gap-2">

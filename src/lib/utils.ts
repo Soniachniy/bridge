@@ -24,7 +24,7 @@ export const enforcer = (event: string) => {
   return null;
 };
 
-export function truncateAddress(address: string | undefined): string {
+export function truncateAddress(address: string | undefined | null): string {
   if (!address) return "";
   if (address.length <= 16) return address;
 
