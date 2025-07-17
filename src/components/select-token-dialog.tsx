@@ -163,10 +163,7 @@ const SelectTokenDialog: FC<Props> = ({
                     value={blockchain}
                     className="hover:bg-element"
                   >
-                    <div
-                      key={`${blockchain}-${title}`}
-                      className="text-white flex flex-row gap-2 "
-                    >
+                    <div className="text-white flex flex-row gap-2 ">
                       <img
                         src={icon}
                         alt={title}
