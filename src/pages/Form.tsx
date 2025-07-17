@@ -44,7 +44,7 @@ export default function Form() {
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 1000 : 0, [
     amountIn,
   ]);
-
+  console.log(debouncedAmountIn);
   const selectedToken = useWatch({ control, name: "selectedToken" });
   const { connectWallet, getPublicKey, isConnected } = useNetwork(
     translateNetwork(selectedToken?.blockchain)
