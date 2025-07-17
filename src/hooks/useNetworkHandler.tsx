@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppKit } from "@reown/appkit/react";
 import { Account } from "@near-wallet-selector/core";
 
-import { useTonConnectModal, useTonWallet } from "@tonconnect/ui-react";
+import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 
 const useNetwork = (network: Network | null) => {
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
@@ -16,10 +16,10 @@ const useNetwork = (network: Network | null) => {
   const { isConnected, address } = useAccount();
 
   const { publicKey } = useWallet();
-
+  const [tonConnectUI] = useTonConnectUI();
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
-  const { state, open: openTon } = useTonConnectModal();
+
   const tonWallet = useTonWallet();
 
   const updateIsNearConnected = useCallback(async () => {
@@ -61,7 +61,7 @@ const useNetwork = (network: Network | null) => {
       }
     },
     connectWallet: () => {
-      console.log("connectWallet", tonWallet, network, state);
+      console.log("connectWallet", tonConnectUI.modalState, tonWallet, network);
       switch (network) {
         case Network.BASE:
         case Network.AURORA:
@@ -74,11 +74,7 @@ const useNetwork = (network: Network | null) => {
         case Network.NEAR:
           return openModal();
         case Network.TON:
-          return async () => {
-            // await tonConnectUI.disconnect();
-            // tonConnectUI.openModal();
-            openTon();
-          };
+          return tonConnectUI.openModal();
         default:
           return null;
       }
