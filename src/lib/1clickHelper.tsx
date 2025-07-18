@@ -28,7 +28,7 @@ export const NetworkIconMap = {
   [Network.ARBITRUM]: <ArbitrumIcon />,
   [Network.ETHEREUM]: <EthereumIcon />,
   [Network.AURORA]: <img src={AuroraIcon} alt="Aurora" className="w-6 h-6" />,
-  [Network.BEREA]: <img src={BeraIcon} alt="Berea" className="w-6 h-6" />,
+  [Network.BERA]: <img src={BeraIcon} alt="Bera" className="w-6 h-6" />,
   [Network.BITCOIN]: (
     <img src={BitcoinIcon} alt="Bitcoin" className="w-6 h-6" />
   ),
@@ -78,16 +78,20 @@ export const fetchTokens = async (): Promise<TokenResponse[]> => {
   }
 };
 
-export const getTokenIcon = (assetId: string) => {
-  return TOKEN_ICON_BY_DEFUSE_ASSET_ID[assetId];
+export const getTokenIcon = (asset: TokenResponse) => {
+  return (
+    TOKEN_ICON_BY_DEFUSE_ASSET_ID[asset.assetId] ||
+    TOKEN_BY_SYMBOL[asset.symbol]
+  );
 };
+
 export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.NEAR]: "src/assets/networks/near.svg",
   [TokenResponse.blockchain.ETH]: "src/assets/networks/evm.svg",
   [TokenResponse.blockchain.BASE]: "src/assets/networks/base.svg",
   [TokenResponse.blockchain.ARB]: "src/assets/networks/arbitrum.svg",
   [TokenResponse.blockchain.GNOSIS]: "src/assets/networks/gnosis.png",
-  [TokenResponse.blockchain.BERA]: "src/assets/networks/berachain.png",
+  [TokenResponse.blockchain.BERA]: "src/assets/networks/bera.png",
   [TokenResponse.blockchain.BSC]: "src/assets/networks/bsc.svg",
   [TokenResponse.blockchain.POL]: "src/assets/networks/polygon.png",
   [TokenResponse.blockchain.SOL]: "src/assets/networks/solana.svg",
@@ -99,7 +103,22 @@ export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.TRON]: "src/assets/networks/tron.png",
 };
 
+export const TOKEN_BY_SYMBOL: Record<string, string> = {
+  USDC: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+  USDT: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
+  BTC: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+  ETH: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+};
+
 export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
+  "nep245:v2_1.omni.hot.tg:1117_":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
+  "nep245:v2_1.omni.hot.tg:1117_3tsdfyziyc7EJbP2aULWSKU4toBaAcN4FdTgfm5W1mC4ouR":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/28289.png",
+  "nep141:eth.bridge.near":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+  "nep141:bera.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/24647.png",
   "nep141:eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
   "nep141:usdt.tether-token.near":
@@ -148,7 +167,8 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     "https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png",
   "nep141:gnosis-0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png",
-
+  "nep141:sui.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
   "nep141:xrp.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/52.png",
   "nep141:sol.omft.near":
@@ -173,8 +193,6 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     "https://s2.coinmarketcap.com/static/img/coins/128x128/11841.png",
   "nep141:sol-d600e625449a4d9380eaf5e3265e54c90d34e260.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/35347.png",
-  "nep141:bera.omft.near":
-    "https://s2.coinmarketcap.com/static/img/coins/128x128/24647.png",
   "nep141:sol-b9c68f94ec8fd160137af8cdfe5e61cd68e2afba.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/28752.png",
   "nep141:zec.omft.near":
@@ -285,7 +303,7 @@ export function translateNetwork(network?: string): Network {
     case "gnosis":
       return Network.GNOSIS;
     case "bera":
-      return Network.BEREA;
+      return Network.BERA;
     case "base":
       return Network.BASE;
     case "tron":

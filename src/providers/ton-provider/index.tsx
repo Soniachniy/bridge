@@ -5,7 +5,8 @@ import "@hot-wallet/sdk/adapter/ton";
 
 export const TonProvider = ({ children }: PropsWithChildren) => {
   const connector = new TonConnect({
-    manifestUrl: "./public/tonconnect-manifest.json",
+    manifestUrl:
+      "https://bridge-lyart-three.vercel.app/tonconnect-manifest.json",
   });
 
   return (

@@ -11,17 +11,25 @@ import { Account } from "@near-wallet-selector/core";
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/providers/evm-provider";
+import { tonClient } from "@/providers/ton-provider/ton-utils";
+import { Address } from "@ton/core";
+import { getSplTokenBalance } from "@/providers/solana-provider/solana-utils";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 const useNetwork = (network: Network | null) => {
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const { openModal, selector, RPCProvider } = useWalletSelector();
   const { isConnected, address } = useAccount();
-
   const { publicKey } = useWallet();
   const [tonConnectUI] = useTonConnectUI();
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
-
+  const solanaAccount = useAppKitAccount({ namespace: "solana" });
+  const eip155Account = useAppKitAccount({ namespace: "eip155" });
+  const bip122Account = useAppKitAccount({ namespace: "bip122" });
+  console.log(eip155Account, "eip155Account");
+  console.log(bip122Account, "bip122Account");
+  console.log(solanaAccount, "solanaAccount");
   const tonWallet = useTonWallet();
 
   const updateIsNearConnected = useCallback(async () => {
@@ -95,8 +103,9 @@ const useNetwork = (network: Network | null) => {
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
-        case Network.SOLANA:
           return address;
+        case Network.SOLANA:
+          return solanaAccount.address;
         case Network.NEAR:
           return nearAddress?.accountId;
         case Network.TON:
@@ -118,6 +127,11 @@ const useNetwork = (network: Network | null) => {
             token: contractAddress as `0x${string}`,
           });
           return value;
+        case Network.SOLANA:
+          return getSplTokenBalance(
+            solanaAccount.address as `0x${string}`,
+            contractAddress as `0x${string}`
+          );
         case Network.NEAR:
           if (!contractAddress) {
             return 0;
@@ -130,6 +144,17 @@ const useNetwork = (network: Network | null) => {
             }
           );
           return nearBalance;
+        case Network.TON:
+          if (!tonWallet?.account?.address || !contractAddress) {
+            return 0;
+          }
+          const tonTokenBalance =
+            await tonClient.accounts.getAccountJettonBalance(
+              Address.parse(tonWallet?.account?.address),
+              Address.parse(contractAddress)
+            );
+          return tonTokenBalance;
+
         default:
           return null;
       }

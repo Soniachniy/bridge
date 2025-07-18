@@ -68,7 +68,7 @@ export enum Network {
   ARBITRUM = "ARBITRUM",
   AURORA = "AURORA",
   BASE = "BASE",
-  BEREA = "BEREA",
+  BERA = "BERA",
   BNB = "BNB",
   BITCOIN = "BITCOIN",
   DOGE = "DOGE",

@@ -3,11 +3,7 @@ import { Dialog } from "@radix-ui/themes";
 import { ChevronDown, SearchIcon, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 
-import {
-  CHAIN_TITLE,
-  TOKEN_ICON_BY_DEFUSE_ASSET_ID,
-  CHAIN_ICON,
-} from "@/lib/1clickHelper";
+import { CHAIN_TITLE, CHAIN_ICON, getTokenIcon } from "@/lib/1clickHelper";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -93,7 +89,7 @@ const SelectTokenDialog: FC<Props> = ({
           {selectedToken ? (
             <div className="relative h-[55px] flex items-center">
               <img
-                src={TOKEN_ICON_BY_DEFUSE_ASSET_ID[selectedToken.assetId]}
+                src={getTokenIcon(selectedToken)}
                 alt={selectedToken?.symbol ?? "token"}
                 className="size-12 rounded-full"
               />
@@ -213,10 +209,7 @@ const SelectTokenDialog: FC<Props> = ({
                 >
                   <div className="relative shrink-0 mx-2  ">
                     <img
-                      src={
-                        TOKEN_ICON_BY_DEFUSE_ASSET_ID[token.assetId] ??
-                        "/static/icons/empty.svg"
-                      }
+                      src={getTokenIcon(token) ?? "/static/icons/empty.svg"}
                       alt={token?.symbol ?? "token"}
                       className="size-10 rounded-full"
                     />

@@ -30,7 +30,7 @@ export const wagmiAdapter = new WagmiAdapter({
 });
 
 // 5. Create modal
-createAppKit({
+export const modal = createAppKit({
   adapters: [wagmiAdapter, solanaWeb3JsAdapter],
   networks: [mainnet, arbitrum, solana],
   projectId,
