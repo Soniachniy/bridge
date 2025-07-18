@@ -1,3 +1,4 @@
+import Big from "big.js";
 import { clsx, type ClassValue } from "clsx";
 
 import { twMerge } from "tailwind-merge";
@@ -8,6 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const inputRegex = RegExp("^\\d*(?:\\\\[.])?\\d*$"); // match escaped "." characters via in a non-capturing group
+export const BASE = 10;
 
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -50,3 +52,9 @@ export const validateBalance = (
   }
   return;
 };
+
+export const formatTokenAmount = (
+  value: string | number | Big,
+  decimals = 18,
+  precision?: number
+): string => Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);

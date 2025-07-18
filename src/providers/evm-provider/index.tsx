@@ -13,9 +13,9 @@ const solanaWeb3JsAdapter = new SolanaAdapter();
 
 // 2. Create a metadata object - optional
 const metadata = {
-  name: "AppKit",
-  description: "AppKit Example",
-  url: "https://example.com", // origin must match your domain & subdomain
+  name: "HyperDep",
+  description: "HyperDep",
+  url: "https://bridge-lyart-three.vercel.app/",
   icons: ["https://avatars.githubusercontent.com/u/179229932"],
 };
 
@@ -36,7 +36,7 @@ createAppKit({
   projectId,
   metadata,
   features: {
-    analytics: true, // Optional - defaults to your Cloud configuration
+    analytics: true,
   },
 });
 

@@ -9,10 +9,12 @@ import { useAppKit } from "@reown/appkit/react";
 import { Account } from "@near-wallet-selector/core";
 
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
+import { getBalance } from "wagmi/actions";
+import { wagmiAdapter } from "@/providers/evm-provider";
 
 const useNetwork = (network: Network | null) => {
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
-  const { openModal, selector } = useWalletSelector();
+  const { openModal, selector, RPCProvider } = useWalletSelector();
   const { isConnected, address } = useAccount();
 
   const { publicKey } = useWallet();
@@ -99,6 +101,35 @@ const useNetwork = (network: Network | null) => {
           return nearAddress?.accountId;
         case Network.TON:
           return tonWallet?.account?.address;
+        default:
+          return null;
+      }
+    },
+    getBalance: async (contractAddress?: string) => {
+      switch (network) {
+        case Network.BASE:
+        case Network.AURORA:
+        case Network.BNB:
+        case Network.ARBITRUM:
+        case Network.POLYGON:
+        case Network.ETHEREUM:
+          const { value } = await getBalance(wagmiAdapter.wagmiConfig, {
+            address: address as `0x${string}`,
+            token: contractAddress as `0x${string}`,
+          });
+          return value;
+        case Network.NEAR:
+          if (!contractAddress) {
+            return 0;
+          }
+          const nearBalance = await RPCProvider.viewFunction(
+            "ft_balance_of",
+            contractAddress,
+            {
+              account_id: nearAddress?.accountId,
+            }
+          );
+          return nearBalance;
         default:
           return null;
       }

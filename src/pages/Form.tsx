@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
 import { Network } from "@/config";
-import { enforcer, truncateAddress } from "@/lib/utils";
+import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
@@ -24,7 +24,12 @@ export interface FormData {
 }
 
 export interface FormInterface {
-  selectedToken: TokenResponse | null;
+  selectedToken:
+    | (TokenResponse & {
+        balance: string;
+        balanceUpdatedAt: number;
+      })
+    | null;
   amount: string;
 }
 
@@ -46,7 +51,8 @@ export default function Form() {
   ]);
   console.log(debouncedAmountIn);
   const selectedToken = useWatch({ control, name: "selectedToken" });
-  const { connectWallet, getPublicKey, isConnected } = useNetwork(
+
+  const { connectWallet, getPublicKey, isConnected, getBalance } = useNetwork(
     translateNetwork(selectedToken?.blockchain)
   );
 
@@ -54,6 +60,7 @@ export default function Form() {
     queryKey: ["one-click-tokens"],
     queryFn: async () => {
       const response = await fetchTokens();
+      console.log(response, "response");
       return response;
     },
     refetchOnWindowFocus: false,
@@ -61,6 +68,24 @@ export default function Form() {
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
+
+  useEffect(() => {
+    const getSelectedTokenBalance = async () => {
+      console.log(selectedToken, "changed");
+      if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
+        const balance = await getBalance(selectedToken.contractAddress);
+        console.log(balance, selectedToken.contractAddress);
+        if (balance) {
+          setValue("selectedToken", {
+            ...selectedToken,
+            balance: balance.toString(),
+            balanceUpdatedAt: Date.now(),
+          });
+        }
+      }
+    };
+    getSelectedTokenBalance();
+  }, [selectedToken]);
 
   return (
     <div className="p-4 w-full min-h-96">
@@ -93,7 +118,13 @@ export default function Form() {
           </div>
           <SelectTokenDialog
             allTokens={data ?? []}
-            selectToken={(token) => setValue("selectedToken", token)}
+            selectToken={(token) => {
+              setValue("selectedToken", {
+                ...token,
+                balance: "0",
+                balanceUpdatedAt: 0,
+              });
+            }}
             selectedToken={selectedToken}
           />
         </div>
@@ -103,26 +134,63 @@ export default function Form() {
           <label htmlFor="from" className="text-white font-thin text-sm">
             Amount
           </label>
-          <div className="bg-[#1B2429] rounded-2xl p-4 flex flex-col items-start gap-2 hover:bg-[#29343a] w-[480px]">
-            <input
-              type="text"
-              pattern="^[0-9]*[.,]?[0-9]*$"
-              className="text-[#9DB2BD] border-none outline-none text-2xl w-full font-light  "
-              value={amountIn ?? ""}
-              onChange={(e) => {
-                const enforcedValue = enforcer(e.target.value);
-                if (enforcedValue === null) return;
-                setValue("amount", enforcedValue);
-              }}
-              placeholder="0"
-              inputMode="decimal"
-              autoComplete="off"
-              minLength={1}
-              maxLength={79}
-              spellCheck="false"
-              autoCorrect="off"
-            />
-            <span className="text-[#9DB2BD] text-xs font-light">$0.00</span>
+          <div className="bg-[#1B2429] rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] w-[480px] h-[75px]">
+            {/* Left Section */}
+            <div className="flex flex-col gap-1 w-[210px]">
+              <div className="flex flex-row items-center gap-7">
+                <input
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  className="text-white border-none outline-none text-2xl font-light bg-transparent font-inter leading-none"
+                  value={amountIn ?? ""}
+                  onChange={(e) => {
+                    const enforcedValue = enforcer(e.target.value);
+                    if (enforcedValue === null) return;
+                    setValue("amount", enforcedValue);
+                  }}
+                  placeholder="0"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  minLength={1}
+                  maxLength={79}
+                  spellCheck="false"
+                  autoCorrect="off"
+                />
+              </div>
+              <div className="flex flex-row gap-1">
+                <span className="text-white text-xs font-light font-inter leading-[14px]">
+                  At least 119.5 USDC
+                </span>
+              </div>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex flex-col justify-center items-end gap-2 h-11">
+              <button
+                type="button"
+                className="text-[#97FCE4] text-sm font-semibold font-inter leading-[16px] hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  if (selectedToken?.balance) {
+                    setValue(
+                      "amount",
+                      formatTokenAmount(
+                        selectedToken?.balance ?? 0,
+                        selectedToken?.decimals
+                      ) ?? "0"
+                    );
+                  }
+                }}
+              >
+                Max
+              </button>
+              <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
+                {formatTokenAmount(
+                  selectedToken?.balance ?? 0,
+                  selectedToken?.decimals
+                )}{" "}
+                {selectedToken?.symbol}
+              </span>
+            </div>
           </div>
         </div>
       </div>
