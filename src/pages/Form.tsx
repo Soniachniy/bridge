@@ -60,7 +60,6 @@ export default function Form() {
     queryKey: ["one-click-tokens"],
     queryFn: async () => {
       const response = await fetchTokens();
-      console.log(response, "response");
       return response;
     },
     refetchOnWindowFocus: false,
@@ -71,10 +70,8 @@ export default function Form() {
 
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
-      console.log(selectedToken, "changed");
       if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
         const balance = await getBalance(selectedToken.contractAddress);
-        console.log(balance, selectedToken.contractAddress);
         if (balance) {
           setValue("selectedToken", {
             ...selectedToken,
@@ -136,12 +133,12 @@ export default function Form() {
           </label>
           <div className="bg-[#1B2429] rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] w-[480px] h-[75px]">
             {/* Left Section */}
-            <div className="flex flex-col gap-1 w-[210px]">
-              <div className="flex flex-row items-center gap-7">
+            <div className="flex grow-1 flex-col gap-1 w-[210px]">
+              <div className="flex grow-1 flex-row items-center gap-7">
                 <input
                   type="text"
                   pattern="^[0-9]*[.,]?[0-9]*$"
-                  className="text-white border-none outline-none text-2xl font-light bg-transparent font-inter leading-none"
+                  className="text-white grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none"
                   value={amountIn ?? ""}
                   onChange={(e) => {
                     const enforcedValue = enforcer(e.target.value);
@@ -159,7 +156,7 @@ export default function Form() {
               </div>
               <div className="flex flex-row gap-1">
                 <span className="text-white text-xs font-light font-inter leading-[14px]">
-                  At least 119.5 USDC
+                  At least 5 USDC
                 </span>
               </div>
             </div>
@@ -194,14 +191,23 @@ export default function Form() {
           </div>
         </div>
       </div>
-      {selectedToken && (
+      {selectedToken && !isConnected() && (
         <div className="self-stretch inline-flex justify-center items-start w-full mt-10">
-          <div className="flex-1 px-4 py-3 bg-main_light rounded-xl flex justify-center items-center overflow-hidden max-w-[480px]">
+          <div className="flex-1 px-4 py-3 bg-main_light rounded-xl flex justify-center items-center cursor-pointer overflow-hidden max-w-[480px]">
             <div
               onClick={connectWallet}
-              className="text-center justify-center text-main text-base font-normal font-['Inter'] leading-normal"
+              className="text-center justify-center text-main text-base font-normal font-['Inter'] leading-normal cursor-pointer"
             >
               Connect wallet
+            </div>
+          </div>
+        </div>
+      )}
+      {selectedToken && isConnected() && (
+        <div className="self-stretch inline-flex justify-center items-start w-full mt-10">
+          <div className="flex-1 px-4 py-3 bg-main_light rounded-xl flex justify-center items-center cursor-pointer overflow-hidden max-w-[480px]">
+            <div className="text-center justify-center text-main text-base font-normal font-['Inter'] leading-normal ">
+              Proceed
             </div>
           </div>
         </div>
