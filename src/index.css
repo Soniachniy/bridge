@@ -21,6 +21,7 @@
   --color-element: #273035;
   --color-gray_text: #9db2bd;
   --color-main_white: #ffffff;
+  --color-error: #ff6e6e;
 }
 
 @layer base {
