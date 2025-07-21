@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
-import {
-  fetchTokens,
-  OneClickSwapFormValues,
-  translateNetwork,
-} from "@/lib/1clickHelper";
-import { Network } from "@/config";
+import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
+
 import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery } from "@tanstack/react-query";
