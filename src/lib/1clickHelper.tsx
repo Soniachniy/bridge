@@ -15,9 +15,40 @@ import GnosisIcon from "@/assets/networks/gnosis.png";
 import PolygonIcon from "@/assets/networks/polygon.png";
 import TronIcon from "@/assets/networks/tron.png";
 import ZecIcon from "@/assets/networks/zec.png";
+import { parseUnits } from "viem";
 
 import { Network, oneClickConfig } from "@/config";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import {
+  GetExecutionStatusResponse,
+  OneClickService,
+  QuoteRequest,
+  QuoteResponse,
+  TokenResponse,
+} from "@defuse-protocol/one-click-sdk-typescript";
+
+export type OneClickSwapFormValues = {
+  amountIn: string;
+  amountOut: string;
+  recipient: string;
+  depositAddress: string;
+};
+
+export type OneClickSwapTransaction = {
+  date: string;
+  tokenDataIn: {
+    defuseAssetId: string;
+    icon: string;
+    symbol: string;
+    amount: string;
+  };
+  tokenDataOut: {
+    defuseAssetId: string;
+    icon: string;
+    symbol: string;
+    amount: string;
+  };
+  status: GetExecutionStatusResponse.status;
+};
 
 export const NetworkIconMap = {
   [Network.NEAR]: <NearIcon />,
@@ -70,11 +101,56 @@ export const onClickRoutes = {
 
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
   try {
-    const response = await fetch(onClickRoutes.tokens);
-    return response.json();
+    const response = await OneClickService.getTokens();
+    console.log("response", response);
+    return response;
   } catch (error) {
     console.error(error);
     return [];
+  }
+};
+
+type Props = {
+  tokenIn: TokenResponse;
+  amountIn: string;
+  setFormValue: (value: string) => void;
+  recipient: string | null;
+  slippage: string;
+  refundAddress: string;
+};
+
+export const requestSwapQuote = async ({
+  tokenIn,
+  amountIn,
+  recipient,
+  setFormValue,
+  slippage,
+  refundAddress,
+}: Props): Promise<QuoteResponse | null> => {
+  try {
+    const response = await OneClickService.getQuote({
+      dry: !recipient,
+      swapType: QuoteRequest.swapType.EXACT_INPUT,
+      slippageTolerance: Number(slippage) * 100,
+      originAsset: tokenIn.assetId,
+      depositType: QuoteRequest.depositType.ORIGIN_CHAIN,
+      destinationAsset:
+        "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+      amount: parseUnits(amountIn, tokenIn.decimals).toString(),
+      refundTo: refundAddress || "0xd6bd5ba5e9fc6a6db3c023dcd5b12ddb062655d4",
+      refundType: QuoteRequest.refundType.ORIGIN_CHAIN,
+      recipient: recipient || "0xd6bd5ba5e9fc6a6db3c023dcd5b12ddb062655d4",
+      recipientType: QuoteRequest.recipientType.DESTINATION_CHAIN,
+      referral: "referral",
+      deadline: new Date(Date.now() + 600 * 1000).toISOString(),
+      quoteWaitingTimeMs: 5000,
+    });
+    console.log("response", response);
+    setFormValue(response.quote.amountOutFormatted);
+    return response as QuoteResponse;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
 

@@ -35,13 +35,12 @@ export const formValidationSchema = z.object({
 
   amount: z
     .string()
-    .min(1, "Amount is required")
+    .min(0.000001, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Amount must be a valid positive number",
-    })
-    .refine((val) => Number(val) >= 5, {
-      message: "Minimum amount is 5 USDC",
     }),
+  amountOut: z.string().optional(),
+  depositAddress: z.string().optional(),
 });
 
 export const createFormValidationSchema = (strategy: string | null) => {

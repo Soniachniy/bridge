@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
-import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
+import {
+  fetchTokens,
+  OneClickSwapFormValues,
+  requestSwapQuote,
+  translateNetwork,
+} from "@/lib/1clickHelper";
 import { Network } from "@/config";
 import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
@@ -13,6 +18,9 @@ import useNetwork from "@/hooks/useNetworkHandler";
 import { renderActionButtons } from "@/components/ActionButtons";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/error-icon.svg?react";
+import WalletIcon from "@/assets/wallet-icon.svg?react";
+import ManualIcon from "@/assets/manual.svg?react";
+
 import {
   createFormValidationSchema,
   FormValidationData,
@@ -28,7 +36,9 @@ export interface FormData {
   network: Network | null;
   depositMethod: EDepositMethod;
   amount: string;
+  amountOut?: string;
   sourceWalletConnected: boolean;
+  depositAddress?: string;
 }
 
 export enum EStrategy {
@@ -43,7 +53,6 @@ export default function Form() {
     control,
     setValue,
     handleSubmit,
-
     register,
     formState: { errors, dirtyFields },
   } = useForm({
@@ -52,17 +61,19 @@ export default function Form() {
     reValidateMode: "onChange",
     defaultValues: {
       amount: "",
+      amountOut: "",
       selectedToken: null,
       hyperliquidAddress: "",
       refundAddress: "",
+      depositAddress: "",
     },
   });
   const selectedToken = useWatch({ control, name: "selectedToken" });
 
   const amountIn = useWatch({ control: control, name: "amount" });
-
+  const amountOut = useWatch({ control: control, name: "amountOut" });
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
-  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 1000 : 0, [
+  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 2000 : 0, [
     amountIn,
   ]);
   console.log(debouncedAmountIn);
@@ -86,6 +97,19 @@ export default function Form() {
   });
 
   useEffect(() => {
+    if (debouncedAmountIn && selectedToken) {
+      requestSwapQuote({
+        tokenIn: selectedToken,
+        amountIn: debouncedAmountIn,
+        setFormValue: (value: string) => setValue("amountOut", value),
+        recipient: hyperliquidAddress,
+        slippage: "0.5",
+        refundAddress: refundAddress,
+      });
+    }
+  }, [debouncedAmountIn, selectedToken, hyperliquidAddress, refundAddress]);
+
+  useEffect(() => {
     const getSelectedTokenBalance = async () => {
       if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
         const balance = await getBalance(selectedToken.contractAddress);
@@ -102,7 +126,7 @@ export default function Form() {
   }, [selectedToken]);
 
   const onSubmit = (data: FormValidationData) => {
-    console.log(data);
+    console.log("onSubmit", data);
   };
 
   return (
@@ -119,19 +143,20 @@ export default function Form() {
       <div className="flex flex-col justify-center items-center mb-10">
         <div className="flex flex-col gap-2 justify-center items-center">
           <div className="flex flex-row gap-2 justify-between w-[480px]">
-            <label
-              htmlFor="from"
-              className="text-white font-thin text-sm text-left  w-[480px]"
-            >
+            <div className="text-white font-thin text-sm text-left  w-[480px]">
               From
-            </label>
-            {isConnected() && (
-              <label
-                htmlFor="from"
-                className="text-white font-thin text-sm text-left  w-[480px] text-right"
-              >
+            </div>
+            {strategy && isConnected() && strategy === EStrategy.SWAP && (
+              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end w-[480px] text-right">
+                <WalletIcon />
                 {truncateAddress(getPublicKey())}
-              </label>
+              </div>
+            )}
+            {strategy && strategy === EStrategy.DEPOSIT && (
+              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end w-[480px] text-right">
+                <ManualIcon />
+                Manual deposit
+              </div>
             )}
           </div>
           <SelectTokenDialog
@@ -201,7 +226,11 @@ export default function Form() {
               </div>
               <div className="flex flex-row gap-1 justify-between">
                 <span className="text-white text-xs font-light font-inter leading-[14px]">
-                  At least 5 USDC
+                  {amountOut && (
+                    <span className="text-white text-xs font-light font-inter leading-[14px]">
+                      At least ${amountOut} USDC
+                    </span>
+                  )}
                 </span>
                 <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
                   {formatTokenAmount(
@@ -220,7 +249,7 @@ export default function Form() {
           )}
         </div>
 
-        {selectedToken && (
+        {strategy && (
           <>
             <div className="flex flex-col gap-2 mt-6">
               <label className="text-[#9DB2BD] font-normal text-xs font-inter">
@@ -302,7 +331,8 @@ export default function Form() {
           selectedToken,
           strategy,
           setStrategy,
-          connectWallet
+          connectWallet,
+          isConnected()
         )}
       </form>
     </div>
