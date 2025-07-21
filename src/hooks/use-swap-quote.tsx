@@ -8,12 +8,12 @@ import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { parseUnits } from "viem";
 
-import { OneClickSwapFormValues } from "@/lib/1clickHelper";
+import { FormInterface } from "@/lib/validation";
 
 type Props = {
-  tokenIn: TokenResponse;
+  tokenIn: TokenResponse | null;
   amountIn: string;
-  setFormValue: (name: keyof OneClickSwapFormValues, value: string) => void;
+  setFormValue: (name: keyof FormInterface, value: string) => void;
   recipient: string | null;
   slippage: string;
   refundAddress: string;
@@ -28,8 +28,9 @@ const useSwapQuote = ({
   refundAddress,
 }: Props) => {
   return useQuery<QuoteResponse | null>({
-    queryKey: ["quote", amountIn, recipient, tokenIn.assetId, slippage],
+    queryKey: ["quote", amountIn, recipient, tokenIn?.assetId, slippage],
     queryFn: async () => {
+      if (!tokenIn) return null;
       try {
         const response = await OneClickService.getQuote({
           dry: !recipient,

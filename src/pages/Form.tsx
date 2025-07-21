@@ -4,7 +4,6 @@ import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import {
   fetchTokens,
   OneClickSwapFormValues,
-  requestSwapQuote,
   translateNetwork,
 } from "@/lib/1clickHelper";
 import { Network } from "@/config";
@@ -23,22 +22,14 @@ import ManualIcon from "@/assets/manual.svg?react";
 
 import {
   createFormValidationSchema,
+  FormInterface,
   FormValidationData,
 } from "@/lib/validation";
+import useSwapQuote from "@/hooks/use-swap-quote";
 
 export enum EDepositMethod {
   WALLET = "wallet",
   EXCHANGE = "exchange",
-}
-
-export interface FormData {
-  asset: TokenResponse;
-  network: Network | null;
-  depositMethod: EDepositMethod;
-  amount: string;
-  amountOut?: string;
-  sourceWalletConnected: boolean;
-  depositAddress?: string;
 }
 
 export enum EStrategy {
@@ -76,9 +67,19 @@ export default function Form() {
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 2000 : 0, [
     amountIn,
   ]);
-  console.log(debouncedAmountIn);
+
   const hyperliquidAddress = useWatch({ control, name: "hyperliquidAddress" });
   const refundAddress = useWatch({ control, name: "refundAddress" });
+
+  useSwapQuote({
+    tokenIn: selectedToken,
+    amountIn: debouncedAmountIn ?? "",
+    setFormValue: (key: keyof FormInterface, value: string) =>
+      setValue(key, value),
+    recipient: hyperliquidAddress,
+    slippage: "0.5",
+    refundAddress: refundAddress,
+  });
 
   const { connectWallet, getPublicKey, isConnected, getBalance } = useNetwork(
     translateNetwork(selectedToken?.blockchain)
@@ -95,19 +96,6 @@ export default function Form() {
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
-
-  useEffect(() => {
-    if (debouncedAmountIn && selectedToken) {
-      requestSwapQuote({
-        tokenIn: selectedToken,
-        amountIn: debouncedAmountIn,
-        setFormValue: (value: string) => setValue("amountOut", value),
-        recipient: hyperliquidAddress,
-        slippage: "0.5",
-        refundAddress: refundAddress,
-      });
-    }
-  }, [debouncedAmountIn, selectedToken, hyperliquidAddress, refundAddress]);
 
   useEffect(() => {
     const getSelectedTokenBalance = async () => {

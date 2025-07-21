@@ -77,4 +77,6 @@ export interface FormInterface {
   amount: string;
   hyperliquidAddress: string;
   refundAddress: string;
+  amountOut: string;
+  depositAddress: string;
 }

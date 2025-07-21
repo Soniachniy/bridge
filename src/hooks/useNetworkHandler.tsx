@@ -71,7 +71,6 @@ const useNetwork = (network: Network | null) => {
       }
     },
     connectWallet: () => {
-      console.log("connectWallet", tonConnectUI.modalState, tonWallet, network);
       switch (network) {
         case Network.BASE:
         case Network.AURORA:
