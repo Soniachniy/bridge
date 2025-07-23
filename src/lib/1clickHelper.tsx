@@ -104,6 +104,7 @@ export const fetchTokens = async (): Promise<TokenResponse[]> => {
   }
 };
 
+
 export const getTokenIcon = (asset: TokenResponse) => {
   return (
     TOKEN_ICON_BY_DEFUSE_ASSET_ID[asset.assetId] ||
