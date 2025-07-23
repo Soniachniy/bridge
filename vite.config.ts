@@ -4,7 +4,7 @@ import svgr from "vite-plugin-svgr";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { cloudflare } from "@cloudflare/vite-plugin";
+// import { cloudflare } from "@cloudflare/vite-plugin";
 
 import path from "path";
 
@@ -24,6 +24,6 @@ export default defineConfig({
     svgr(),
     tailwindcss(),
     nodePolyfills(),
-    cloudflare(),
+    // cloudflare(),
   ],
 });
