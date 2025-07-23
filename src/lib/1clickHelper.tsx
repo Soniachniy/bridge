@@ -16,7 +16,7 @@ import PolygonIcon from "@/assets/networks/polygon.png";
 import TronIcon from "@/assets/networks/tron.png";
 import ZecIcon from "@/assets/networks/zec.png";
 
-import { Network, oneClickConfig } from "@/config";
+import { Network } from "@/config";
 import {
   GetExecutionStatusResponse,
   OneClickService,
@@ -92,15 +92,9 @@ export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.TRON]: "Tron",
 };
 
-export const onClickRoutes = {
-  tokens: `${oneClickConfig.baseUrl}/tokens`,
-};
-
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
   try {
-    const response = await OneClickService.getTokens();
-    console.log("response", response);
-    return response;
+    return await OneClickService.getTokens();
   } catch (error) {
     console.error(error);
     return [];

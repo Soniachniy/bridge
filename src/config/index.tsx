@@ -4,65 +4,18 @@ import { setupSender } from "@near-wallet-selector/sender";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
 import { Adapter } from "@solana/wallet-adapter-base";
-import { arbitrum, mainnet, sepolia } from "wagmi/chains";
-import { injected, metaMask, safe } from "wagmi/connectors";
+import { WalletModuleFactory } from "@near-wallet-selector/core";
+import { BrowserWallet } from "@near-wallet-selector/core";
 
-export const oneClickConfig = {
-  baseUrl: "https://1click.chaindefuser.com/v0",
-};
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import {
+  mainnet,
+  arbitrum,
+  solana,
+  AppKitNetwork,
+} from "@reown/appkit/networks";
 
-// EVM Configuration
-export const evmConfig = {
-  chains: [mainnet, sepolia, arbitrum] as const,
-  connectors: [injected(), metaMask(), safe()],
-  transports: {
-    [mainnet.id]: "http",
-    [sepolia.id]: "http",
-  },
-};
-
-// Solana Configuration
-export const solanaConfig = {
-  endpoint:
-    "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
-  autoConnect: true,
-  wallets: [
-    () => new PhantomWalletAdapter() as Adapter,
-    () => new HotWalletAdapter() as Adapter,
-  ],
-};
-
-// NEAR Configuration
-export const nearConfig = {
-  network: "mainnet" as const,
-  contractId: "",
-  modules: [
-    () => setupHotWallet(),
-    () => setupMyNearWallet(),
-    () => setupSender(),
-  ],
-  fallbackRpcUrls: [
-    "https://rpc.mainnet.pagoda.co",
-    "https://rpc.near.org",
-    "https://rpc.mainnet.near.org",
-  ],
-};
-
-// TON Configuration
-export const tonConfig = {
-  walletsListSource: "/wallets-v2.json",
-  manifestUrl: "https://hapi-app.vercel.app/tonconnect-manifest.json",
-};
-
-// QueryClient Configuration
-export const queryClientConfig = {
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 10, // 10 minutes
-    },
-  },
-};
+import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 
 export enum Network {
   ARBITRUM = "ARBITRUM",
@@ -83,32 +36,37 @@ export enum Network {
   ZEC = "ZEC",
 }
 
-export const networkAddresses = {
-  [Network.ARBITRUM]: {
-    bridge: "0x0000000000000000000000000000000000000000",
+export const basicConfig = {
+  arbitrumProxyAddress: "0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a",
+  proxyApiPoint: "api.hyperdep.now",
+  nearConfig: {
+    network: "mainnet" as const,
+    contractId: "",
+    modules: [
+      setupHotWallet() as WalletModuleFactory<BrowserWallet>,
+      setupMyNearWallet(),
+      setupSender(),
+    ],
   },
-  [Network.ETHEREUM]: {
-    bridge: "0x0000000000000000000000000000000000000000",
+  evmConfig: {
+    projectId: "2c00d113200749f27e7e970776874f1c",
+    adapters: [WagmiAdapter, SolanaAdapter],
+    networks: [mainnet, arbitrum, solana] as [
+      AppKitNetwork,
+      ...AppKitNetwork[]
+    ],
   },
-  [Network.SOLANA]: {
-    bridge: "0x0000000000000000000000000000000000000000",
+  tonConfig: {
+    manifestUrl:
+      "https://bridge-lyart-three.vercel.app/tonconnect-manifest.json",
   },
-  [Network.TON]: {
-    bridge: "0x0000000000000000000000000000000000000000",
-  },
-  [Network.TRON]: {
-    bridge: "0x0000000000000000000000000000000000000000",
-  },
-  [Network.XRP]: {
-    bridge: "0x0000000000000000000000000000000000000000",
-  },
-  [Network.ZEC]: {
-    bridge: "0x0000000000000000000000000000000000000000",
-  },
-  [Network.NEAR]: {
-    bridge: "0x0000000000000000000000000000000000000000",
-  },
-  [Network.POLYGON]: {
-    bridge: "0x0000000000000000000000000000000000000000",
+  solanaConfig: {
+    endpoint:
+      "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
+    autoConnect: true,
+    wallets: [
+      new PhantomWalletAdapter() as Adapter,
+      new HotWalletAdapter() as Adapter,
+    ],
   },
 };

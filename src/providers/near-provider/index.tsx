@@ -8,22 +8,17 @@ import {
   Transaction,
   WalletSelectorState,
 } from "@near-wallet-selector/core";
-import type {
-  WalletSelector,
-  AccountState,
-  WalletModuleFactory,
-  BrowserWallet,
-} from "@near-wallet-selector/core";
+import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
-import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
-import { setupSender } from "@near-wallet-selector/sender";
+
 import { providers } from "near-api-js";
 
 import { AccountView, CodeResult } from "near-api-js/lib/providers/provider";
 import "@near-wallet-selector/modal-ui/styles.css";
-import { setupHotWallet } from "@hot-wallet/sdk/adapter/near";
+
 import { getGas, getAmount } from "@/lib/providerHelpers";
+import { basicConfig } from "@/config";
 
 export interface ITransaction {
   receiverId: string;
@@ -91,8 +86,6 @@ export default class RPCProviderService implements IRPCProviderService {
   }
 }
 
-const NETWORK_ID = "mainnet";
-
 interface WalletSelectorContextValue {
   openModal: () => void;
   selector: WalletSelector | null;
@@ -146,16 +139,12 @@ export const WalletSelectorContextProvider = ({
 
   const init = useCallback(async () => {
     const selectorInstance = await setupWalletSelector({
-      network: NETWORK_ID as NetworkId,
+      network: basicConfig.nearConfig.network as NetworkId,
       debug: true,
-      modules: [
-        setupMyNearWallet(),
-        setupHotWallet() as WalletModuleFactory<BrowserWallet>,
-        setupSender(),
-      ],
+      modules: basicConfig.nearConfig.modules,
     });
     const modalInstance = setupModal(selectorInstance, {
-      contractId: "" as string,
+      contractId: basicConfig.nearConfig.contractId,
     });
     const state = selectorInstance.store.getState();
     syncAccountState(localStorage.getItem("accountId"), state.accounts);

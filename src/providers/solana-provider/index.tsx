@@ -2,16 +2,17 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { PropsWithChildren, useMemo } from "react";
-import { solanaConfig } from "../../config";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { PropsWithChildren } from "react";
+
+import { basicConfig } from "@/config";
 
 export const SolanaProvider = ({ children }: PropsWithChildren) => {
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
-
   return (
-    <ConnectionProvider endpoint={solanaConfig.endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={solanaConfig.autoConnect}>
+    <ConnectionProvider endpoint={basicConfig.solanaConfig.endpoint}>
+      <WalletProvider
+        wallets={basicConfig.solanaConfig.wallets}
+        autoConnect={basicConfig.solanaConfig.autoConnect}
+      >
         {children}
       </WalletProvider>
     </ConnectionProvider>
