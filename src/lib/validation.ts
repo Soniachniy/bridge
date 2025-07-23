@@ -35,7 +35,10 @@ export const formValidationSchema = z.object({
 
   amount: z
     .string()
-    .min(0.000001, "Amount is required")
+    .min(
+      5,
+      "Amount too small after fees. Minimum deposit: $5 USDC after all fees."
+    )
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Amount must be a valid positive number",
     }),

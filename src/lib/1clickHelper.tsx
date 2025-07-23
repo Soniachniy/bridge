@@ -91,8 +91,8 @@ export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
 
   [TokenResponse.blockchain.TRON]: "Tron",
   [TokenResponse.blockchain.SUI]: "SUI",
-  [TokenResponse.blockchain.OP]: "OP",
-  [TokenResponse.blockchain.AVAX]: "AVAX",
+  [TokenResponse.blockchain.OP]: "Optimism",
+  [TokenResponse.blockchain.AVAX]: "Avalanche",
 };
 
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
