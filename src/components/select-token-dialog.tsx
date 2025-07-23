@@ -100,7 +100,7 @@ const SelectTokenDialog: FC<Props> = ({
               />
             </div>
           ) : (
-            <img src="/src/assets/empty-state.svg" alt="empty-state" />
+            <img src="/empty-state.svg" alt="empty-state" />
           )}
 
           {selectedToken ? (

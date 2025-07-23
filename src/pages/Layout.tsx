@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex justify-between items-center mx-20 my-4">
           <div className="flex items-center gap-2 ">
             <img
-              src="/src/assets/logo-extended.svg"
+              src="/logo-extended.svg"
               alt="logo"
               className="w-full h-full"
             />
