@@ -43,9 +43,9 @@ enum RPCProviderMethods {
 const FINALITY_FINAL = "final";
 
 export default class RPCProviderService implements IRPCProviderService {
-  private provider?: providers.JsonRpcProvider;
+  private provider?: InstanceType<typeof providers.JsonRpcProvider>;
 
-  constructor(provider?: providers.JsonRpcProvider) {
+  constructor(provider?: InstanceType<typeof providers.JsonRpcProvider>) {
     this.provider = provider;
   }
 
@@ -61,7 +61,7 @@ export default class RPCProviderService implements IRPCProviderService {
         finality: FINALITY_FINAL,
       });
 
-      const result = JSON.parse(Buffer.from(response.result).toString());
+      const result = JSON.parse(new TextDecoder().decode(new Uint8Array(response.result)));
       return result;
     } catch (error) {
       console.error(error);

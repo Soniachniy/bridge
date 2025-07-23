@@ -56,7 +56,7 @@ const useSwapQuote = ({
             setFormValue("depositAddress", response.quote.depositAddress);
         }
         return response;
-      } catch (error) {
+      } catch (error: unknown) {
         if (isAxiosError(error)) {
           throw new Error(error.response?.data.message || "Invalid request");
         }
