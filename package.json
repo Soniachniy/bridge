@@ -91,5 +91,6 @@
     "viem": "2.x",
     "vite": "^7.0.4",
     "wagmi": "^2.15.6"
-  }
+  },
+  "packageManager": "yarn@4.9.2"
 }
