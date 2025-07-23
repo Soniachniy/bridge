@@ -90,6 +90,9 @@ export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.ZEC]: "Zcash",
 
   [TokenResponse.blockchain.TRON]: "Tron",
+  [TokenResponse.blockchain.SUI]: "SUI",
+  [TokenResponse.blockchain.OP]: "OP",
+  [TokenResponse.blockchain.AVAX]: "AVAX",
 };
 
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
@@ -124,6 +127,9 @@ export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.XRP]: "src/assets/networks/xrp.png",
   [TokenResponse.blockchain.ZEC]: "src/assets/networks/zec.png",
   [TokenResponse.blockchain.TRON]: "src/assets/networks/tron.png",
+  [TokenResponse.blockchain.SUI]: "src/assets/networks/tron.png",
+  [TokenResponse.blockchain.AVAX]: "src/assets/networks/tron.png",
+  [TokenResponse.blockchain.OP]: "src/assets/networks/tron.png",
 };
 
 export const TOKEN_BY_SYMBOL: Record<string, string> = {
