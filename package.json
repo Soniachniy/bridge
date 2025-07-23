@@ -33,6 +33,7 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.10.0",
     "@defuse-protocol/one-click-sdk-typescript": "^0.1.5",
     "@eslint/js": "^9.30.1",
     "@hot-wallet/sdk": "^1.0.11",
@@ -89,8 +90,9 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "viem": "2.x",
-    "vite": "^7.0.4",
-    "wagmi": "^2.15.6"
+    "vite": "^7.0.5",
+    "wagmi": "^2.15.6",
+    "wrangler": "^4.25.1"
   },
   "packageManager": "yarn@4.9.2"
 }
