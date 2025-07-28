@@ -38,7 +38,7 @@ export enum Network {
 
 export const basicConfig = {
   arbitrumProxyAddress: "0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a",
-  proxyApiPoint: "api.hyperdep.now",
+  proxyApiPoint: "https://api.hyperdep.now",
   nearConfig: {
     network: "mainnet" as const,
     contractId: "",

@@ -19,6 +19,14 @@ import "@near-wallet-selector/modal-ui/styles.css";
 
 import { getGas, getAmount } from "@/lib/providerHelpers";
 import { basicConfig } from "@/config";
+import { Big } from "big.js";
+
+const BASE = 10;
+const GAS_UNITS = 12;
+const Tgas = Big(1).times(Big(BASE).pow(GAS_UNITS)).toFixed();
+
+export const convertGas = (gas: string = "60"): string =>
+  Big(gas).times(Tgas).toFixed();
 
 export interface ITransaction {
   receiverId: string;
@@ -29,6 +37,8 @@ export interface ITransaction {
     args?: object;
   }[];
 }
+
+export const ONE_YOCTO = "1";
 
 export interface IRPCProviderService {
   viewFunction: (method: string, accountId: string, args?: any) => Promise<any>;
@@ -61,7 +71,9 @@ export default class RPCProviderService implements IRPCProviderService {
         finality: FINALITY_FINAL,
       });
 
-      const result = JSON.parse(new TextDecoder().decode(new Uint8Array(response.result)));
+      const result = JSON.parse(
+        new TextDecoder().decode(new Uint8Array(response.result))
+      );
       return result;
     } catch (error) {
       console.error(error);

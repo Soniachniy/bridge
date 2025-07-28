@@ -19,7 +19,6 @@ import ZecIcon from "@/assets/networks/zec.png";
 import { Network } from "@/config";
 import {
   GetExecutionStatusResponse,
-  OneClickService,
   TokenResponse,
 } from "@defuse-protocol/one-click-sdk-typescript";
 
@@ -93,15 +92,6 @@ export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.SUI]: "SUI",
   [TokenResponse.blockchain.OP]: "Optimism",
   [TokenResponse.blockchain.AVAX]: "Avalanche",
-};
-
-export const fetchTokens = async (): Promise<TokenResponse[]> => {
-  try {
-    return await OneClickService.getTokens();
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
 };
 
 export const getTokenIcon = (asset: TokenResponse) => {

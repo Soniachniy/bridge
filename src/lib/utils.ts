@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 
 import { twMerge } from "tailwind-merge";
 import { parseUnits } from "viem";
+type ValueType = string | number | Big;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -58,3 +59,8 @@ export const formatTokenAmount = (
   decimals = 18,
   precision?: number
 ): string => Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);
+
+export const parseTokenAmount = (value: ValueType, decimals: number) =>
+  Big(value)
+    .mul(BASE ** decimals)
+    .toFixed(0);

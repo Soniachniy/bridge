@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { fetchTokens, translateNetwork } from "@/lib/1clickHelper";
+import { translateNetwork } from "@/lib/1clickHelper";
 
 import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -21,6 +21,7 @@ import {
   FormValidationData,
 } from "@/lib/validation";
 import useSwapQuote from "@/hooks/use-swap-quote";
+import { fetchTokens } from "@/providers/proxy-provider";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -62,23 +63,22 @@ export default function Form() {
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 2000 : 0, [
     amountIn,
   ]);
-
+  const queryClient = useQueryClient();
   const hyperliquidAddress = useWatch({ control, name: "hyperliquidAddress" });
   const refundAddress = useWatch({ control, name: "refundAddress" });
+  const depositAddress = useWatch({ control, name: "depositAddress" });
 
   useSwapQuote({
     tokenIn: selectedToken,
     amountIn: debouncedAmountIn ?? "",
     setFormValue: (key: keyof FormInterface, value: string) =>
       setValue(key, value),
-    recipient: hyperliquidAddress,
-    slippage: "0.5",
-    refundAddress: refundAddress,
+    hyperliquidAddress,
+    refundAddress,
   });
 
-  const { connectWallet, getPublicKey, isConnected, getBalance } = useNetwork(
-    translateNetwork(selectedToken?.blockchain)
-  );
+  const { connectWallet, getPublicKey, isConnected, getBalance, makeDeposit } =
+    useNetwork(translateNetwork(selectedToken?.blockchain));
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -108,8 +108,27 @@ export default function Form() {
     getSelectedTokenBalance();
   }, [selectedToken]);
 
-  const onSubmit = (data: FormValidationData) => {
-    console.log("onSubmit", data);
+  const onSubmit = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [
+        "quote",
+        debouncedAmountIn,
+        hyperliquidAddress,
+        selectedToken?.assetId,
+      ],
+    });
+    if (depositAddress && selectedToken) {
+      await queryClient.invalidateQueries({
+        queryKey: ["status", depositAddress],
+      });
+      const success = await makeDeposit(
+        selectedToken,
+        depositAddress,
+        amountIn,
+        selectedToken.decimals
+      );
+      console.log(success);
+    }
   };
 
   return (
