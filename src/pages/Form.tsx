@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { translateNetwork } from "@/lib/1clickHelper";
+import { getDepositStatus, translateNetwork } from "@/lib/1clickHelper";
 
 import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
@@ -15,13 +15,13 @@ import ErrorIcon from "@/assets/error-icon.svg?react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import ManualIcon from "@/assets/manual.svg?react";
 
-import {
-  createFormValidationSchema,
-  FormInterface,
-  FormValidationData,
-} from "@/lib/validation";
+import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/use-swap-quote";
-import { fetchTokens } from "@/providers/proxy-provider";
+import {
+  fetchTokens,
+  getPermitData,
+  getStatus,
+} from "@/providers/proxy-provider";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -77,8 +77,14 @@ export default function Form() {
     refundAddress,
   });
 
-  const { connectWallet, getPublicKey, isConnected, getBalance, makeDeposit } =
-    useNetwork(translateNetwork(selectedToken?.blockchain));
+  const {
+    connectWallet,
+    getPublicKey,
+    isConnected,
+    getBalance,
+    makeDeposit,
+    signData,
+  } = useNetwork(translateNetwork(selectedToken?.blockchain));
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -127,6 +133,15 @@ export default function Form() {
         amountIn,
         selectedToken.decimals
       );
+      localStorage.setItem("depositAddress", depositAddress);
+      const depositStatus = await getDepositStatus(depositAddress);
+
+      if (depositStatus.status) {
+        const permitData = await getPermitData(depositAddress);
+        console.log(permitData, "permitData");
+        const signature = await signData(permitData);
+        console.log(signature, "signData");
+      }
       console.log(success);
     }
   };

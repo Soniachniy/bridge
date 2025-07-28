@@ -6,7 +6,7 @@ import {
   useWalletSelector,
 } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
-import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAppKit } from "@reown/appkit/react";
@@ -16,13 +16,14 @@ import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/providers/evm-provider";
 import { tonClient } from "@/providers/ton-provider/ton-utils";
-import { Address } from "@ton/core";
+import { Address, beginCell, toNano } from "@ton/core";
 import { getSplTokenBalance } from "@/providers/solana-provider/solana-utils";
 import { useAppKitAccount } from "@reown/appkit/react";
 
 import {
   prepareTransactionRequest,
   sendTransaction,
+  signMessage,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
@@ -40,6 +41,7 @@ import {
 } from "@solana/web3.js";
 import { parseTokenAmount } from "@/lib/utils";
 import { getOrCreateAssociatedTokenAccount } from "@/providers/solana-provider";
+import { PermitDataResponse } from "@/providers/proxy-provider";
 
 const useNetwork = (network: Network | null) => {
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
@@ -56,7 +58,6 @@ const useNetwork = (network: Network | null) => {
   console.log(bip122Account, "bip122Account");
   console.log(solanaAccount, "solanaAccount");
   const tonWallet = useTonWallet();
-  const solanaWallet = useAnchorWallet();
 
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
 
@@ -257,7 +258,7 @@ const useNetwork = (network: Network | null) => {
           }
           tx.add(
             createTransferInstruction(
-              new PublicKey(solanaAccount.address),
+              new PublicKey(sourceAccount),
               new PublicKey(solanaDestinationAccount),
               new PublicKey(solanaAccount.address),
               BigInt(parseTokenAmount(amount, selectedToken.decimals))
@@ -307,7 +308,60 @@ const useNetwork = (network: Network | null) => {
             } else return false;
           } else return false;
         case Network.TON:
+          if (!tonWallet?.account?.address || !selectedToken.contractAddress) {
+            return false;
+          }
+          const jettonWalletAddress = Address.parse(
+            selectedToken.contractAddress
+          );
+          const toAddress = Address.parse(depositAddress);
+          const jettonAmount = toNano(amount);
+
+          const payload = beginCell()
+            .storeUint(0xf8a7ea5, 32)
+            .storeUint(0, 64)
+            .storeCoins(jettonAmount)
+            .storeAddress(toAddress)
+            .storeAddress(Address.parse(tonWallet?.account?.address))
+            .storeBit(false)
+            .storeCoins(toNano("0.1"))
+            .storeBit(false)
+            .endCell()
+            .toBoc()
+            .toString("base64");
+
+          const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 600, // valid for 10 minutes
+            messages: [
+              {
+                address: jettonWalletAddress.toString(),
+                amount: toNano("0.05").toString(),
+                payload,
+              },
+            ],
+          };
+
+          try {
+            await tonConnectUI.sendTransaction(transaction);
+            alert("Transaction sent!");
+          } catch (err) {
+            console.error(err);
+            alert("Transaction failed.");
+          }
           return console.log("ton");
+      }
+    },
+    signData: async (data: PermitDataResponse) => {
+      switch (network) {
+        case Network.BASE:
+        case Network.AURORA:
+        case Network.BNB:
+        case Network.ARBITRUM:
+        case Network.POLYGON:
+        case Network.ETHEREUM:
+          return signMessage(wagmiAdapter.wagmiConfig, {
+            message: JSON.stringify(data.data),
+          });
       }
     },
   };

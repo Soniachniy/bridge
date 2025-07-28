@@ -34,6 +34,36 @@ interface QuoteResponse {
   };
 }
 
+export interface PermitDataResponse {
+  success: boolean;
+  data: {
+    domain: {
+      name: string;
+      version: string;
+      chainId: number;
+      verifyingContract: string;
+    };
+    types: {
+      Permit: [
+        { name: "owner"; type: "address" },
+        { name: "spender"; type: "address" },
+        { name: "value"; type: "uint256" },
+        { name: "nonce"; type: "uint256" },
+        { name: "deadline"; type: "uint256" }
+      ];
+    };
+    message: {
+      owner: string;
+      spender: string;
+      value: string;
+      nonce: string;
+      deadline: number;
+    };
+    depositAddress: string;
+    finalAmount: string;
+  };
+}
+
 export const getQuote = async (
   dryRun: boolean,
   assetFrom: string,
@@ -70,11 +100,15 @@ export const getQuote = async (
 };
 
 export const getStatus = async (depositAddress: string) => {
-  return await fetch(API_ROUTES.STATUS + depositAddress);
+  const response = await fetch(API_ROUTES.STATUS + depositAddress);
+  return response.json();
 };
 
-export const getPermitData = async (depositAddress: string) => {
-  return await fetch(API_ROUTES.GET_PERMIT + depositAddress);
+export const getPermitData = async (
+  depositAddress: string
+): Promise<PermitDataResponse> => {
+  const response = await fetch(API_ROUTES.GET_PERMIT + depositAddress);
+  return response.json();
 };
 
 export const execute = async (
@@ -85,11 +119,12 @@ export const execute = async (
     s: string;
   }
 ) => {
-  return await fetch(API_ROUTES.EXECUTE, {
+  const response = await fetch(API_ROUTES.EXECUTE, {
     method: "POST",
     body: JSON.stringify({
       depositAddress,
       userPermit,
     }),
   });
+  return response.json();
 };
