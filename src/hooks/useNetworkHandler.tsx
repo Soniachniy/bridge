@@ -21,6 +21,7 @@ import {
   sendTransaction,
   signMessage,
   signTypedData,
+  switchChain,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
@@ -391,6 +392,10 @@ const useNetwork = (network: Network | null) => {
         case Network.NEAR:
         case Network.TON:
           const { message, types, domain } = data.data;
+          await switchChain(wagmiAdapter.wagmiConfig, {
+            chainId: Number(domain.chainId),
+          });
+          console.log(domain.chainId, "domain.chainId");
           return signTypedData(wagmiAdapter.wagmiConfig, {
             types,
             primaryType: "Permit",

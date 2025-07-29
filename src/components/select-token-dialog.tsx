@@ -71,7 +71,11 @@ const SelectTokenDialog: FC<Props> = ({
       return matchesSearch && matchesNetwork;
     });
   }, [allTokens, search, currentSelectedBlockchains]);
-
+  console.log(
+    selectedToken?.blockchain,
+    selectedToken?.symbol,
+    "selectedToken"
+  );
   return (
     <Dialog.Root
       onOpenChange={(open) => {
@@ -144,13 +148,24 @@ const SelectTokenDialog: FC<Props> = ({
               value={currentSelectedBlockchains}
               disabled={blockchains.length === 1}
             >
-              <SelectTrigger className="w-full min-h-[42px] bg-main_dark text-white outline-1 hover:outline-main_light focus:outline-none focus:ring-0 focus:border-none active:outline-none active:ring-0 active:border-none">
+              <SelectTrigger className="w-full text-black min-h-[42px]  focus:border-0 outline-1 focus:outline-1 outline-main_light  focus:ring-offset-0 bg-main_dark text-white">
                 <SelectValue
                   id="network"
                   asChild
                   placeholder="Select Network"
                   className="text-sm font-medium outline-none bg-main_dark leading-5 border-10 border-white"
-                />
+                >
+                  {selectedBlockchain && (
+                    <div className="text-white flex flex-row gap-2 ">
+                      <img
+                        src={CHAIN_ICON[selectedBlockchain]}
+                        alt={selectedBlockchain ?? "blockchain"}
+                        className="size-[22px] rounded-full"
+                      />
+                      {CHAIN_TITLE[selectedBlockchain]}
+                    </div>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-main_dark text-white ">
                 {blockchains.map(({ blockchain, title, icon }) => (
@@ -178,7 +193,7 @@ const SelectTokenDialog: FC<Props> = ({
               Select Token
             </Label>
 
-            <div className="flex items-center gap-2  bg-main_dark outline-1 hover:outline-main_light p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
+            <div className="flex items-center gap-2  bg-main_dark outline-1 outline-main_light p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
               <SearchIcon className="size-4  text-muted-foreground bg-main_dark hover:outline-main_light" />
               <input
                 type="token"

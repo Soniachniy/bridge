@@ -123,26 +123,25 @@ export default function Form() {
   }, [selectedToken]);
 
   const onSubmit = async () => {
-    // await queryClient.invalidateQueries({
-    //   queryKey: [
-    //     "quote",
-    //     debouncedAmountIn,
-    //     hyperliquidAddress,
-    //     refundAddress,
-    //     selectedToken?.assetId,
-    //   ],
-    // });
-    const depositAddress =
-      "6bee5e24614032010fad329dc1a51894b866a0b087a5f23a14b83d68a80da018";
+    await queryClient.invalidateQueries({
+      queryKey: [
+        "quote",
+        debouncedAmountIn,
+        hyperliquidAddress,
+        refundAddress,
+        selectedToken?.assetId,
+      ],
+    });
+
     if (depositAddress && selectedToken) {
       console.log(depositAddress, "start");
-      // const success = await makeDeposit(
-      //   selectedToken,
-      //   depositAddress,
-      //   amountIn,
-      //   selectedToken.decimals
-      // );
-      // console.log(success, "success");
+      const success = await makeDeposit(
+        selectedToken,
+        depositAddress,
+        amountIn,
+        selectedToken.decimals
+      );
+      console.log(success, "success");
       localStorage.setItem("depositAddress", depositAddress);
       const depositStatus = await getDepositStatus(depositAddress);
 
