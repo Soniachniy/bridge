@@ -144,7 +144,7 @@ const SelectTokenDialog: FC<Props> = ({
               value={currentSelectedBlockchains}
               disabled={blockchains.length === 1}
             >
-              <SelectTrigger className="w-full min-h-[42px] bg-main_dark text-white    outline-1 hover:outline-main_light focus:outline-none focus:ring-0 focus:border-none active:outline-none active:ring-0 active:border-none">
+              <SelectTrigger className="w-full min-h-[42px] bg-main_dark text-white outline-1 hover:outline-main_light focus:outline-none focus:ring-0 focus:border-none active:outline-none active:ring-0 active:border-none">
                 <SelectValue
                   id="network"
                   asChild

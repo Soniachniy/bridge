@@ -14,15 +14,7 @@ export default defineConfig({
     },
   },
   define: {
-    global: {},
     "process.env": {},
   },
-  plugins: [
-    react(),
-    tsconfigPaths(),
-    svgr(),
-    tailwindcss(),
-    nodePolyfills(),
-    // cloudflare(),
-  ],
+  plugins: [react(), tsconfigPaths(), svgr(), tailwindcss(), nodePolyfills()],
 });

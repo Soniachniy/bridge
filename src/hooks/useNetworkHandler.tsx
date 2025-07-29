@@ -1,16 +1,12 @@
 import { basicConfig, Network } from "@/config";
 
-import {
-  convertGas,
-  ONE_YOCTO,
-  useWalletSelector,
-} from "@/providers/near-provider";
+import { useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAppKit } from "@reown/appkit/react";
-import { Account } from "@near-wallet-selector/core";
+import { Account, Transaction } from "@near-wallet-selector/core";
 
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
@@ -24,10 +20,11 @@ import {
   prepareTransactionRequest,
   sendTransaction,
   signMessage,
+  signTypedData,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
-import Big from "big.js";
+
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import {
   createTransferInstruction,
@@ -37,11 +34,17 @@ import {
   Connection,
   PublicKey,
   sendAndConfirmTransaction,
-  Transaction,
+  Transaction as SolanaTransaction,
 } from "@solana/web3.js";
 import { parseTokenAmount } from "@/lib/utils";
 import { getOrCreateAssociatedTokenAccount } from "@/providers/solana-provider";
 import { PermitDataResponse } from "@/providers/proxy-provider";
+import {
+  checkSwapStorageBalance,
+  ITransaction,
+  ONE_YOCTO_NEAR,
+} from "@/lib/nearHelper";
+import { getAmount, getGas } from "@/lib/providerHelpers";
 
 const useNetwork = (network: Network | null) => {
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
@@ -52,11 +55,7 @@ const useNetwork = (network: Network | null) => {
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
   const solanaAccount = useAppKitAccount({ namespace: "solana" });
-  const eip155Account = useAppKitAccount({ namespace: "eip155" });
-  const bip122Account = useAppKitAccount({ namespace: "bip122" });
-  console.log(eip155Account, "eip155Account");
-  console.log(bip122Account, "bip122Account");
-  console.log(solanaAccount, "solanaAccount");
+
   const tonWallet = useTonWallet();
 
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
@@ -123,8 +122,9 @@ const useNetwork = (network: Network | null) => {
           return console.log("base");
       }
     },
-    getPublicKey: () => {
-      switch (network) {
+    getPublicKey: (localNetwork?: Network) => {
+      const currentNetwork = localNetwork ?? network;
+      switch (currentNetwork) {
         case Network.BASE:
         case Network.AURORA:
         case Network.BNB:
@@ -222,7 +222,7 @@ const useNetwork = (network: Network | null) => {
           );
           return status.status === "success";
         case Network.SOLANA:
-          const tx = new Transaction();
+          const tx = new SolanaTransaction();
           if (!selectedToken.contractAddress || !solanaAccount.address) {
             return false;
           }
@@ -276,31 +276,60 @@ const useNetwork = (network: Network | null) => {
           console.log(txHash, "txHash");
           return txHash;
         case Network.NEAR:
-          if (!selector) {
+          console.log(depositAddress, "depositAddress");
+          if (
+            !selector ||
+            !nearAddress?.accountId ||
+            !selectedToken.contractAddress
+          ) {
             return false;
           }
           const wallet = await selector.wallet();
-
-          const trx = await wallet.signAndSendTransaction({
+          const transactions: ITransaction[] = [];
+          const storageBalance = await checkSwapStorageBalance({
+            accountId: nearAddress?.accountId as string,
+            contractId: selectedToken.contractAddress as string,
+            provider: RPCProvider,
+            depositAddress: depositAddress,
+          });
+          transactions.push(...storageBalance);
+          transactions.push({
             receiverId: selectedToken.contractAddress,
-            actions: [
+            functionCalls: [
               {
-                type: "FunctionCall",
-                params: {
-                  methodName: "ft_transfer_call",
-                  deposit: ONE_YOCTO,
-                  gas: convertGas("80"),
-                  args: {
-                    amount: Big(amount).toFixed(),
-                    receiver_id: depositAddress,
-                  },
+                methodName: "ft_transfer",
+                args: {
+                  amount: parseTokenAmount(amount, selectedToken.decimals),
+                  receiver_id: depositAddress,
+                  msg: "",
                 },
+                amount: ONE_YOCTO_NEAR,
               },
             ],
           });
-          if (trx) {
+          const nearTransactions: Transaction[] = transactions.map(
+            (transaction: ITransaction) => ({
+              signerId: nearAddress?.accountId,
+              receiverId: transaction.receiverId,
+              actions: transaction.functionCalls.map((fc) => ({
+                type: "FunctionCall",
+                params: {
+                  methodName: fc.methodName,
+                  args: fc.args || {},
+                  gas: getGas(fc.gas).toFixed(),
+                  deposit: getAmount(fc.amount).toFixed(),
+                },
+              })),
+            })
+          );
+          const trx = await wallet.signAndSendTransactions({
+            transactions: nearTransactions,
+          });
+
+          if (trx && Array.isArray(trx) && trx.length > 0) {
+            const lastOutcome = trx[trx.length - 1];
             const successStatus = Object.prototype.hasOwnProperty.call(
-              trx.status,
+              lastOutcome.status,
               "SuccessValue"
             );
             if (successStatus) {
@@ -348,7 +377,7 @@ const useNetwork = (network: Network | null) => {
             console.error(err);
             alert("Transaction failed.");
           }
-          return console.log("ton");
+          return true;
       }
     },
     signData: async (data: PermitDataResponse) => {
@@ -359,8 +388,25 @@ const useNetwork = (network: Network | null) => {
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
-          return signMessage(wagmiAdapter.wagmiConfig, {
-            message: JSON.stringify(data.data),
+        case Network.NEAR:
+        case Network.TON:
+          const { message, types, domain } = data.data;
+          return signTypedData(wagmiAdapter.wagmiConfig, {
+            types,
+            primaryType: "Permit",
+            domain: {
+              name: domain.name,
+              version: domain.version,
+              chainId: BigInt(domain.chainId),
+              verifyingContract: domain.verifyingContract as `0x${string}`,
+            },
+            message: {
+              owner: message.owner as `0x${string}`,
+              spender: message.spender as `0x${string}`,
+              value: BigInt(message.value),
+              nonce: BigInt(message.nonce),
+              deadline: BigInt(message.deadline),
+            },
           });
       }
     },

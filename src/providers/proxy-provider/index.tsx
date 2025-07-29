@@ -32,6 +32,7 @@ interface QuoteResponse {
     recipient: string;
     refundTo: string;
   };
+  error?: string;
 }
 
 export interface PermitDataResponse {
@@ -75,10 +76,14 @@ export const getQuote = async (
   if (dryRun) {
     const response = await fetch(API_ROUTES.QUOTE, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         assetFrom,
         blockchain,
         slippageTolerance: SLIPPAGE,
+        amount,
       }),
     });
     return response.json();
@@ -87,6 +92,9 @@ export const getQuote = async (
   }
   const response = await fetch(API_ROUTES.QUOTE, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       assetFrom,
       blockchain,
@@ -121,6 +129,9 @@ export const execute = async (
 ) => {
   const response = await fetch(API_ROUTES.EXECUTE, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       depositAddress,
       userPermit,

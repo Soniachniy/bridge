@@ -19,9 +19,12 @@ import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/use-swap-quote";
 import {
   fetchTokens,
+  execute,
   getPermitData,
   getStatus,
 } from "@/providers/proxy-provider";
+import { sliceHex } from "viem";
+import { Network } from "@/config";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -34,25 +37,28 @@ export enum EStrategy {
 }
 
 export default function Form() {
-  const [strategy, setStrategy] = useState<EStrategy | null>(null);
+  const [strategy, setStrategy] = useState<EStrategy | null>(EStrategy.SWAP);
 
   const {
     control,
     setValue,
     handleSubmit,
     register,
+    setError,
+    clearErrors,
     formState: { errors, dirtyFields },
   } = useForm({
     resolver: zodResolver(createFormValidationSchema(strategy)),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
-      amount: "",
+      amount: "2.49",
       amountOut: "",
       selectedToken: null,
       hyperliquidAddress: "",
       refundAddress: "",
-      depositAddress: "",
+      depositAddress:
+        "6bee5e24614032010fad329dc1a51894b866a0b087a5f23a14b83d68a80da018",
     },
   });
   const selectedToken = useWatch({ control, name: "selectedToken" });
@@ -75,6 +81,8 @@ export default function Form() {
       setValue(key, value),
     hyperliquidAddress,
     refundAddress,
+    setError: (key: keyof FormInterface, value: {}) => setError(key, value),
+    clearError: (key: (keyof FormInterface)[]) => clearErrors(key),
   });
 
   const {
@@ -115,24 +123,26 @@ export default function Form() {
   }, [selectedToken]);
 
   const onSubmit = async () => {
-    await queryClient.invalidateQueries({
-      queryKey: [
-        "quote",
-        debouncedAmountIn,
-        hyperliquidAddress,
-        selectedToken?.assetId,
-      ],
-    });
+    // await queryClient.invalidateQueries({
+    //   queryKey: [
+    //     "quote",
+    //     debouncedAmountIn,
+    //     hyperliquidAddress,
+    //     refundAddress,
+    //     selectedToken?.assetId,
+    //   ],
+    // });
+    const depositAddress =
+      "6bee5e24614032010fad329dc1a51894b866a0b087a5f23a14b83d68a80da018";
     if (depositAddress && selectedToken) {
-      await queryClient.invalidateQueries({
-        queryKey: ["status", depositAddress],
-      });
-      const success = await makeDeposit(
-        selectedToken,
-        depositAddress,
-        amountIn,
-        selectedToken.decimals
-      );
+      console.log(depositAddress, "start");
+      // const success = await makeDeposit(
+      //   selectedToken,
+      //   depositAddress,
+      //   amountIn,
+      //   selectedToken.decimals
+      // );
+      // console.log(success, "success");
       localStorage.setItem("depositAddress", depositAddress);
       const depositStatus = await getDepositStatus(depositAddress);
 
@@ -141,8 +151,21 @@ export default function Form() {
         console.log(permitData, "permitData");
         const signature = await signData(permitData);
         console.log(signature, "signData");
+        if (signature) {
+          const r = sliceHex(signature, 0, 32);
+          const s = sliceHex(signature, 32, 64);
+          const vByte = sliceHex(signature, 64, 65);
+          const v = parseInt(vByte, 16);
+
+          const proccess = await execute(depositAddress, {
+            v: v,
+            r: r,
+            s: s,
+          });
+          console.log(proccess, "proccess");
+        }
       }
-      console.log(success);
+      // console.log(success);
     }
   };
 
@@ -260,13 +283,13 @@ export default function Form() {
             </div>
           </div>
           {errors.amount && (
-            <div className="text-error text-xs font-normal text-left w-full font-inter">
-              {errors.amount.message}
+            <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
+              <span>{errors.amount.message}</span>
             </div>
           )}
         </div>
 
-        {strategy && (
+        {selectedToken && (
           <>
             <div className="flex flex-col gap-2 mt-6">
               <label className="text-[#9DB2BD] font-normal text-xs font-inter">
@@ -279,7 +302,7 @@ export default function Form() {
                       type="text"
                       {...register("hyperliquidAddress")}
                       className="text-white grow-1 border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      value={hyperliquidAddress ?? ""}
+                      value={getPublicKey(Network.ETHEREUM) ?? ""}
                       placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
                       autoComplete="off"
                       spellCheck="false"
@@ -300,8 +323,8 @@ export default function Form() {
                 </div>
               </div>
               {errors.hyperliquidAddress && (
-                <div className="text-error text-xs font-normal text-left w-full font-inter">
-                  {errors.hyperliquidAddress.message}
+                <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
+                  <span>{errors.hyperliquidAddress.message}</span>
                 </div>
               )}
             </div>
@@ -317,7 +340,7 @@ export default function Form() {
                       type="text"
                       {...register("refundAddress")}
                       className="text-white border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      value={refundAddress ?? ""}
+                      value={getPublicKey() ?? ""}
                       placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
                       autoComplete="off"
                       spellCheck="false"
@@ -336,8 +359,8 @@ export default function Form() {
                 </div>
               </div>
               {errors.refundAddress && (
-                <div className="text-error text-xs font-normal text-left w-full font-inter">
-                  {errors.refundAddress.message}
+                <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
+                  <span>{errors.refundAddress.message}</span>
                 </div>
               )}
             </div>

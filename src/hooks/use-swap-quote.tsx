@@ -4,6 +4,7 @@ import { isAxiosError } from "axios";
 
 import { FormInterface } from "@/lib/validation";
 import { getQuote } from "@/providers/proxy-provider";
+import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
 
 type Props = {
   tokenIn: TokenResponse | null;
@@ -11,6 +12,8 @@ type Props = {
   setFormValue: (name: keyof FormInterface, value: string) => void;
   hyperliquidAddress: string | undefined;
   refundAddress: string;
+  setError: (key: keyof FormInterface, value: {}) => void;
+  clearError: (key: (keyof FormInterface)[]) => void;
 };
 
 const useSwapQuote = ({
@@ -19,9 +22,17 @@ const useSwapQuote = ({
   setFormValue,
   hyperliquidAddress,
   refundAddress,
+  setError,
+  clearError,
 }: Props) => {
   return useQuery({
-    queryKey: ["quote", amountIn, hyperliquidAddress, tokenIn?.assetId],
+    queryKey: [
+      "quote",
+      amountIn,
+      hyperliquidAddress || "",
+      refundAddress || "",
+      tokenIn?.assetId,
+    ],
     queryFn: async () => {
       if (!tokenIn) return null;
       try {
@@ -30,13 +41,37 @@ const useSwapQuote = ({
           tokenIn.assetId,
           tokenIn.blockchain,
           hyperliquidAddress,
-          amountIn,
+          parseTokenAmount(amountIn, tokenIn.decimals),
           refundAddress
         );
+        if (!response?.success) {
+          const isAmountError = response?.error?.includes("Amount too small");
+          if (isAmountError) {
+            setError("amount", {
+              message: response?.error || "Failed to fetch quote",
+            });
+          } else if (response?.error?.includes("refundTo")) {
+            setError("refundAddress", {
+              message: response?.error || "Failed to fetch quote",
+            });
+          } else if (response?.error?.includes("hyperliquidAddress")) {
+            setError("hyperliquidAddress", {
+              message: response?.error || "Failed to fetch quote",
+            });
+          }
+          return null;
+        }
         if (response) {
-          setFormValue("amountOut", response.data.expectedAmountOut);
+          setFormValue(
+            "amountOut",
+            formatTokenAmount(response.data.expectedAmountOut, 6)
+          );
+
           if (response.data.depositAddress)
             setFormValue("depositAddress", response.data.depositAddress);
+          if (!Boolean(hyperliquidAddress)) {
+            clearError(["hyperliquidAddress", "refundAddress"]);
+          }
         }
         return response;
       } catch (error: unknown) {
