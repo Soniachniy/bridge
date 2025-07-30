@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 
 import { getDepositStatus, translateNetwork } from "@/lib/1clickHelper";
 
-import { enforcer, formatTokenAmount, truncateAddress } from "@/lib/utils";
+import {
+  enforcer,
+  formatTokenAmount,
+  isSupportedNetwork,
+  truncateAddress,
+} from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
@@ -14,6 +19,8 @@ import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/error-icon.svg?react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import ManualIcon from "@/assets/manual.svg?react";
+import CopyIcon from "@/assets/copy-icon.svg?react";
+import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/use-swap-quote";
@@ -21,10 +28,9 @@ import {
   fetchTokens,
   execute,
   getPermitData,
-  getStatus,
 } from "@/providers/proxy-provider";
 import { sliceHex } from "viem";
-import { Network } from "@/config";
+import useManualDeposit from "@/hooks/use-manual-deposit";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -37,7 +43,7 @@ export enum EStrategy {
 }
 
 export default function Form() {
-  const [strategy, setStrategy] = useState<EStrategy | null>(EStrategy.SWAP);
+  const [strategy, setStrategy] = useState<EStrategy>(EStrategy.SWAP);
 
   const {
     control,
@@ -96,6 +102,8 @@ export default function Form() {
     signData,
   } = useNetwork(translateNetwork(selectedToken?.blockchain), setValue, watch);
 
+  useManualDeposit(strategy, signData, depositAddress);
+
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
     queryFn: async () => {
@@ -122,6 +130,19 @@ export default function Form() {
       }
     };
     getSelectedTokenBalance();
+  }, [selectedToken, hyperliquidAddress, refundAddress]);
+
+  useEffect(() => {
+    if (selectedToken) {
+      const isSupported = isSupportedNetwork(
+        translateNetwork(selectedToken.blockchain)
+      );
+      if (!isSupported) {
+        setStrategy(EStrategy.DEPOSIT);
+      } else {
+        setStrategy(EStrategy.SWAP);
+      }
+    }
   }, [selectedToken]);
 
   const onSubmit = async () => {
@@ -169,7 +190,7 @@ export default function Form() {
       // console.log(success);
     }
   };
-
+  console.log(connectedEVMWallet, "connectedEVMWallet");
   return (
     <div className="p-4 w-full min-h-96">
       <div className="flex flex-col justify-center items-center mb-6">
@@ -303,7 +324,6 @@ export default function Form() {
                       type="text"
                       {...register("hyperliquidAddress")}
                       className="text-white grow-1 border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      value={getPublicKey(Network.ETHEREUM) ?? ""}
                       placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
                       autoComplete="off"
                       spellCheck="false"
@@ -320,6 +340,18 @@ export default function Form() {
                     {hyperliquidAddress &&
                       dirtyFields.hyperliquidAddress &&
                       !errors.hyperliquidAddress && <SuccessIcon />}
+                  </div>
+                  <div className="flex flex-row justify-end items-center gap-1">
+                    <div
+                      onClick={async () => {
+                        const text =
+                          await window.navigator.clipboard.readText();
+                        setValue("hyperliquidAddress", text);
+                      }}
+                      className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
+                    >
+                      paste
+                    </div>
                   </div>
                 </div>
               </div>
@@ -341,7 +373,6 @@ export default function Form() {
                       type="text"
                       {...register("refundAddress")}
                       className="text-white border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      value={getPublicKey() ?? ""}
                       placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
                       autoComplete="off"
                       spellCheck="false"
@@ -357,6 +388,18 @@ export default function Form() {
                       dirtyFields.refundAddress &&
                       !errors.refundAddress && <SuccessIcon />}
                   </div>
+                  <div className="flex flex-row justify-end items-center gap-1">
+                    <div
+                      onClick={async () => {
+                        const text =
+                          await window.navigator.clipboard.readText();
+                        setValue("refundAddress", text);
+                      }}
+                      className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
+                    >
+                      paste
+                    </div>
+                  </div>
                 </div>
               </div>
               {errors.refundAddress && (
@@ -367,6 +410,43 @@ export default function Form() {
             </div>
           </>
         )}
+        {!isSupportedNetwork(translateNetwork(selectedToken?.blockchain)) &&
+          connectedEVMWallet &&
+          depositAddress && (
+            <div className="self-stretch py-6 inline-flex flex-col justify-start items-center gap-4">
+              <div className="size- flex flex-col justify-start items-center gap-1">
+                <div className="justify-center text-gray_text text-2xl font-normal font-['Inter'] leading-normal">
+                  Your deposit address.
+                </div>
+                <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
+                  Send assets manually to this address.
+                </div>
+              </div>
+              <div className="text-center justify-center text-main_white text-sm font-normal font-['Inter'] leading-none">
+                {depositAddress}
+              </div>
+              <div className="size- inline-flex justify-start items-start gap-2">
+                <div className="size- inline-flex justify-start items-start">
+                  <div
+                    onClick={() => {
+                      navigator.clipboard.writeText(depositAddress ?? "");
+                    }}
+                    className="cursor-pointer pl-2 pr-4 py-2 bg-main_light rounded-[10px] flex justify-center items-center gap-2 overflow-hidden"
+                  >
+                    <CopyIcon />
+                    <div className="justify-center text-black text-sm font-normal font-['DM_Sans'] leading-normal">
+                      Copy address
+                    </div>
+                  </div>
+                </div>
+                <div className="cursor-pointer flex justify-start items-start">
+                  <div className="size- p-2 bg-main_light rounded-[10px] flex justify-center items-center overflow-hidden">
+                    <QRCodeIcon />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
         {renderActionButtons(
           selectedToken,

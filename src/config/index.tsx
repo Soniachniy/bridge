@@ -36,6 +36,25 @@ export enum Network {
   ZEC = "ZEC",
 }
 
+export const supportedNetworks = {
+  [Network.ETHEREUM]: true,
+  [Network.SOLANA]: false,
+  [Network.NEAR]: true,
+  [Network.TON]: false,
+  [Network.POLYGON]: true,
+  [Network.ARBITRUM]: true,
+  [Network.AURORA]: true,
+  [Network.BASE]: true,
+  [Network.BERA]: true,
+  [Network.BNB]: true,
+  [Network.BITCOIN]: false,
+  [Network.DOGE]: false,
+  [Network.GNOSIS]: false,
+  [Network.TRON]: false,
+  [Network.XRP]: false,
+  [Network.ZEC]: false,
+};
+
 export const basicConfig = {
   arbitrumProxyAddress: "0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a",
   proxyApiPoint: "https://api.hyperdep.now",

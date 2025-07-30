@@ -28,12 +28,10 @@ export async function getStorageBalance({
 }
 
 export async function checkSwapStorageBalance({
-  accountId,
   contractId,
   provider,
   depositAddress,
 }: {
-  accountId: string;
   contractId: string;
   depositAddress: string;
   provider: any;

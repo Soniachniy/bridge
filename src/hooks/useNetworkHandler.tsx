@@ -19,7 +19,6 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import {
   prepareTransactionRequest,
   sendTransaction,
-  signMessage,
   signTypedData,
   switchChain,
   waitForTransactionReceipt,
@@ -58,13 +57,13 @@ const useNetwork = (
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const { openModal, selector, RPCProvider } = useWalletSelector();
   const { isConnected, address } = useAccount();
-  const { publicKey } = useWallet();
+  const { publicKey, connect } = useWallet();
   const [tonConnectUI] = useTonConnectUI();
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
-  // const solanaAccount = useAppKitAccount({ namespace: "solana" });
-  const evmAccount = useAppKitAccount({ namespace: "eip155" });
 
+  const evmAccount = useAppKitAccount({ namespace: "eip155" });
+  console.log("evmAccount", evmAccount);
   const tonWallet = useTonWallet();
 
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
@@ -88,8 +87,8 @@ const useNetwork = (
   }, [updateIsNearConnected, selector]);
 
   useEffect(() => {
-    console.log(connectedEVMWallet, "connectedEVMWallet");
     if (evmAccount.address && !connectedEVMWallet) {
+      console.log("evmAccount.address", evmAccount.address);
       setValue("connectedEVMWallet", true);
     }
   }, [evmAccount.address]);
@@ -123,11 +122,12 @@ const useNetwork = (
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
-        case Network.SOLANA:
           return open({
             view: "Connect",
             namespace: "eip155",
           });
+        case Network.SOLANA:
+          return connect();
         case Network.NEAR:
           return openModal();
         case Network.TON:
@@ -308,7 +308,6 @@ const useNetwork = (
           const wallet = await selector.wallet();
           const transactions: ITransaction[] = [];
           const storageBalance = await checkSwapStorageBalance({
-            accountId: nearAddress?.accountId as string,
             contractId: selectedToken.contractAddress as string,
             provider: RPCProvider,
             depositAddress: depositAddress,

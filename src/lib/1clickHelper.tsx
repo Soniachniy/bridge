@@ -343,9 +343,9 @@ export const delay = async (time = 1000): Promise<void> => {
   return new Promise((res) => setTimeout(res, time));
 };
 
-export const getDepositStatus = async (depositAddress: string) => {
+export const getDepositStatus = async (depositAddress: string, retries = 9) => {
   const timeInterval = 7000;
-  const maxRetries = 9;
+  const maxRetries = retries;
   let attempt = 0;
 
   let status: boolean | null = false;

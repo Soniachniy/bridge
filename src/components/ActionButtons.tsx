@@ -1,6 +1,8 @@
 import { EStrategy } from "@/pages/Form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { Network } from "@/config";
+import { isSupportedNetwork } from "@/lib/utils";
+import { translateNetwork } from "@/lib/1clickHelper";
 
 export const ActionButton = ({
   onClick,
@@ -80,7 +82,11 @@ export const renderActionButtons = (
       </div>
     );
   }
-  if (!selectedToken) return null;
+  if (
+    !selectedToken ||
+    !isSupportedNetwork(translateNetwork(selectedToken.blockchain))
+  )
+    return null;
   if (strategy === EStrategy.SWAP && isConnected) {
     return (
       <>

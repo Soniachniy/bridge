@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 
 import { twMerge } from "tailwind-merge";
 import { parseUnits } from "viem";
+import { Network, supportedNetworks } from "@/config";
 type ValueType = string | number | Big;
 
 export function cn(...inputs: ClassValue[]) {
@@ -64,3 +65,7 @@ export const parseTokenAmount = (value: ValueType, decimals: number) =>
   Big(value)
     .mul(BASE ** decimals)
     .toFixed(0);
+
+export const isSupportedNetwork = (network: Network) => {
+  return supportedNetworks[network];
+};

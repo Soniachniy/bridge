@@ -10,8 +10,8 @@ type Props = {
   tokenIn: TokenResponse | null;
   amountIn: string;
   setFormValue: (name: keyof FormInterface, value: string) => void;
-  hyperliquidAddress: string | undefined;
-  refundAddress: string;
+  hyperliquidAddress: string | null;
+  refundAddress: string | null;
   setError: (key: keyof FormInterface, value: {}) => void;
   clearError: (key: (keyof FormInterface)[]) => void;
 };
@@ -40,9 +40,9 @@ const useSwapQuote = ({
           !hyperliquidAddress,
           tokenIn.assetId,
           tokenIn.blockchain,
-          hyperliquidAddress,
+          hyperliquidAddress ?? "",
           parseTokenAmount(amountIn, tokenIn.decimals),
-          refundAddress
+          refundAddress ?? ""
         );
         if (!response?.success) {
           const isAmountError = response?.error?.includes("Amount too small");
