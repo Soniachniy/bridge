@@ -1,6 +1,6 @@
 import { basicConfig, Network } from "@/config";
 
-import { useWalletSelector } from "@/providers/near-provider";
+import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
@@ -159,7 +159,12 @@ const useNetwork = (
           return null;
       }
     },
-    getBalance: async (contractAddress?: string) => {
+    getBalance: async (
+      contractAddress?: string
+    ): Promise<{
+      balance: bigint;
+      nearBalance: bigint;
+    }> => {
       switch (network) {
         case Network.BASE:
         case Network.AURORA:
@@ -171,45 +176,58 @@ const useNetwork = (
             address: address as `0x${string}`,
             token: contractAddress as `0x${string}`,
           });
-          return value;
+          return { balance: value, nearBalance: 0n };
         case Network.SOLANA:
-          if (!publicKey) return 0;
-          return getSplTokenBalance(
+          if (!publicKey) return { balance: 0n, nearBalance: 0n };
+          const balance = await getSplTokenBalance(
             publicKey,
             contractAddress as `0x${string}`
           );
+          return { balance: BigInt(balance ?? 0), nearBalance: 0n };
         case Network.NEAR:
-          if (!contractAddress) {
-            return 0;
+          if (!contractAddress || !nearAddress?.accountId) {
+            return { balance: 0n, nearBalance: 0n };
           }
-          const nearBalance = await RPCProvider.viewFunction(
+          let nearBalance = 0;
+          const tokenBalance = await RPCProvider.viewFunction(
             "ft_balance_of",
             contractAddress,
             {
               account_id: nearAddress?.accountId,
             }
           );
-          return nearBalance;
+          if (contractAddress === "wrap.near") {
+            nearBalance = await RPCProvider.viewAccount(nearAddress?.accountId);
+          }
+
+          return {
+            balance: BigInt(tokenBalance ?? 0) + BigInt(nearBalance ?? 0),
+            nearBalance: BigInt(nearBalance ?? 0),
+          };
         case Network.TON:
           if (!tonWallet?.account?.address || !contractAddress) {
-            return 0;
+            return { balance: 0n, nearBalance: 0n };
           }
           const tonTokenBalance =
             await tonClient.accounts.getAccountJettonBalance(
               Address.parse(tonWallet?.account?.address),
               Address.parse(contractAddress)
             );
-          return tonTokenBalance;
+          return {
+            balance: BigInt(tonTokenBalance.balance.toString()),
+            nearBalance: 0n,
+          };
 
         default:
-          return null;
+          return { balance: 0n, nearBalance: 0n };
       }
     },
     makeDeposit: async (
       selectedToken: TokenResponse,
       depositAddress: string,
       amount: string,
-      decimals: number
+      decimals: number,
+      balance: { balance: bigint; nearBalance?: bigint }
     ) => {
       switch (network) {
         case Network.BASE:
@@ -303,6 +321,25 @@ const useNetwork = (
           }
           const wallet = await selector.wallet();
           const transactions: ITransaction[] = [];
+          if (selectedToken.contractAddress === "wrap.near") {
+            const nearShortage = balance.balance - (balance?.nearBalance ?? 0n);
+
+            if (nearShortage <= balance.balance) return false;
+
+            if (nearShortage > 0n) {
+              transactions.push({
+                receiverId: selectedToken.contractAddress,
+                functionCalls: [
+                  {
+                    methodName: "near_deposit",
+                    args: { amount: nearShortage },
+                    gas: convertGas("100"),
+                    amount: ONE_YOCTO_NEAR,
+                  },
+                ],
+              });
+            }
+          }
           const storageBalance = await checkSwapStorageBalance({
             contractId: selectedToken.contractAddress as string,
             provider: RPCProvider,
@@ -323,6 +360,7 @@ const useNetwork = (
               },
             ],
           });
+
           const nearTransactions: Transaction[] = transactions.map(
             (transaction: ITransaction) => ({
               signerId: nearAddress?.accountId,

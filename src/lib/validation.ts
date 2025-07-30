@@ -39,7 +39,8 @@ export const formValidationSchema = z
         decimals: z.number(),
         contractAddress: z.string().optional(),
         blockchain: z.nativeEnum(TokenResponse.blockchain),
-        balance: z.string(),
+        balance: z.bigint(),
+        balanceNear: z.bigint(),
         balanceUpdatedAt: z.number(),
       })
       .nullable()
@@ -107,7 +108,8 @@ export type FormValidationData = z.infer<FormInterface>;
 export interface FormInterface {
   selectedToken:
     | (TokenResponse & {
-        balance: string;
+        balance: bigint;
+        balanceNear: bigint;
         balanceUpdatedAt: number;
       })
     | null;

@@ -4,7 +4,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { parseUnits } from "viem";
 import { Network, supportedNetworks } from "@/config";
-type ValueType = string | number | Big;
+type ValueType = string | number | Big | bigint;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -56,15 +56,28 @@ export const validateBalance = (
 };
 
 export const formatTokenAmount = (
-  value: string | number | Big,
+  value: string | number | Big | bigint,
   decimals = 18,
   precision?: number
-): string => Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);
+): string => {
+  if (typeof value === "bigint") {
+    return Big(value.toString())
+      .div(Big(BASE).pow(decimals))
+      .toFixed(precision);
+  }
+  return Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);
+};
 
-export const parseTokenAmount = (value: ValueType, decimals: number) =>
-  Big(value)
+export const parseTokenAmount = (value: ValueType, decimals: number) => {
+  if (typeof value === "bigint") {
+    return Big(value.toString())
+      .mul(BASE ** decimals)
+      .toFixed(0);
+  }
+  return Big(value)
     .mul(BASE ** decimals)
     .toFixed(0);
+};
 
 export const isSupportedNetwork = (network: Network) => {
   return supportedNetworks[network];

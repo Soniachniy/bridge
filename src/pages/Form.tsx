@@ -110,11 +110,14 @@ export default function Form() {
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
       if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
-        const balance = await getBalance(selectedToken.contractAddress);
+        const { balance, nearBalance } = await getBalance(
+          selectedToken.contractAddress
+        );
         if (balance) {
           setValue("selectedToken", {
             ...selectedToken,
-            balance: balance.toString(),
+            balance: balance,
+            balanceNear: nearBalance,
             balanceUpdatedAt: Date.now(),
           });
         }
@@ -152,7 +155,11 @@ export default function Form() {
         selectedToken,
         depositAddress,
         amountIn,
-        selectedToken.decimals
+        selectedToken.decimals,
+        {
+          balance: BigInt(selectedToken.balance),
+          nearBalance: BigInt(selectedToken.balanceNear ?? "0"),
+        }
       );
 
       const depositStatus = await getDepositStatus(depositAddress);
@@ -198,7 +205,8 @@ export default function Form() {
             selectToken={(token) => {
               setValue("selectedToken", {
                 ...token,
-                balance: "0",
+                balance: 0n,
+                balanceNear: 0n,
                 balanceUpdatedAt: 0,
               });
             }}
@@ -247,7 +255,7 @@ export default function Form() {
                       setValue(
                         "amount",
                         formatTokenAmount(
-                          selectedToken?.balance ?? 0,
+                          selectedToken?.balance ?? 0n,
                           selectedToken?.decimals
                         ) ?? "0"
                       );
@@ -271,7 +279,8 @@ export default function Form() {
                 </span>
                 <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
                   {formatTokenAmount(
-                    selectedToken?.balance ?? 0,
+                    (selectedToken?.balance ?? 0n) +
+                      (selectedToken?.balanceNear ?? 0n),
                     selectedToken?.decimals
                   )}{" "}
                   {selectedToken?.symbol}
