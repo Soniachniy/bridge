@@ -66,6 +66,9 @@ const useSwapQuote = ({
             "amountOut",
             formatTokenAmount(response.data.expectedAmountOut, 6)
           );
+          if (Number(response.data.expectedAmountOut) > 0) {
+            clearError(["amountOut"]);
+          }
 
           if (response.data.depositAddress)
             setFormValue("depositAddress", response.data.depositAddress);

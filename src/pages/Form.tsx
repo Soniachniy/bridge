@@ -27,6 +27,7 @@ import useSwapQuote from "@/hooks/use-swap-quote";
 import { fetchTokens } from "@/providers/proxy-provider";
 import useManualDeposit from "@/hooks/use-manual-deposit";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "@radix-ui/themes";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -69,7 +70,7 @@ export default function Form() {
   const amountIn = useWatch({ control: control, name: "amount" });
   const amountOut = useWatch({ control: control, name: "amountOut" });
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
-  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 2000 : 0, [
+  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 500 : 0, [
     amountIn,
   ]);
   const queryClient = useQueryClient();
@@ -78,7 +79,7 @@ export default function Form() {
   const depositAddress = useWatch({ control, name: "depositAddress" });
   const connectedEVMWallet = useWatch({ control, name: "connectedEVMWallet" });
 
-  useSwapQuote({
+  const { isLoading } = useSwapQuote({
     tokenIn: selectedToken,
     amountIn: debouncedAmountIn ?? "",
     setFormValue: (key: keyof FormInterface, value: string) =>
@@ -258,11 +259,15 @@ export default function Form() {
               </div>
               <div className="flex flex-row gap-1 justify-between">
                 <span className="text-white text-xs font-light font-inter leading-[14px]">
-                  {amountOut && (
+                  {isLoading ? (
+                    <span className="text-white flex flex-row gap-1 items-center text-xs font-light font-inter leading-[14px]">
+                      Loading <Spinner size="1" />
+                    </span>
+                  ) : amountOut ? (
                     <span className="text-white text-xs font-light font-inter leading-[14px]">
                       At least ${amountOut} USDC
                     </span>
-                  )}
+                  ) : null}
                 </span>
                 <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
                   {formatTokenAmount(
