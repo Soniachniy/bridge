@@ -36,6 +36,7 @@
     "near-api-js": "^6.2.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.7.1",
     "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0",
     "vite-plugin-node-polyfills": "^0.24.0",

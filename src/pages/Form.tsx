@@ -24,13 +24,9 @@ import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/use-swap-quote";
-import {
-  fetchTokens,
-  execute,
-  getPermitData,
-} from "@/providers/proxy-provider";
-import { sliceHex } from "viem";
+import { fetchTokens } from "@/providers/proxy-provider";
 import useManualDeposit from "@/hooks/use-manual-deposit";
+import { useNavigate } from "react-router-dom";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -44,7 +40,7 @@ export enum EStrategy {
 
 export default function Form() {
   const [strategy, setStrategy] = useState<EStrategy>(EStrategy.SWAP);
-
+  const navigate = useNavigate();
   const {
     control,
     setValue,
@@ -93,16 +89,10 @@ export default function Form() {
     clearError: (key: (keyof FormInterface)[]) => clearErrors(key),
   });
 
-  const {
-    connectWallet,
-    getPublicKey,
-    isConnected,
-    getBalance,
-    makeDeposit,
-    signData,
-  } = useNetwork(translateNetwork(selectedToken?.blockchain), setValue, watch);
+  const { connectWallet, getPublicKey, isConnected, getBalance, makeDeposit } =
+    useNetwork(translateNetwork(selectedToken?.blockchain), setValue, watch);
 
-  useManualDeposit(strategy, signData, depositAddress);
+  useManualDeposit(strategy, navigate, depositAddress);
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -157,40 +147,20 @@ export default function Form() {
     });
 
     if (depositAddress && selectedToken) {
-      console.log(depositAddress, "start");
-      const success = await makeDeposit(
+      await makeDeposit(
         selectedToken,
         depositAddress,
         amountIn,
         selectedToken.decimals
       );
-      console.log(success, "success");
-      localStorage.setItem("depositAddress", depositAddress);
+
       const depositStatus = await getDepositStatus(depositAddress);
-
-      if (depositStatus.status) {
-        const permitData = await getPermitData(depositAddress);
-        console.log(permitData, "permitData");
-        const signature = await signData(permitData);
-        console.log(signature, "signData");
-        if (signature) {
-          const r = sliceHex(signature, 0, 32);
-          const s = sliceHex(signature, 32, 64);
-          const vByte = sliceHex(signature, 64, 65);
-          const v = parseInt(vByte, 16);
-
-          const proccess = await execute(depositAddress, {
-            v: v,
-            r: r,
-            s: s,
-          });
-          console.log(proccess, "proccess");
-        }
+      if (depositStatus) {
+        navigate(`/${depositAddress}`);
       }
-      // console.log(success);
     }
   };
-  console.log(connectedEVMWallet, "connectedEVMWallet");
+
   return (
     <div className="p-4 w-full min-h-96">
       <div className="flex flex-col justify-center items-center mb-6">

@@ -44,7 +44,7 @@ export async function checkSwapStorageBalance({
       contractId,
       provider,
     });
-    console.log(storageAvailable, "storageAvailable");
+
     if (storageAvailable === null || storageAvailable.total === "0") {
       transactions.push({
         receiverId: contractId,

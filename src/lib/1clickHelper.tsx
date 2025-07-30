@@ -355,14 +355,12 @@ export const getDepositStatus = async (depositAddress: string, retries = 9) => {
     try {
       await delay(timeInterval);
       const statusResponse = await getStatus(depositAddress);
-      console.log(statusResponse, "statusResponse");
       if (
         statusResponse.success &&
         statusResponse.data.status === "ready_for_permit"
       ) {
         status = true;
         data = statusResponse.data;
-        console.log(statusResponse, "data inside");
         break;
       } else {
         status = false;

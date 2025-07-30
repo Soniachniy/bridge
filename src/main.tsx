@@ -7,6 +7,8 @@ import { WalletSelector } from "@near-wallet-selector/core";
 import { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import Layout from "./pages/Layout";
 import Form from "./pages/Form";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProcessingScreen from "./pages/ProcessingScreen";
 
 declare global {
   interface Window {
@@ -19,7 +21,12 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Providers>
       <Layout>
-        <Form />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Form />} />
+            <Route path="/:id" element={<ProcessingScreen />} />
+          </Routes>
+        </BrowserRouter>
       </Layout>
     </Providers>
   </StrictMode>

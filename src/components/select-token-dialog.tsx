@@ -71,11 +71,7 @@ const SelectTokenDialog: FC<Props> = ({
       return matchesSearch && matchesNetwork;
     });
   }, [allTokens, search, currentSelectedBlockchains]);
-  console.log(
-    selectedToken?.blockchain,
-    selectedToken?.symbol,
-    "selectedToken"
-  );
+
   return (
     <Dialog.Root
       onOpenChange={(open) => {

@@ -63,7 +63,7 @@ const useNetwork = (
   const [isNearConnected, setIsNearConnected] = useState(false);
 
   const evmAccount = useAppKitAccount({ namespace: "eip155" });
-  console.log("evmAccount", evmAccount);
+
   const tonWallet = useTonWallet();
 
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
@@ -88,7 +88,6 @@ const useNetwork = (
 
   useEffect(() => {
     if (evmAccount.address && !connectedEVMWallet) {
-      console.log("evmAccount.address", evmAccount.address);
       setValue("connectedEVMWallet", true);
     }
   }, [evmAccount.address]);
@@ -134,12 +133,6 @@ const useNetwork = (
           return tonConnectUI.openModal();
         default:
           return null;
-      }
-    },
-    switchNetwork: () => {
-      switch (network) {
-        case Network.BASE:
-          return console.log("base");
       }
     },
     getPublicKey: (localNetwork?: Network) => {
@@ -297,7 +290,6 @@ const useNetwork = (
           console.log(txHash, "txHash");
           return txHash;
         case Network.NEAR:
-          console.log(depositAddress, "depositAddress");
           if (
             !selector ||
             !nearAddress?.accountId ||
@@ -414,7 +406,7 @@ const useNetwork = (
           await switchChain(wagmiAdapter.wagmiConfig, {
             chainId: Number(domain.chainId),
           });
-          console.log(domain.chainId, "domain.chainId");
+
           return signTypedData(wagmiAdapter.wagmiConfig, {
             types,
             primaryType: "Permit",
