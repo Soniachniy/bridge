@@ -4,7 +4,6 @@ import { basicConfig } from "@/config";
 
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { createAppKit } from "@reown/appkit/react";
-import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 
 const queryClientConfig = {
   defaultOptions: {
@@ -14,7 +13,6 @@ const queryClientConfig = {
     },
   },
 };
-const solanaWeb3JsAdapter = new SolanaAdapter();
 
 const metadata = {
   name: "HyperDep",
@@ -30,7 +28,7 @@ export const wagmiAdapter = new WagmiAdapter({
 });
 
 export const modal = createAppKit({
-  adapters: [wagmiAdapter, solanaWeb3JsAdapter],
+  adapters: [wagmiAdapter],
   networks: basicConfig.evmConfig.networks,
   projectId: basicConfig.evmConfig.projectId,
   metadata,

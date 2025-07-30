@@ -46,19 +46,20 @@ export default function Form() {
     register,
     setError,
     clearErrors,
-    formState: { errors, dirtyFields },
+    watch,
+    formState: { errors, dirtyFields, isSubmitting, isValidating },
   } = useForm({
     resolver: zodResolver(createFormValidationSchema(strategy)),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
-      amount: "2.49",
+      amount: "",
       amountOut: "",
       selectedToken: null,
       hyperliquidAddress: "",
       refundAddress: "",
-      depositAddress:
-        "6bee5e24614032010fad329dc1a51894b866a0b087a5f23a14b83d68a80da018",
+      depositAddress: "",
+      connectedEVMWallet: false,
     },
   });
   const selectedToken = useWatch({ control, name: "selectedToken" });
@@ -73,6 +74,7 @@ export default function Form() {
   const hyperliquidAddress = useWatch({ control, name: "hyperliquidAddress" });
   const refundAddress = useWatch({ control, name: "refundAddress" });
   const depositAddress = useWatch({ control, name: "depositAddress" });
+  const connectedEVMWallet = useWatch({ control, name: "connectedEVMWallet" });
 
   useSwapQuote({
     tokenIn: selectedToken,
@@ -92,7 +94,7 @@ export default function Form() {
     getBalance,
     makeDeposit,
     signData,
-  } = useNetwork(translateNetwork(selectedToken?.blockchain));
+  } = useNetwork(translateNetwork(selectedToken?.blockchain), setValue, watch);
 
   const { data } = useQuery({
     queryKey: ["one-click-tokens"],
@@ -371,7 +373,10 @@ export default function Form() {
           strategy,
           setStrategy,
           connectWallet,
-          isConnected()
+          isConnected(),
+          isSubmitting,
+          isValidating,
+          connectedEVMWallet
         )}
       </form>
     </div>

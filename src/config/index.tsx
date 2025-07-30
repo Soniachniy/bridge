@@ -63,10 +63,10 @@ export const basicConfig = {
   solanaConfig: {
     endpoint:
       "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
-    autoConnect: true,
+    autoConnect: false,
     wallets: [
-      new PhantomWalletAdapter() as Adapter,
       new HotWalletAdapter() as Adapter,
+      new PhantomWalletAdapter() as Adapter,
     ],
   },
 };

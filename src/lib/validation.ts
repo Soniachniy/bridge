@@ -52,6 +52,7 @@ export const formValidationSchema = z
     }),
     amountOut: z.string().optional(),
     depositAddress: z.string().optional(),
+    connectedEVMWallet: z.boolean(),
   })
   .check((ctx) => {
     if (ctx.value.selectedToken?.blockchain === "near") {
@@ -81,22 +82,22 @@ export const formValidationSchema = z
 
 export const createFormValidationSchema = (strategy: string | null) => {
   const baseSchema = formValidationSchema;
-  // if (strategy === "swap") {
-  //   return baseSchema.refine(
-  //     (data) => {
-  //       const maxBalance =
-  //         Number(data.selectedToken?.balance) /
-  //         Math.pow(10, data.selectedToken?.decimals ?? 1);
+  if (strategy === "swap") {
+    return baseSchema.refine(
+      (data) => {
+        const maxBalance =
+          Number(data.selectedToken?.balance) /
+          Math.pow(10, data.selectedToken?.decimals ?? 1);
 
-  //       const amount = Number(data.amount);
-  //       return amount <= maxBalance;
-  //     },
-  //     {
-  //       message: `Amount cannot exceed your balance`,
-  //       path: ["amount"],
-  //     }
-  //   );
-  // }
+        const amount = Number(data.amount);
+        return amount <= maxBalance;
+      },
+      {
+        message: `Amount cannot exceed your balance`,
+        path: ["amount"],
+      }
+    );
+  }
 
   return baseSchema;
 };
@@ -113,6 +114,7 @@ export interface FormInterface {
   amount: string;
   hyperliquidAddress: string;
   refundAddress: string;
-  amountOut: string;
-  depositAddress: string;
+  amountOut?: string;
+  depositAddress?: string;
+  connectedEVMWallet: boolean;
 }

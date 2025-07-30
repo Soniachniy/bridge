@@ -3,14 +3,14 @@ import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { getAssociatedTokenAddress, getAccount } from "@solana/spl-token";
 
 export async function getSplTokenBalance(
-  userWalletAddress: string,
+  userWalletAddress: PublicKey,
   tokenMintAddress?: string,
   rpcUrl = clusterApiUrl("mainnet-beta")
 ): Promise<number | null> {
   const connection = new Connection(rpcUrl, "confirmed");
-  const wallet = new PublicKey(userWalletAddress);
+
   if (!tokenMintAddress) {
-    const lamports = await connection.getBalance(wallet);
+    const lamports = await connection.getBalance(userWalletAddress);
     const sol = lamports / 1e9;
 
     return sol;
@@ -18,7 +18,7 @@ export async function getSplTokenBalance(
   const mint = new PublicKey(tokenMintAddress);
 
   try {
-    const ata = await getAssociatedTokenAddress(mint, wallet);
+    const ata = await getAssociatedTokenAddress(mint, userWalletAddress);
     const tokenAccount = await getAccount(connection, ata);
 
     return Number(tokenAccount.amount);

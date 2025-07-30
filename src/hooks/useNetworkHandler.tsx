@@ -46,8 +46,15 @@ import {
   ONE_YOCTO_NEAR,
 } from "@/lib/nearHelper";
 import { getAmount, getGas } from "@/lib/providerHelpers";
+import { FormInterface } from "@/lib/validation";
+import { UseFormWatch } from "react-hook-form";
 
-const useNetwork = (network: Network | null) => {
+const useNetwork = (
+  network: Network | null,
+  setValue: (key: keyof FormInterface, value: any) => void,
+  watch: UseFormWatch<FormInterface>
+) => {
+  const connectedEVMWallet = watch("connectedEVMWallet");
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const { openModal, selector, RPCProvider } = useWalletSelector();
   const { isConnected, address } = useAccount();
@@ -55,7 +62,8 @@ const useNetwork = (network: Network | null) => {
   const [tonConnectUI] = useTonConnectUI();
   const { open } = useAppKit();
   const [isNearConnected, setIsNearConnected] = useState(false);
-  const solanaAccount = useAppKitAccount({ namespace: "solana" });
+  // const solanaAccount = useAppKitAccount({ namespace: "solana" });
+  const evmAccount = useAppKitAccount({ namespace: "eip155" });
 
   const tonWallet = useTonWallet();
 
@@ -79,6 +87,13 @@ const useNetwork = (network: Network | null) => {
     updateIsNearConnected();
   }, [updateIsNearConnected, selector]);
 
+  useEffect(() => {
+    console.log(connectedEVMWallet, "connectedEVMWallet");
+    if (evmAccount.address && !connectedEVMWallet) {
+      setValue("connectedEVMWallet", true);
+    }
+  }, [evmAccount.address]);
+
   return {
     isConnected: () => {
       switch (network) {
@@ -99,8 +114,9 @@ const useNetwork = (network: Network | null) => {
           return false;
       }
     },
-    connectWallet: () => {
-      switch (network) {
+    connectWallet: (localNetwork?: Network) => {
+      const currentNetwork = localNetwork ?? network;
+      switch (currentNetwork) {
         case Network.BASE:
         case Network.AURORA:
         case Network.BNB:
@@ -108,7 +124,10 @@ const useNetwork = (network: Network | null) => {
         case Network.POLYGON:
         case Network.ETHEREUM:
         case Network.SOLANA:
-          return open();
+          return open({
+            view: "Connect",
+            namespace: "eip155",
+          });
         case Network.NEAR:
           return openModal();
         case Network.TON:
@@ -134,7 +153,7 @@ const useNetwork = (network: Network | null) => {
         case Network.ETHEREUM:
           return address;
         case Network.SOLANA:
-          return solanaAccount.address;
+          return publicKey?.toBase58();
         case Network.NEAR:
           return nearAddress?.accountId;
         case Network.TON:
@@ -157,8 +176,9 @@ const useNetwork = (network: Network | null) => {
           });
           return value;
         case Network.SOLANA:
+          if (!publicKey) return 0;
           return getSplTokenBalance(
-            solanaAccount.address as `0x${string}`,
+            publicKey,
             contractAddress as `0x${string}`
           );
         case Network.NEAR:
@@ -224,14 +244,14 @@ const useNetwork = (network: Network | null) => {
           return status.status === "success";
         case Network.SOLANA:
           const tx = new SolanaTransaction();
-          if (!selectedToken.contractAddress || !solanaAccount.address) {
+          if (!selectedToken.contractAddress || !publicKey) {
             return false;
           }
           let sourceAccount = await getAssociatedTokenAddress(
             new PublicKey(selectedToken.contractAddress),
-            new PublicKey(solanaAccount.address),
+            publicKey,
             false,
-            new PublicKey(solanaAccount.address)
+            publicKey
           );
           let {
             status: isAccountCreated,
@@ -240,17 +260,17 @@ const useNetwork = (network: Network | null) => {
           } = await getOrCreateAssociatedTokenAccount(
             solanaConnection,
             new PublicKey(selectedToken.contractAddress),
-            new PublicKey(solanaAccount.address),
+            publicKey,
             false,
-            solanaAccount.address
+            publicKey.toBase58()
           );
           if (!isAccountCreated && instruction) {
             tx.add(instruction);
             solanaDestinationAccount = await getAssociatedTokenAddress(
               new PublicKey(selectedToken.contractAddress),
-              new PublicKey(solanaAccount.address),
+              publicKey,
               false,
-              new PublicKey(solanaAccount.address)
+              publicKey
             );
           }
           if (!solanaDestinationAccount) {
@@ -261,7 +281,7 @@ const useNetwork = (network: Network | null) => {
             createTransferInstruction(
               new PublicKey(sourceAccount),
               new PublicKey(solanaDestinationAccount),
-              new PublicKey(solanaAccount.address),
+              publicKey,
               BigInt(parseTokenAmount(amount, selectedToken.decimals))
             )
           );
