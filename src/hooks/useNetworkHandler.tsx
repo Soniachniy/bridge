@@ -71,7 +71,11 @@ const useNetwork = (
   const updateIsNearConnected = useCallback(async () => {
     if (selector) {
       try {
-        const wallet = await selector.wallet();
+        const selectedWalletId = selector?.store.getState().selectedWalletId;
+        if (!selectedWalletId) {
+          return;
+        }
+        const wallet = await selector.wallet(selectedWalletId);
         const accounts = await wallet?.getAccounts();
         setNearAddress(accounts?.[0] ?? null);
         setIsNearConnected(accounts && accounts.length > 0);
