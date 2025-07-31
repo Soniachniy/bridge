@@ -149,7 +149,7 @@ export default function Form() {
         selectedToken?.assetId,
       ],
     });
-
+    console.log(selectedToken, depositAddress, "selectedToken");
     if (depositAddress && selectedToken) {
       await makeDeposit(
         selectedToken,
@@ -279,8 +279,7 @@ export default function Form() {
                 </span>
                 <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
                   {formatTokenAmount(
-                    (selectedToken?.balance ?? 0n) +
-                      (selectedToken?.balanceNear ?? 0n),
+                    selectedToken?.balance ?? 0n,
                     selectedToken?.decimals
                   )}{" "}
                   {selectedToken?.symbol}

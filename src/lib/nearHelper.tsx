@@ -22,9 +22,28 @@ export async function getStorageBalance({
   contractId: string;
   provider: any;
 }) {
-  return provider.viewFunction("storage_balance_of", contractId, {
-    account_id: accountId,
-  });
+  const currentBalance = await provider.viewFunction(
+    "storage_balance_of",
+    contractId,
+    {
+      account_id: accountId,
+    }
+  );
+  if (!currentBalance) {
+    const balanceBounds = await provider.viewFunction(
+      "storage_balance_bounds",
+      contractId,
+      {}
+    );
+    return {
+      total: currentBalance?.total ?? 0n,
+      shouldDeposit: BigInt(balanceBounds.min),
+    };
+  }
+  return {
+    total: currentBalance?.total ?? 0n,
+    shouldDeposit: 0n,
+  };
 }
 
 export async function checkSwapStorageBalance({
@@ -35,17 +54,17 @@ export async function checkSwapStorageBalance({
   contractId: string;
   depositAddress: string;
   provider: any;
-}) {
+}): Promise<{ tx: ITransaction[]; amount: bigint }> {
   const transactions: ITransaction[] = [];
   try {
-    if (contractId === NEAR_TOKEN_ID) return [];
+    if (contractId === NEAR_TOKEN_ID) return { tx: [], amount: 0n };
     const storageAvailable = await getStorageBalance({
       accountId: depositAddress,
       contractId,
       provider,
     });
 
-    if (storageAvailable === null || storageAvailable.total === "0") {
+    if (storageAvailable.total === 0n || storageAvailable.shouldDeposit > 0n) {
       transactions.push({
         receiverId: contractId,
         functionCalls: [
@@ -63,8 +82,8 @@ export async function checkSwapStorageBalance({
         ],
       });
     }
-    return transactions;
+    return { tx: transactions, amount: storageAvailable.shouldDeposit };
   } catch (e) {
-    return [];
+    return { tx: [], amount: 0n };
   }
 }

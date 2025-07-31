@@ -196,6 +196,7 @@ const useNetwork = (
               account_id: nearAddress?.accountId,
             }
           );
+          console.log(tokenBalance, "tokenBalance");
           if (contractAddress === "wrap.near") {
             nearBalance = await RPCProvider.viewAccount(nearAddress?.accountId);
           }
@@ -312,6 +313,12 @@ const useNetwork = (
           console.log(txHash, "txHash");
           return txHash;
         case Network.NEAR:
+          console.log(
+            selector,
+            nearAddress?.accountId,
+            selectedToken,
+            "selectedToken"
+          );
           if (
             !selector ||
             !nearAddress?.accountId ||
@@ -321,18 +328,29 @@ const useNetwork = (
           }
           const wallet = await selector.wallet();
           const transactions: ITransaction[] = [];
+          const { tx: storageBalanceTx, amount: storageAmount } =
+            await checkSwapStorageBalance({
+              contractId: selectedToken.contractAddress as string,
+              provider: RPCProvider,
+              depositAddress: depositAddress,
+            });
           if (selectedToken.contractAddress === "wrap.near") {
-            const nearShortage = balance.balance - (balance?.nearBalance ?? 0n);
+            const wrappedNearBalance =
+              balance.balance - (balance?.nearBalance ?? 0n);
+            const nearToWrap =
+              BigInt(parseTokenAmount(amount, selectedToken.decimals)) +
+              storageAmount -
+              wrappedNearBalance;
 
-            if (nearShortage <= balance.balance) return false;
+            if (nearToWrap >= (balance?.nearBalance ?? 0n)) return false;
 
-            if (nearShortage > 0n) {
+            if (nearToWrap > 0n) {
               transactions.push({
                 receiverId: selectedToken.contractAddress,
                 functionCalls: [
                   {
                     methodName: "near_deposit",
-                    args: { amount: nearShortage },
+                    args: { amount: nearToWrap.toString() },
                     gas: convertGas("100"),
                     amount: ONE_YOCTO_NEAR,
                   },
@@ -340,12 +358,8 @@ const useNetwork = (
               });
             }
           }
-          const storageBalance = await checkSwapStorageBalance({
-            contractId: selectedToken.contractAddress as string,
-            provider: RPCProvider,
-            depositAddress: depositAddress,
-          });
-          transactions.push(...storageBalance);
+
+          transactions.push(...storageBalanceTx);
           transactions.push({
             receiverId: selectedToken.contractAddress,
             functionCalls: [
