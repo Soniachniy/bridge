@@ -15,7 +15,12 @@ export const API_ROUTES = {
 
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
   try {
-    return await OneClickService.getTokens();
+    const tokens = await OneClickService.getTokens();
+    console.log(
+      tokens,
+      tokens.filter((token) => !token.contractAddress)
+    );
+    return tokens;
   } catch (error) {
     console.error(error);
     return [];

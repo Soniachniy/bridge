@@ -47,6 +47,7 @@ import {
 import { getAmount, getGas } from "@/lib/providerHelpers";
 import { FormInterface } from "@/lib/validation";
 import { UseFormWatch } from "react-hook-form";
+import { isNativeToken } from "@/lib/1clickHelper";
 
 const useNetwork = (
   network: Network | null,
@@ -160,6 +161,7 @@ const useNetwork = (
       }
     },
     getBalance: async (
+      assetId: string,
       contractAddress?: string
     ): Promise<{
       balance: bigint;
@@ -172,11 +174,28 @@ const useNetwork = (
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
-          const { value } = await getBalance(wagmiAdapter.wagmiConfig, {
-            address: address as `0x${string}`,
-            token: contractAddress as `0x${string}`,
-          });
-          return { balance: value, nearBalance: 0n };
+          let balanceEVM = 0n;
+          if (isNativeToken(network, assetId)) {
+            // TODO: fix this
+            const { value: nativeBalanceEVM } = await getBalance(
+              wagmiAdapter.wagmiConfig,
+              {
+                address: address as `0x${string}`,
+              }
+            );
+            balanceEVM = nativeBalanceEVM;
+          } else {
+            const { value: tokenBalanceEVM } = await getBalance(
+              wagmiAdapter.wagmiConfig,
+              {
+                address: address as `0x${string}`,
+                token: contractAddress as `0x${string}`,
+              }
+            );
+            balanceEVM = tokenBalanceEVM;
+          }
+
+          return { balance: balanceEVM, nearBalance: 0n };
         case Network.SOLANA:
           if (!publicKey) return { balance: 0n, nearBalance: 0n };
           const balance = await getSplTokenBalance(

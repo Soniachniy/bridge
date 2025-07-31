@@ -334,6 +334,29 @@ export function translateNetwork(network?: string): Network {
   return Network.ARBITRUM;
 }
 
+export const NATIVE_TOKENS_BY_DEFUSE_ID: Record<Network, string | undefined> = {
+  [Network.NEAR]: "nep141:wrap.near",
+  [Network.ETHEREUM]: "nep141:eth.omft.near",
+  [Network.BASE]: "nep141:base.omft.near",
+  [Network.ARBITRUM]: "nep141:arb.omft.near",
+  [Network.GNOSIS]: "nep141:gnosis.omft.near",
+  [Network.BERA]: "nep141:bera.omft.near",
+  [Network.BNB]: "nep141:bsc.omft.near",
+  [Network.POLYGON]: "nep141:pol.omft.near",
+  [Network.SOLANA]: "nep141:sol.omft.near",
+  [Network.BITCOIN]: "nep141:btc.omft.near",
+  [Network.TON]: undefined,
+  [Network.DOGE]: "nep141:doge.omft.near",
+  [Network.XRP]: "nep141:xrp.omft.near",
+  [Network.ZEC]: "nep141:zec.omft.near",
+  [Network.TRON]: "nep141:tron.omft.near",
+  [Network.AURORA]: "nep141:aurora",
+};
+
+export const isNativeToken = (blockchain: Network, assetId: string) => {
+  return NATIVE_TOKENS_BY_DEFUSE_ID[blockchain] === assetId;
+};
+
 export function getNetworkIcon(network: string): React.ReactNode | null {
   const networkType = translateNetwork(network);
   if (!networkType) return null;

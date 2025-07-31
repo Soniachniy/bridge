@@ -111,6 +111,7 @@ export default function Form() {
     const getSelectedTokenBalance = async () => {
       if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
         const { balance, nearBalance } = await getBalance(
+          selectedToken.assetId,
           selectedToken.contractAddress
         );
         if (balance) {
