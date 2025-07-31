@@ -176,7 +176,6 @@ const useNetwork = (
         case Network.ETHEREUM:
           let balanceEVM = 0n;
           if (isNativeToken(network, assetId)) {
-            // TODO: fix this
             const { value: nativeBalanceEVM } = await getBalance(
               wagmiAdapter.wagmiConfig,
               {
@@ -258,18 +257,24 @@ const useNetwork = (
         case Network.ETHEREUM:
           const request = await prepareTransactionRequest(
             wagmiAdapter.wagmiConfig,
-            {
-              to: selectedToken.contractAddress as `0x${string}`,
-              value: parseEther(amount),
-              data: encodeFunctionData({
-                abi: erc20Abi,
-                functionName: "transfer",
-                args: [
-                  depositAddress as `0x${string}`,
-                  parseUnits(amount, decimals),
-                ],
-              }),
-            }
+            isNativeToken(network, selectedToken.assetId)
+              ? {
+                  to: selectedToken.contractAddress as `0x${string}`,
+                  value: parseEther(amount),
+                  data: "0x",
+                }
+              : {
+                  to: selectedToken.contractAddress as `0x${string}`,
+                  value: parseEther(amount),
+                  data: encodeFunctionData({
+                    abi: erc20Abi,
+                    functionName: "transfer",
+                    args: [
+                      depositAddress as `0x${string}`,
+                      parseUnits(amount, decimals),
+                    ],
+                  }),
+                }
           );
           const hash = await sendTransaction(wagmiAdapter.wagmiConfig, request);
           const status = await waitForTransactionReceipt(
