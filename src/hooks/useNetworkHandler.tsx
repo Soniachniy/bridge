@@ -13,7 +13,12 @@ import { getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/providers/evm-provider";
 import { tonClient } from "@/providers/ton-provider/ton-utils";
 import { Address, beginCell, toNano } from "@ton/core";
-import { getSplTokenBalance } from "@/providers/solana-provider/solana-utils";
+import {
+  createSPLTransferSolanaTransaction,
+  checkSolanaATARequired,
+  getSplTokenBalance,
+  createTransferSolanaTransaction,
+} from "@/providers/solana-provider/solana-utils";
 import { useAppKitAccount } from "@reown/appkit/react";
 
 import {
@@ -47,7 +52,7 @@ import {
 import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
 import { UseFormWatch } from "react-hook-form";
-import { isNativeToken } from "@/lib/1clickHelper";
+import { isNativeToken, translateNetwork } from "@/lib/1clickHelper";
 
 const useNetwork = (
   network: Network | null,
@@ -286,55 +291,40 @@ const useNetwork = (
           );
           return status.status === "success";
         case Network.SOLANA:
-          const tx = new SolanaTransaction();
+          const solanaNative = isNativeToken(
+            translateNetwork(selectedToken.blockchain),
+            selectedToken.assetId
+          );
+          const solanaATACreationRequired = await checkSolanaATARequired(
+            depositAddress,
+            solanaNative,
+            selectedToken.contractAddress
+          );
+
           if (!selectedToken.contractAddress || !publicKey) {
             return false;
           }
-          let sourceAccount = await getAssociatedTokenAddress(
-            new PublicKey(selectedToken.contractAddress),
-            publicKey,
-            false,
-            publicKey
-          );
-          let {
-            status: isAccountCreated,
-            account: solanaDestinationAccount,
-            instruction,
-          } = await getOrCreateAssociatedTokenAccount(
-            solanaConnection,
-            new PublicKey(selectedToken.contractAddress),
-            publicKey,
-            false,
-            publicKey.toBase58()
-          );
-          if (!isAccountCreated && instruction) {
-            tx.add(instruction);
-            solanaDestinationAccount = await getAssociatedTokenAddress(
-              new PublicKey(selectedToken.contractAddress),
-              publicKey,
-              false,
-              publicKey
-            );
-          }
-          if (!solanaDestinationAccount) {
-            console.log("solanaDestinationAccount not found");
-            return false;
-          }
-          tx.add(
-            createTransferInstruction(
-              new PublicKey(sourceAccount),
-              new PublicKey(solanaDestinationAccount),
-              publicKey,
-              BigInt(parseTokenAmount(amount, selectedToken.decimals))
-            )
-          );
+          const transactionSolana = solanaNative
+            ? createTransferSolanaTransaction(
+                publicKey.toBase58(),
+                depositAddress,
+                BigInt(parseTokenAmount(amount, decimals))
+              )
+            : createSPLTransferSolanaTransaction(
+                publicKey.toBase58(),
+                depositAddress,
+                BigInt(parseTokenAmount(amount, decimals)),
+                selectedToken.contractAddress,
+                !solanaATACreationRequired
+              );
+
           const latestBlockHash = await solanaConnection.getLatestBlockhash(
             "confirmed"
           );
-          tx.recentBlockhash = await latestBlockHash.blockhash;
+          transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
           const txHash = await sendAndConfirmTransaction(
             solanaConnection,
-            tx,
+            transactionSolana,
             []
           );
           console.log(txHash, "txHash");

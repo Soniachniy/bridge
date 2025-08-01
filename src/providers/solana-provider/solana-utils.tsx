@@ -79,11 +79,11 @@ const checkATAExists = async (
 };
 
 export const checkSolanaATARequired = async (
-  tokenAddress: string,
   depositAddress: string | null,
-  isNativeToken: boolean
+  isNativeToken: boolean,
+  tokenAddress?: string
 ): Promise<boolean> => {
-  if (isNativeToken || depositAddress === null) {
+  if (isNativeToken || depositAddress === null || !tokenAddress) {
     return false;
   }
 
