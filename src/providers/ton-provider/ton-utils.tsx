@@ -33,11 +33,7 @@ export async function createDepositTonTransaction(
   amount: bigint,
   selectedToken: TokenResponse
 ): Promise<SendTransactionTonParams | null> {
-  if (
-    selectedToken.blockchain !== "ton" ||
-    !selectedToken.blockchain ||
-    !selectedToken.contractAddress
-  )
+  if (selectedToken.blockchain !== "ton" || !selectedToken.blockchain)
     return null;
 
   if (
@@ -48,7 +44,9 @@ export async function createDepositTonTransaction(
   ) {
     return createDepositTonNativeTransaction(depositAddress, amount);
   }
-
+  if (!selectedToken.contractAddress) {
+    return null;
+  }
   return await createDepositTonJettonTransaction(
     userWalletAddress,
     depositAddress,

@@ -6,6 +6,15 @@ export const isValidEVMAddress = (address: string): boolean => {
   return evmAddressRegex.test(address);
 };
 
+const tonBase64Regex = /^[EU][A-Z0-9_-]{47,49}$/i;
+const tonHexRegex = /^0:[a-fA-F0-9]{64}$/;
+
+const tonAddressSchema = z
+  .string()
+  .refine((val) => tonBase64Regex.test(val) || tonHexRegex.test(val), {
+    message:
+      "Invalid TON address format. Must be a valid Base64 or hex address.",
+  });
 const nearAddressSchema = z.string().refine(
   (val) => {
     const isImplicitAccount = val.length === 64 && /^[0-9a-f]{64}$/.test(val);
@@ -39,7 +48,7 @@ export const evmAddressValidation = z
 
 export const formValidationSchema = z
   .object({
-    hyperliquidAddress: evmAddressValidation,
+    hyperliquidAddress: z.string(),
     refundAddress: z.string(),
     selectedToken: z
       .object({
@@ -76,6 +85,7 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid .near address",
           input: ctx.value.refundAddress,
+          path: ["refundAddress"],
         });
       }
     } else if (ctx.value.selectedToken?.blockchain === "sol") {
@@ -87,6 +97,19 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid Solana address",
           input: ctx.value.refundAddress,
+          path: ["refundAddress"],
+        });
+      }
+    } else if (ctx.value.selectedToken?.blockchain === "ton") {
+      const tonAddressParse = tonAddressSchema.safeParse(
+        ctx.value.refundAddress
+      );
+      if (!tonAddressParse.success) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Address is not a valid TON address",
+          input: ctx.value.refundAddress,
+          path: ["refundAddress"],
         });
       }
     } else {
@@ -98,6 +121,7 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid EVM address",
           input: ctx.value.refundAddress,
+          path: ["refundAddress"],
         });
       }
     }

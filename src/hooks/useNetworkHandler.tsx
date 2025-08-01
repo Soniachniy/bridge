@@ -76,6 +76,7 @@ const useNetwork = (
   useEffect(() => {
     if (evmAccount.address && !connectedEVMWallet) {
       setValue("connectedEVMWallet", true);
+      setValue("hyperliquidAddress", evmAccount.address);
     }
   }, [evmAccount.address]);
 
@@ -243,7 +244,7 @@ const useNetwork = (
             nearBalance: BigInt(nearBalance ?? 0),
           };
         case Network.TON:
-          if (!tonWallet?.account?.address || !contractAddress) {
+          if (!tonWallet?.account?.address) {
             return { balance: 0n, nearBalance: 0n };
           }
           if (isNativeToken(network, assetId)) {
@@ -251,6 +252,9 @@ const useNetwork = (
               Address.parse(tonWallet?.account?.address)
             );
             return { balance: balance, nearBalance: 0n };
+          }
+          if (!contractAddress) {
+            return { balance: 0n, nearBalance: 0n };
           }
 
           const tonTokenBalance =
@@ -440,7 +444,7 @@ const useNetwork = (
             } else return false;
           } else return false;
         case Network.TON:
-          if (!tonWallet?.account?.address || !selectedToken.contractAddress) {
+          if (!tonWallet?.account?.address) {
             return false;
           }
           const transaction = await createDepositTonTransaction(

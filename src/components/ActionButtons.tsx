@@ -1,7 +1,7 @@
 import { EStrategy } from "@/pages/Form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { Network } from "@/config";
-import { isSupportedNetwork } from "@/lib/utils";
+import { getShortAddress, isSupportedNetwork } from "@/lib/utils";
 import { translateNetwork } from "@/lib/1clickHelper";
 
 export const ActionButton = ({
@@ -68,9 +68,9 @@ export const renderActionButtons = (
   isConnected: boolean,
   isSubmitting: boolean,
   isValidating: boolean,
-  isConnectedEVMWallet: boolean
+  connectedEVMWallet: string | null
 ) => {
-  if (!isConnectedEVMWallet) {
+  if (!Boolean(connectedEVMWallet)) {
     return (
       <div className="mt-10 flex grow-1 w-full">
         <ActionButton
@@ -90,7 +90,7 @@ export const renderActionButtons = (
   if (strategy === EStrategy.SWAP && isConnected) {
     return (
       <>
-        <div className="mt-10 flex grow-1 w-full">
+        <div className="mt-10 flex justify-center items-center flex-col gap-2 grow-1 w-full">
           <ActionButton
             variant="primary"
             isSubmitButton
@@ -100,6 +100,12 @@ export const renderActionButtons = (
               ? "Processing..."
               : "Proceed transfer"}
           </ActionButton>
+          {connectedEVMWallet && (
+            <div className="justify-center max-w-[480px] text-gray_text text-xs font-normal font-['Inter'] leading-none">
+              Connected EVM wallet [{getShortAddress(connectedEVMWallet)}] will
+              be used for your HyperLiquid deposit.
+            </div>
+          )}
         </div>
         <div className="mt-5 flex grow-1 w-full">
           <ActionButton

@@ -345,7 +345,7 @@ export const NATIVE_TOKENS_BY_DEFUSE_ID: Record<Network, string | undefined> = {
   [Network.POLYGON]: "nep141:pol.omft.near",
   [Network.SOLANA]: "nep141:sol.omft.near",
   [Network.BITCOIN]: "nep141:btc.omft.near",
-  [Network.TON]: undefined,
+  [Network.TON]: "nep245:v2_1.omni.hot.tg:1117_",
   [Network.DOGE]: "nep141:doge.omft.near",
   [Network.XRP]: "nep141:xrp.omft.near",
   [Network.ZEC]: "nep141:zec.omft.near",

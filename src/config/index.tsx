@@ -47,7 +47,7 @@ export const supportedNetworks = {
   [Network.ETHEREUM]: true,
   [Network.SOLANA]: true,
   [Network.NEAR]: true,
-  [Network.TON]: false,
+  [Network.TON]: true,
   [Network.POLYGON]: true,
   [Network.ARBITRUM]: true,
   [Network.AURORA]: true,

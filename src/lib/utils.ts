@@ -16,6 +16,12 @@ export const BASE = 10;
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
+export const getShortAddress = (address: string) => {
+  return `${address.substring(0, 4)}...${address.substring(
+    address.length - 5,
+    address.length
+  )}`;
+};
 
 export const enforcer = (event: string) => {
   const nextUserInput = event.replace(/,/g, ".");

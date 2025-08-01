@@ -28,6 +28,7 @@ import { fetchTokens } from "@/providers/proxy-provider";
 import useManualDeposit from "@/hooks/useManualDeposit";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
+import { Network } from "@/config";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -50,6 +51,7 @@ export default function Form() {
     setError,
     clearErrors,
     watch,
+    trigger,
     formState: { errors, dirtyFields, isSubmitting, isValidating },
   } = useForm({
     resolver: zodResolver(createFormValidationSchema(strategy)),
@@ -169,7 +171,7 @@ export default function Form() {
       }
     }
   };
-
+  console.log(errors, "errors");
   return (
     <div className="p-4 w-full min-h-96">
       <div className="flex flex-col justify-center items-center mb-6">
@@ -299,55 +301,6 @@ export default function Form() {
           <>
             <div className="flex flex-col gap-2 mt-6">
               <label className="text-[#9DB2BD] font-normal text-xs font-inter">
-                Your Hyperliquid address
-              </label>
-              <div className="bg-[#1B2429] rounded-xl p-3 flex flex-row justify-between items-center gap-7 w-[480px] h-12">
-                <div className="flex flex-col grow-1 gap-1 w-[210px]">
-                  <div className="flex flex-row grow-1 items-center">
-                    <input
-                      type="text"
-                      {...register("hyperliquidAddress")}
-                      className="text-white grow-1 border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
-                      autoComplete="off"
-                      spellCheck="false"
-                      autoCorrect="off"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-row justify-end items-center gap-1">
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    {hyperliquidAddress && errors.hyperliquidAddress && (
-                      <ErrorIcon />
-                    )}
-                    {hyperliquidAddress &&
-                      dirtyFields.hyperliquidAddress &&
-                      !errors.hyperliquidAddress && <SuccessIcon />}
-                  </div>
-                  <div className="flex flex-row justify-end items-center gap-1">
-                    <div
-                      onClick={async () => {
-                        const text =
-                          await window.navigator.clipboard.readText();
-                        setValue("hyperliquidAddress", text);
-                      }}
-                      className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
-                    >
-                      paste
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {errors.hyperliquidAddress && (
-                <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
-                  <span>{errors.hyperliquidAddress.message}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2 mt-6">
-              <label className="text-[#9DB2BD] font-normal text-xs font-inter">
                 Refund address
               </label>
               <div className="bg-[#1B2429] rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 w-[480px] h-12">
@@ -378,6 +331,7 @@ export default function Form() {
                         const text =
                           await window.navigator.clipboard.readText();
                         setValue("refundAddress", text);
+                        trigger("refundAddress");
                       }}
                       className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
                     >
@@ -440,7 +394,7 @@ export default function Form() {
           isConnected(),
           isSubmitting,
           isValidating,
-          connectedEVMWallet
+          getPublicKey(Network.ARBITRUM) ?? null
         )}
       </form>
     </div>

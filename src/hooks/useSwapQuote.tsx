@@ -55,10 +55,6 @@ const useSwapQuote = ({
             setError("refundAddress", {
               message: response?.error || "Failed to fetch quote",
             });
-          } else if (response?.error?.includes("hyperliquidAddress")) {
-            setError("hyperliquidAddress", {
-              message: response?.error || "Failed to fetch quote",
-            });
           }
           return null;
         }
