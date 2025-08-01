@@ -32,10 +32,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 
 export const SolanaProvider = ({ children }: PropsWithChildren) => {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(
-    () => basicConfig.solanaConfig.endpoint || clusterApiUrl(network),
-    [network]
-  );
+  const endpoint = useMemo(() => basicConfig.solanaConfig.endpoint, [network]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

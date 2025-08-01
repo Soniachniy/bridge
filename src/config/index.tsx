@@ -14,7 +14,6 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import {
   mainnet,
   arbitrum,
-  solana,
   AppKitNetwork,
   base,
   aurora,
@@ -24,8 +23,6 @@ import {
   tron,
   gnosis,
 } from "@reown/appkit/networks";
-
-import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 
 export enum Network {
   ARBITRUM = "ARBITRUM",
@@ -79,11 +76,10 @@ export const basicConfig = {
   },
   evmConfig: {
     projectId: "2c00d113200749f27e7e970776874f1c",
-    adapters: [WagmiAdapter, SolanaAdapter],
+    adapters: [WagmiAdapter],
     networks: [
       mainnet,
       arbitrum,
-      solana,
       base,
       aurora,
       polygon,
@@ -100,11 +96,10 @@ export const basicConfig = {
   solanaConfig: {
     endpoint:
       "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
-    autoConnect: false,
+    autoConnect: true,
     wallets: [
       new HotWalletAdapter() as Adapter,
       new PhantomWalletAdapter() as Adapter,
-      new SolflareWalletAdapter() as Adapter,
     ],
   },
 };

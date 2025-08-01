@@ -50,6 +50,7 @@ const useSwapQuote = ({
             setError("amount", {
               message: response?.error || "Failed to fetch quote",
             });
+            setFormValue("amountOut", "");
           } else if (response?.error?.includes("refundTo")) {
             setError("refundAddress", {
               message: response?.error || "Failed to fetch quote",
@@ -72,7 +73,7 @@ const useSwapQuote = ({
 
           if (response.data.depositAddress)
             setFormValue("depositAddress", response.data.depositAddress);
-          if (!Boolean(hyperliquidAddress)) {
+          if (Boolean(hyperliquidAddress)) {
             clearError(["hyperliquidAddress", "refundAddress"]);
           }
         }

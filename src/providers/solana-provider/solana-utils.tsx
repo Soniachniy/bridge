@@ -1,4 +1,4 @@
-import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 
 import { getAssociatedTokenAddress, getAccount } from "@solana/spl-token";
 
@@ -98,23 +98,25 @@ export const checkSolanaATARequired = async (
 
 export async function getSplTokenBalance(
   userWalletAddress: PublicKey,
-  tokenMintAddress?: string,
-  rpcUrl = clusterApiUrl("mainnet-beta")
+  tokenMintAddress?: string
 ): Promise<number | null> {
-  const connection = new Connection(rpcUrl, "confirmed");
+  const connection = new Connection(
+    basicConfig.solanaConfig.endpoint,
+    "confirmed"
+  );
 
   if (!tokenMintAddress) {
     const lamports = await connection.getBalance(userWalletAddress);
-    const sol = lamports / 1e9;
 
-    return sol;
+    console.log(lamports, "solana balance");
+    return lamports;
   }
   const mint = new PublicKey(tokenMintAddress);
 
   try {
     const ata = await getAssociatedTokenAddress(mint, userWalletAddress);
     const tokenAccount = await getAccount(connection, ata);
-
+    console.log(tokenAccount, "tokenAccount");
     return Number(tokenAccount.amount);
   } catch (err: any) {
     if (err.message.includes("Failed to find account")) {

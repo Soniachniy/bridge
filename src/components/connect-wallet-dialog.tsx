@@ -28,7 +28,7 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
         if (open) return;
       }}
     >
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         <Button
           type="button"
           variant="outline"

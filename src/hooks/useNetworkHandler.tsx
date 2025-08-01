@@ -61,9 +61,10 @@ const useNetwork = (
   watch: UseFormWatch<FormInterface>
 ) => {
   /* SOLANA */
-  const { publicKey, connect } = useWallet();
+  const { publicKey } = useWallet();
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
   const { setVisible } = useWalletModal();
+  const { sendTransaction: sendTransactionSolana } = useWallet();
   /* EVM */
   const { open } = useAppKit();
   const evmAccount = useAppKitAccount({ namespace: "eip155" });
@@ -140,7 +141,12 @@ const useNetwork = (
             namespace: "eip155",
           });
         case Network.SOLANA:
-          return setVisible(true);
+          try {
+            return setVisible(true);
+          } catch (e) {
+            console.log("SOLANA", e);
+            return null;
+          }
         case Network.NEAR:
           return openModal();
         case Network.TON:
@@ -160,6 +166,7 @@ const useNetwork = (
         case Network.ETHEREUM:
           return address;
         case Network.SOLANA:
+          console.log(publicKey, "publicKey");
           return publicKey?.toBase58();
         case Network.NEAR:
           return nearAddress?.accountId;
@@ -210,7 +217,7 @@ const useNetwork = (
             publicKey,
             contractAddress as `0x${string}`
           );
-          return { balance: BigInt(balance ?? 0), nearBalance: 0n };
+          return { balance: BigInt(balance?.toString() ?? 0), nearBalance: 0n };
         case Network.NEAR:
           if (!contractAddress || !nearAddress?.accountId) {
             return { balance: 0n, nearBalance: 0n };
@@ -302,7 +309,7 @@ const useNetwork = (
             selectedToken.contractAddress
           );
 
-          if (!selectedToken.contractAddress || !publicKey) {
+          if (!publicKey) {
             return false;
           }
           const transactionSolana = solanaNative
@@ -315,7 +322,7 @@ const useNetwork = (
                 publicKey.toBase58(),
                 depositAddress,
                 BigInt(parseTokenAmount(amount, decimals)),
-                selectedToken.contractAddress,
+                selectedToken.contractAddress as `0x${string}`,
                 !solanaATACreationRequired
               );
 
@@ -323,10 +330,9 @@ const useNetwork = (
             "confirmed"
           );
           transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
-          const txHash = await sendAndConfirmTransaction(
-            solanaConnection,
+          const txHash = await sendTransactionSolana(
             transactionSolana,
-            []
+            solanaConnection
           );
           console.log(txHash, "txHash");
           return txHash;
