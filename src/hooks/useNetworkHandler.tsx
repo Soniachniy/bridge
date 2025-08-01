@@ -54,21 +54,30 @@ const useNetwork = (
   setValue: (key: keyof FormInterface, value: any) => void,
   watch: UseFormWatch<FormInterface>
 ) => {
-  const connectedEVMWallet = watch("connectedEVMWallet");
-  const [nearAddress, setNearAddress] = useState<Account | null>(null);
-  const { openModal, selector, RPCProvider } = useWalletSelector();
-  const { isConnected, address } = useAccount();
+  /* SOLANA */
   const { publicKey, connect } = useWallet();
-  const [tonConnectUI] = useTonConnectUI();
-  const { open } = useAppKit();
-  const [isNearConnected, setIsNearConnected] = useState(false);
-
-  const evmAccount = useAppKitAccount({ namespace: "eip155" });
-
-  const tonWallet = useTonWallet();
-
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
 
+  /* EVM */
+  const { open } = useAppKit();
+  const evmAccount = useAppKitAccount({ namespace: "eip155" });
+  const connectedEVMWallet = watch("connectedEVMWallet");
+
+  useEffect(() => {
+    if (evmAccount.address && !connectedEVMWallet) {
+      setValue("connectedEVMWallet", true);
+    }
+  }, [evmAccount.address]);
+
+  /* TON */
+  const tonWallet = useTonWallet();
+  const [tonConnectUI] = useTonConnectUI();
+
+  /* NEAR */
+  const { openModal, selector, RPCProvider } = useWalletSelector();
+  const [nearAddress, setNearAddress] = useState<Account | null>(null);
+  const [isNearConnected, setIsNearConnected] = useState(false);
+  const { isConnected, address } = useAccount();
   const updateIsNearConnected = useCallback(async () => {
     if (selector) {
       try {
@@ -90,12 +99,6 @@ const useNetwork = (
   useEffect(() => {
     updateIsNearConnected();
   }, [updateIsNearConnected, selector]);
-
-  useEffect(() => {
-    if (evmAccount.address && !connectedEVMWallet) {
-      setValue("connectedEVMWallet", true);
-    }
-  }, [evmAccount.address]);
 
   return {
     isConnected: () => {
@@ -259,13 +262,12 @@ const useNetwork = (
             wagmiAdapter.wagmiConfig,
             isNativeToken(network, selectedToken.assetId)
               ? {
-                  to: selectedToken.contractAddress as `0x${string}`,
+                  to: depositAddress as `0x${string}`,
                   value: parseEther(amount),
                   data: "0x",
                 }
               : {
                   to: selectedToken.contractAddress as `0x${string}`,
-                  value: parseEther(amount),
                   data: encodeFunctionData({
                     abi: erc20Abi,
                     functionName: "transfer",
@@ -276,6 +278,7 @@ const useNetwork = (
                   }),
                 }
           );
+          console.log(request, "request");
           const hash = await sendTransaction(wagmiAdapter.wagmiConfig, request);
           const status = await waitForTransactionReceipt(
             wagmiAdapter.wagmiConfig,

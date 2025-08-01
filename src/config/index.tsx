@@ -13,6 +13,13 @@ import {
   arbitrum,
   solana,
   AppKitNetwork,
+  base,
+  aurora,
+  polygon,
+  bsc,
+  berachain,
+  tron,
+  gnosis,
 } from "@reown/appkit/networks";
 
 import { SolanaAdapter } from "@reown/appkit-adapter-solana";
@@ -70,10 +77,18 @@ export const basicConfig = {
   evmConfig: {
     projectId: "2c00d113200749f27e7e970776874f1c",
     adapters: [WagmiAdapter, SolanaAdapter],
-    networks: [mainnet, arbitrum, solana] as [
-      AppKitNetwork,
-      ...AppKitNetwork[]
-    ],
+    networks: [
+      mainnet,
+      arbitrum,
+      solana,
+      base,
+      aurora,
+      polygon,
+      bsc,
+      berachain,
+      tron,
+      gnosis,
+    ] as [AppKitNetwork, ...AppKitNetwork[]],
   },
   tonConfig: {
     manifestUrl:

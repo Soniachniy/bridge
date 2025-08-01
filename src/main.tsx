@@ -20,14 +20,14 @@ declare global {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Providers>
-      <Layout>
-        <BrowserRouter>
+      <BrowserRouter>
+        <Layout>
           <Routes>
             <Route path="/" element={<Form />} />
             <Route path="/:id" element={<ProcessingScreen />} />
           </Routes>
-        </BrowserRouter>
-      </Layout>
+        </Layout>
+      </BrowserRouter>
     </Providers>
   </StrictMode>
 );
