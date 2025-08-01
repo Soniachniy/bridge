@@ -17,7 +17,7 @@ import { providers } from "near-api-js";
 import { AccountView, CodeResult } from "near-api-js/lib/providers/provider";
 import "@near-wallet-selector/modal-ui/styles.css";
 
-import { getGas, getAmount } from "@/lib/providerHelpers";
+import { getGas, getAmount } from "@/providers/near-provider/nearHelper";
 import { basicConfig } from "@/config";
 import { Big } from "big.js";
 

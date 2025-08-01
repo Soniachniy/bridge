@@ -2,7 +2,7 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useMemo } from "react";
 
 import { basicConfig } from "@/config";
 import {
@@ -25,15 +25,25 @@ import {
   PublicKey,
   TransactionInstruction,
 } from "@solana/web3.js";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { clusterApiUrl } from "@solana/web3.js";
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 export const SolanaProvider = ({ children }: PropsWithChildren) => {
+  const network = WalletAdapterNetwork.Mainnet;
+  const endpoint = useMemo(
+    () => basicConfig.solanaConfig.endpoint || clusterApiUrl(network),
+    [network]
+  );
+
   return (
-    <ConnectionProvider endpoint={basicConfig.solanaConfig.endpoint}>
+    <ConnectionProvider endpoint={endpoint}>
       <WalletProvider
         wallets={basicConfig.solanaConfig.wallets}
         autoConnect={basicConfig.solanaConfig.autoConnect}
       >
-        {children}
+        <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

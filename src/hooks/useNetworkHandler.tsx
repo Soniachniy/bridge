@@ -53,6 +53,7 @@ import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
 import { UseFormWatch } from "react-hook-form";
 import { isNativeToken, translateNetwork } from "@/lib/1clickHelper";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 const useNetwork = (
   network: Network | null,
@@ -62,7 +63,7 @@ const useNetwork = (
   /* SOLANA */
   const { publicKey, connect } = useWallet();
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
-
+  const { setVisible } = useWalletModal();
   /* EVM */
   const { open } = useAppKit();
   const evmAccount = useAppKitAccount({ namespace: "eip155" });
@@ -139,7 +140,7 @@ const useNetwork = (
             namespace: "eip155",
           });
         case Network.SOLANA:
-          return connect();
+          return setVisible(true);
         case Network.NEAR:
           return openModal();
         case Network.TON:
