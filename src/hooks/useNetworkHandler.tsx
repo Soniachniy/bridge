@@ -11,7 +11,10 @@ import { Account, Transaction } from "@near-wallet-selector/core";
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/providers/evm-provider";
-import { tonClient } from "@/providers/ton-provider/ton-utils";
+import {
+  createDepositTonTransaction,
+  tonClient,
+} from "@/providers/ton-provider/ton-utils";
 import { Address, beginCell, toNano } from "@ton/core";
 import {
   createSPLTransferSolanaTransaction,
@@ -243,11 +246,19 @@ const useNetwork = (
           if (!tonWallet?.account?.address || !contractAddress) {
             return { balance: 0n, nearBalance: 0n };
           }
+          if (isNativeToken(network, assetId)) {
+            const { balance } = await tonClient.accounts.getAccount(
+              Address.parse(tonWallet?.account?.address)
+            );
+            return { balance: balance, nearBalance: 0n };
+          }
+
           const tonTokenBalance =
             await tonClient.accounts.getAccountJettonBalance(
               Address.parse(tonWallet?.account?.address),
               Address.parse(contractAddress)
             );
+
           return {
             balance: BigInt(tonTokenBalance.balance.toString()),
             nearBalance: 0n,
@@ -432,35 +443,13 @@ const useNetwork = (
           if (!tonWallet?.account?.address || !selectedToken.contractAddress) {
             return false;
           }
-          const jettonWalletAddress = Address.parse(
-            selectedToken.contractAddress
+          const transaction = await createDepositTonTransaction(
+            tonWallet?.account?.address,
+            depositAddress,
+            BigInt(parseTokenAmount(amount, decimals)),
+            selectedToken
           );
-          const toAddress = Address.parse(depositAddress);
-          const jettonAmount = toNano(amount);
-
-          const payload = beginCell()
-            .storeUint(0xf8a7ea5, 32)
-            .storeUint(0, 64)
-            .storeCoins(jettonAmount)
-            .storeAddress(toAddress)
-            .storeAddress(Address.parse(tonWallet?.account?.address))
-            .storeBit(false)
-            .storeCoins(toNano("0.1"))
-            .storeBit(false)
-            .endCell()
-            .toBoc()
-            .toString("base64");
-
-          const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 600, // valid for 10 minutes
-            messages: [
-              {
-                address: jettonWalletAddress.toString(),
-                amount: toNano("0.05").toString(),
-                payload,
-              },
-            ],
-          };
+          if (!transaction) return false;
 
           try {
             await tonConnectUI.sendTransaction(transaction);

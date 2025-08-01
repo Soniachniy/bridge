@@ -92,6 +92,7 @@ export const basicConfig = {
   tonConfig: {
     manifestUrl:
       "https://bridge-lyart-three.vercel.app/tonconnect-manifest.json",
+    endpoint: "https://toncenter.com/api/v2/jsonRPC",
   },
   solanaConfig: {
     endpoint:
