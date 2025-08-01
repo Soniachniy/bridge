@@ -23,9 +23,9 @@ import CopyIcon from "@/assets/copy-icon.svg?react";
 import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
-import useSwapQuote from "@/hooks/use-swap-quote";
+import useSwapQuote from "@/hooks/useSwapQuote";
 import { fetchTokens } from "@/providers/proxy-provider";
-import useManualDeposit from "@/hooks/use-manual-deposit";
+import useManualDeposit from "@/hooks/useManualDeposit";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 

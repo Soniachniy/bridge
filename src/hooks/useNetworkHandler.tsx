@@ -43,8 +43,8 @@ import {
   checkSwapStorageBalance,
   ITransaction,
   ONE_YOCTO_NEAR,
-} from "@/lib/nearHelper";
-import { getAmount, getGas } from "@/lib/providerHelpers";
+} from "@/providers/near-provider/nearHelper";
+import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
 import { UseFormWatch } from "react-hook-form";
 import { isNativeToken } from "@/lib/1clickHelper";

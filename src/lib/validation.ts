@@ -19,6 +19,17 @@ const nearAddressSchema = z.string().refine(
   }
 );
 
+export const solanaAddressSchema = z.string().refine(
+  (val) => {
+    const isSolanaAddress =
+      val.length === 44 && /^[1-9A-HJ-NP-Za-km-z]{44}$/.test(val);
+    return isSolanaAddress;
+  },
+  {
+    message: "Must be a valid Solana address (44 characters)",
+  }
+);
+
 export const evmAddressValidation = z
   .string()
   .min(1, "Address is required")
@@ -64,6 +75,17 @@ export const formValidationSchema = z
         ctx.issues.push({
           code: "custom",
           message: "Address is not a valid .near address",
+          input: ctx.value.refundAddress,
+        });
+      }
+    } else if (ctx.value.selectedToken?.blockchain === "sol") {
+      const solanaAddressParse = solanaAddressSchema.safeParse(
+        ctx.value.refundAddress
+      );
+      if (!solanaAddressParse.success) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Address is not a valid Solana address",
           input: ctx.value.refundAddress,
         });
       }

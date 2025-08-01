@@ -45,7 +45,7 @@ export enum Network {
 
 export const supportedNetworks = {
   [Network.ETHEREUM]: true,
-  [Network.SOLANA]: false,
+  [Network.SOLANA]: true,
   [Network.NEAR]: true,
   [Network.TON]: false,
   [Network.POLYGON]: true,
