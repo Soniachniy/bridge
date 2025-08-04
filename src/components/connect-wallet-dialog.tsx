@@ -36,30 +36,29 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
   const { accountId } = useWalletSelector();
 
   useEffect(() => {
-    if (evmAccounts.address) {
-      setActiveAddress(evmAccounts.address);
+    setActiveAddress(evmAccounts.address ?? null);
 
-      setConnectedAddresses(
-        [
-          ...evmAccounts.allAccounts.map((address) => ({
-            address: address.address,
-            blockChain: Network.ETHEREUM,
-          })),
-          {
-            address: publicKey?.toBase58() ?? null,
-            blockChain: Network.SOLANA,
-          },
-          {
-            address: Boolean(accountId) ? accountId : null,
-            blockChain: Network.NEAR,
-          },
-          {
-            address: tonWallet?.account?.address ?? null,
-            blockChain: Network.TON,
-          },
-        ].filter((address) => address.address !== null)
-      );
-    }
+    setConnectedAddresses(
+      [
+        ...evmAccounts.allAccounts.map((address) => ({
+          address: address.address,
+          blockChain: Network.ETHEREUM,
+        })),
+        {
+          address: publicKey?.toBase58() ?? null,
+          blockChain: Network.SOLANA,
+        },
+        {
+          address: Boolean(accountId) ? accountId : null,
+          blockChain: Network.NEAR,
+        },
+        {
+          address: tonWallet?.account?.address ?? null,
+          blockChain: Network.TON,
+        },
+      ].filter((address) => address.address !== null)
+    );
+
     const connectors = [
       !publicKey?.toBase58() ? { blockChain: Network.SOLANA } : null,
       !accountId ? { blockChain: Network.NEAR } : null,
