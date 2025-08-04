@@ -15,16 +15,22 @@ const tonAddressSchema = z
     message:
       "Invalid TON address format. Must be a valid Base64 or hex address.",
   });
+
 const nearAddressSchema = z.string().refine(
   (val) => {
-    const isImplicitAccount = val.length === 64 && /^[0-9a-f]{64}$/.test(val);
-    const isNamedAccount =
-      /^(?=.{2,64}$)(?!.*[_.-]{2})[a-z0-9]+([._-]?[a-z0-9]+)*\.near$/.test(val);
-    return isImplicitAccount || isNamedAccount;
+    // Implicit account: exactly 64 characters, containing a-Z and 0-9
+    const isImplicitAccount =
+      val.length === 64 && /^[a-zA-Z0-9]{64}$/.test(val);
+
+    // Named account: 2-64 characters with .near or .hot.tg suffix
+    const isNearAccount = /^.{2,64}\.near$/.test(val);
+    const isHotTgAccount = /^.{2,64}\.hot\.tg$/.test(val);
+
+    return isImplicitAccount || isNearAccount || isHotTgAccount;
   },
   {
     message:
-      "Must be a valid .near address or a 64-character implicit account (hex).",
+      "Must be a valid NEAR address: either 64 alphanumeric characters, or 2-64 characters with .near or .hot.tg suffix.",
   }
 );
 
