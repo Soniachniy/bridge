@@ -12,13 +12,14 @@
 }
 
 @theme {
-  --color-main_dark: #0f1a20;
+  --color-main_dark: #1B2429;
   --color-main_light: #97fce4;
   --color-main_black: #000000;
   --color-element: #273035;
   --color-gray_text: #9db2bd;
   --color-main_white: #ffffff;
   --color-error: #ff6e6e;
+  --color-btn_text: #1fa67d;
 }
 
 @layer base {

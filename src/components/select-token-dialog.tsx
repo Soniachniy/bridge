@@ -144,12 +144,12 @@ const SelectTokenDialog: FC<Props> = ({
               value={currentSelectedBlockchains}
               disabled={blockchains.length === 1}
             >
-              <SelectTrigger className="w-full text-black min-h-[42px]  focus:border-0 outline-1 focus:outline-1 outline-main_light  focus:ring-offset-0 bg-main_dark text-white">
+              <SelectTrigger className="w-full border-1 border-element border-solid hover:border-1  hover:border-element outline-none text-black min-h-[42px] border-1 border-element hover:border-main_light focus:outline-none  focus:ring-offset-0 active:ring-offset-0 focus-within:ring-offset-0 bg-main_dark text-white">
                 <SelectValue
                   id="network"
                   asChild
                   placeholder="Select Network"
-                  className="text-sm font-medium outline-none bg-main_dark leading-5 border-10 border-white"
+                  className="text-sm font-medium focus-within:border-main_light outline-none bg-main_dark leading-5 border-10"
                 >
                   {selectedBlockchain && (
                     <div className="text-white flex flex-row gap-2 ">
@@ -189,7 +189,7 @@ const SelectTokenDialog: FC<Props> = ({
               Select Token
             </Label>
 
-            <div className="flex items-center gap-2  bg-main_dark outline-1 outline-main_light p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
+            <div className="flex items-center gap-2  bg-main_dark outline-1 outline-element hover:outline-main_light focus-within:outline-main_light focus:outline-main_light p-2 rounded-md border-solid w-full aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
               <SearchIcon className="size-4  text-muted-foreground bg-main_dark hover:outline-main_light" />
               <input
                 type="token"

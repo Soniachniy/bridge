@@ -17,7 +17,6 @@ import useNetwork from "@/hooks/useNetworkHandler";
 import { renderActionButtons } from "@/components/ActionButtons";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/error-icon.svg?react";
-import WalletIcon from "@/assets/wallet-icon.svg?react";
 import ManualIcon from "@/assets/manual.svg?react";
 import CopyIcon from "@/assets/copy-icon.svg?react";
 import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
@@ -189,12 +188,7 @@ export default function Form() {
             <div className="text-white font-thin text-sm text-left  w-[480px]">
               From
             </div>
-            {strategy && isConnected() && strategy === EStrategy.SWAP && (
-              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end w-[480px] text-right">
-                <WalletIcon />
-                {truncateAddress(getPublicKey())}
-              </div>
-            )}
+
             {strategy && strategy === EStrategy.DEPOSIT && (
               <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end w-[480px] text-right">
                 <ManualIcon />

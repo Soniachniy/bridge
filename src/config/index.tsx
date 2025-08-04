@@ -25,22 +25,22 @@ import {
 } from "@reown/appkit/networks";
 
 export enum Network {
-  ARBITRUM = "ARBITRUM",
-  AURORA = "AURORA",
-  BASE = "BASE",
-  BERA = "BERA",
-  BNB = "BNB",
-  BITCOIN = "BITCOIN",
-  DOGE = "DOGE",
-  ETHEREUM = "ETHEREUM",
-  GNOSIS = "GNOSIS",
-  NEAR = "NEAR",
-  POLYGON = "POLYGON",
-  SOLANA = "SOLANA",
-  TON = "TON",
-  TRON = "TRON",
-  XRP = "XRP",
-  ZEC = "ZEC",
+  ARBITRUM = "arb",
+  AURORA = "aur",
+  BASE = "base",
+  BERA = "bera",
+  BNB = "bnb",
+  BITCOIN = "btc",
+  DOGE = "doge",
+  ETHEREUM = "eth",
+  GNOSIS = "gnosis",
+  NEAR = "near",
+  POLYGON = "polygon",
+  SOLANA = "sol",
+  TON = "ton",
+  TRON = "tron",
+  XRP = "xrp",
+  ZEC = "zec",
 }
 
 export const supportedNetworks = {

@@ -15,7 +15,7 @@ import {
   createDepositTonTransaction,
   tonClient,
 } from "@/providers/ton-provider/ton-utils";
-import { Address, beginCell, toNano } from "@ton/core";
+import { Address } from "@ton/core";
 import {
   createSPLTransferSolanaTransaction,
   checkSolanaATARequired,
@@ -30,22 +30,15 @@ import {
   signTypedData,
   switchChain,
   waitForTransactionReceipt,
+  disconnect,
 } from "@wagmi/core";
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
 
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import {
-  createTransferInstruction,
-  getAssociatedTokenAddress,
-} from "@solana/spl-token";
-import {
-  Connection,
-  PublicKey,
-  sendAndConfirmTransaction,
-  Transaction as SolanaTransaction,
-} from "@solana/web3.js";
+
+import { Connection } from "@solana/web3.js";
 import { parseTokenAmount } from "@/lib/utils";
-import { getOrCreateAssociatedTokenAccount } from "@/providers/solana-provider";
+
 import { PermitDataResponse } from "@/providers/proxy-provider";
 import {
   checkSwapStorageBalance,
@@ -60,21 +53,22 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 const useNetwork = (
   network: Network | null,
-  setValue: (key: keyof FormInterface, value: any) => void,
-  watch: UseFormWatch<FormInterface>
+  setValue?: (key: keyof FormInterface, value: any) => void,
+  watch?: UseFormWatch<FormInterface>
 ) => {
   /* SOLANA */
-  const { publicKey } = useWallet();
+  const { publicKey, disconnect: disconnectSolana } = useWallet();
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
   /* EVM */
   const { open } = useAppKit();
+  const { isConnected, address } = useAccount();
   const evmAccount = useAppKitAccount({ namespace: "eip155" });
-  const connectedEVMWallet = watch("connectedEVMWallet");
+  const connectedEVMWallet = watch ? watch("connectedEVMWallet") : null;
 
   useEffect(() => {
-    if (evmAccount.address && !connectedEVMWallet) {
+    if (evmAccount.address && !connectedEVMWallet && setValue) {
       setValue("connectedEVMWallet", true);
       setValue("hyperliquidAddress", evmAccount.address);
     }
@@ -85,10 +79,9 @@ const useNetwork = (
   const [tonConnectUI] = useTonConnectUI();
 
   /* NEAR */
-  const { openModal, selector, RPCProvider } = useWalletSelector();
+  const { openModal, signOut, selector, RPCProvider } = useWalletSelector();
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const [isNearConnected, setIsNearConnected] = useState(false);
-  const { isConnected, address } = useAccount();
   const updateIsNearConnected = useCallback(async () => {
     if (selector) {
       try {
@@ -159,6 +152,26 @@ const useNetwork = (
           return null;
       }
     },
+    disconnectWallet: (localNetwork?: Network) => {
+      const currentNetwork = localNetwork ?? network;
+      switch (currentNetwork) {
+        case Network.BASE:
+        case Network.AURORA:
+        case Network.BNB:
+        case Network.ARBITRUM:
+        case Network.POLYGON:
+        case Network.ETHEREUM:
+          return disconnect(wagmiAdapter.wagmiConfig);
+        case Network.SOLANA:
+          return disconnectSolana();
+        case Network.NEAR:
+          return signOut();
+        case Network.TON:
+          return tonConnectUI.disconnect();
+        default:
+          return null;
+      }
+    },
     getPublicKey: (localNetwork?: Network) => {
       const currentNetwork = localNetwork ?? network;
       switch (currentNetwork) {
@@ -170,7 +183,6 @@ const useNetwork = (
         case Network.ETHEREUM:
           return address;
         case Network.SOLANA:
-          console.log(publicKey, "publicKey");
           return publicKey?.toBase58();
         case Network.NEAR:
           return nearAddress?.accountId;
@@ -180,6 +192,7 @@ const useNetwork = (
           return null;
       }
     },
+
     getBalance: async (
       assetId: string,
       contractAddress?: string
