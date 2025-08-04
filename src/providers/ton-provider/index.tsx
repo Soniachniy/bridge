@@ -1,12 +1,11 @@
 import { TonConnect, TonConnectUIProvider } from "@tonconnect/ui-react";
 import { PropsWithChildren } from "react";
 
-import "@hot-wallet/sdk/adapter/ton";
+import { basicConfig } from "@/config";
 
 export const TonProvider = ({ children }: PropsWithChildren) => {
   const connector = new TonConnect({
-    manifestUrl:
-      "https://bridge-lyart-three.vercel.app/tonconnect-manifest.json",
+    manifestUrl: basicConfig.tonConfig.manifestUrl,
   });
 
   return (

@@ -87,8 +87,7 @@ export const basicConfig = {
     ] as [AppKitNetwork, ...AppKitNetwork[]],
   },
   tonConfig: {
-    manifestUrl:
-      "https://bridge-lyart-three.vercel.app/tonconnect-manifest.json",
+    manifestUrl: "https://hyperdep.now/tonconnect-manifest.json",
     endpoint: "https://toncenter.com/api/v2/jsonRPC",
   },
   solanaConfig: {
