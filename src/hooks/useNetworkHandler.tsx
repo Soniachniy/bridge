@@ -37,13 +37,14 @@ import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import { Connection } from "@solana/web3.js";
-import { parseTokenAmount } from "@/lib/utils";
+import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
 
 import { PermitDataResponse } from "@/providers/proxy-provider";
 import {
   checkSwapStorageBalance,
   ITransaction,
   ONE_YOCTO_NEAR,
+  RESERVED_NEAR_BALANCE,
 } from "@/providers/near-provider/nearHelper";
 import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
@@ -239,7 +240,7 @@ const useNetwork = (
           if (!contractAddress || !nearAddress?.accountId) {
             return { balance: 0n, nearBalance: 0n };
           }
-          let nearBalance = 0;
+          let nearBalance = 0n;
           const tokenBalance = await RPCProvider.viewFunction(
             "ft_balance_of",
             contractAddress,
@@ -247,9 +248,16 @@ const useNetwork = (
               account_id: nearAddress?.accountId,
             }
           );
-          console.log(tokenBalance, "tokenBalance");
           if (contractAddress === "wrap.near") {
-            nearBalance = await RPCProvider.viewAccount(nearAddress?.accountId);
+            const nativeNearBalance = await RPCProvider.viewAccount(
+              nearAddress?.accountId
+            );
+
+            const balance = BigInt(nativeNearBalance);
+            nearBalance =
+              balance < RESERVED_NEAR_BALANCE
+                ? 0n
+                : balance - RESERVED_NEAR_BALANCE;
           }
 
           return {
@@ -387,7 +395,6 @@ const useNetwork = (
               depositAddress: depositAddress,
             });
           transactions.push(...storageBalanceTx);
-
           if (selectedToken.contractAddress === "wrap.near") {
             const wrappedNearBalance =
               balance.balance - (balance?.nearBalance ?? 0n);
@@ -396,12 +403,6 @@ const useNetwork = (
               storageAmount -
               wrappedNearBalance;
 
-            console.log(
-              nearToWrap,
-              storageAmount,
-              wrappedNearBalance,
-              "nearToWrap"
-            );
             if (nearToWrap >= (balance?.nearBalance ?? 0n)) return false;
 
             if (nearToWrap > 0n) {
@@ -412,7 +413,7 @@ const useNetwork = (
                     methodName: "near_deposit",
                     args: {},
                     gas: convertGas("100"),
-                    amount: nearToWrap.toString(),
+                    amount: formatTokenAmount(nearToWrap.toString(), 24, 24),
                   },
                 ],
               });

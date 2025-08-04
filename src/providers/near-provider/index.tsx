@@ -89,7 +89,6 @@ export default class RPCProviderService implements IRPCProviderService {
         finality: FINALITY_FINAL,
         account_id: accountId,
       });
-      console.log(response);
       return response.amount;
     } catch (error) {
       console.error(error);

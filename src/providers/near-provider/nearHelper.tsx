@@ -21,6 +21,8 @@ export const getGas = (gas?: string) =>
 export const getAmount = (amount?: string) =>
   amount ? new Big(utils.format.parseNearAmount(amount) ?? 0) : new Big("0");
 
+export const RESERVED_NEAR_BALANCE = 100000000000000000000000n;
+
 export async function getStorageBalance({
   accountId,
   contractId,
@@ -37,7 +39,6 @@ export async function getStorageBalance({
       account_id: accountId,
     }
   );
-  console.log(currentBalance.total);
   if (!currentBalance.total) {
     const balanceBounds = await provider.viewFunction(
       "storage_balance_bounds",

@@ -37,7 +37,7 @@ const useSwapQuote = ({
       if (!tokenIn) return null;
       try {
         const response = await getQuote(
-          !hyperliquidAddress,
+          !hyperliquidAddress || !refundAddress,
           tokenIn.assetId,
           tokenIn.blockchain,
           hyperliquidAddress ?? "",
