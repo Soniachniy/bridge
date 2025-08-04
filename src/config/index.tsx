@@ -1,10 +1,7 @@
 import { setupHotWallet } from "@hot-wallet/sdk/adapter/near";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
 import { Adapter } from "@solana/wallet-adapter-base";
 import { WalletModuleFactory } from "@near-wallet-selector/core";

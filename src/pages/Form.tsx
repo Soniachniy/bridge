@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 
 import { getDepositStatus, translateNetwork } from "@/lib/1clickHelper";
 
-import {
-  enforcer,
-  formatTokenAmount,
-  isSupportedNetwork,
-  truncateAddress,
-} from "@/lib/utils";
+import { enforcer, formatTokenAmount, isSupportedNetwork } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
