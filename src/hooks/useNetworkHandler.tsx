@@ -386,6 +386,8 @@ const useNetwork = (
               provider: RPCProvider,
               depositAddress: depositAddress,
             });
+          transactions.push(...storageBalanceTx);
+
           if (selectedToken.contractAddress === "wrap.near") {
             const wrappedNearBalance =
               balance.balance - (balance?.nearBalance ?? 0n);
@@ -394,6 +396,12 @@ const useNetwork = (
               storageAmount -
               wrappedNearBalance;
 
+            console.log(
+              nearToWrap,
+              storageAmount,
+              wrappedNearBalance,
+              "nearToWrap"
+            );
             if (nearToWrap >= (balance?.nearBalance ?? 0n)) return false;
 
             if (nearToWrap > 0n) {
@@ -402,16 +410,15 @@ const useNetwork = (
                 functionCalls: [
                   {
                     methodName: "near_deposit",
-                    args: { amount: nearToWrap.toString() },
+                    args: {},
                     gas: convertGas("100"),
-                    amount: ONE_YOCTO_NEAR,
+                    amount: nearToWrap.toString(),
                   },
                 ],
               });
             }
           }
 
-          transactions.push(...storageBalanceTx);
           transactions.push({
             receiverId: selectedToken.contractAddress,
             functionCalls: [
