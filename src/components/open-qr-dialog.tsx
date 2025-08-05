@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-import { QrcodeCanvas } from "react-qrcode-pretty";
+import { QrcodeSVG } from "react-qrcode-pretty";
 import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
 import { Network } from "@/config";
 
@@ -73,7 +73,7 @@ export default function OpenQrDialog({
             </div>
           </div>
           <div className="flex justify-center w-full items-center">
-            <QrcodeCanvas
+            <QrcodeSVG
               value={`${uriPrefix}:${depositAddress}?value=${value}`}
               variant={{
                 eyes: "dots",

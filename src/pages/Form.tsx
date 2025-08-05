@@ -35,7 +35,7 @@ export enum EStrategy {
 }
 
 export default function Form() {
-  const [strategy, setStrategy] = useState<EStrategy | null>(null);
+  const [strategy, setStrategy] = useState<EStrategy>(EStrategy.SWAP);
   const navigate = useNavigate();
   const {
     control,
@@ -148,7 +148,7 @@ export default function Form() {
         selectedToken?.assetId,
       ],
     });
-    console.log(selectedToken, depositAddress, "selectedToken");
+
     if (depositAddress && selectedToken) {
       await makeDeposit(
         selectedToken,
@@ -167,7 +167,7 @@ export default function Form() {
       }
     }
   };
-  console.log(errors, "errors");
+
   return (
     <div className="p-4 w-full min-h-96">
       <div className="flex flex-col justify-center items-center mb-6">
