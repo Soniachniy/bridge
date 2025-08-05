@@ -9,11 +9,10 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
 import useNetwork from "@/hooks/useNetworkHandler";
-import { renderActionButtons } from "@/components/ActionButtons";
+import ActionButtons from "@/components/ActionButtons";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/error-icon.svg?react";
 import ManualIcon from "@/assets/manual.svg?react";
-import CopyIcon from "@/assets/copy-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/useSwapQuote";
@@ -22,8 +21,8 @@ import useManualDeposit from "@/hooks/useManualDeposit";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 import { Network } from "@/config";
-import OpenQrDialog from "@/components/open-qr-dialog";
 import SlippageDialog from "@/components/slippage-dialog";
+import DepositAddressSection from "@/components/DepositAddressSection";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -302,10 +301,10 @@ export default function Form() {
         {selectedToken && (
           <>
             <div className="flex flex-col gap-2 mt-6">
-              <label className="text-[#9DB2BD] font-normal text-xs font-inter">
+              <label className="text-gray_text font-normal text-xs font-inter">
                 Refund address
               </label>
-              <div className="bg-[#1B2429] rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 w-[480px] h-12">
+              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 w-[480px] h-12">
                 <div className="flex flex-col grow-1 gap-1 w-[210px]">
                   <div className="flex flex-row grow-1 items-center">
                     <input
@@ -350,58 +349,25 @@ export default function Form() {
             </div>
           </>
         )}
-        {(!isSupportedNetwork(translateNetwork(selectedToken?.blockchain)) ||
-          strategy === EStrategy.DEPOSIT) &&
-          connectedEVMWallet &&
-          depositAddress &&
-          Object.values(errors).length === 0 && (
-            <div className="self-stretch py-6 inline-flex flex-col justify-start items-center gap-4">
-              <div className="size- flex flex-col justify-start items-center gap-1">
-                <div className="justify-center text-gray_text text-2xl font-normal font-['Inter'] leading-normal">
-                  Your deposit address.
-                </div>
-                <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
-                  Send assets manually to this address.
-                </div>
-              </div>
-              <div className="text-center justify-center text-main_white text-sm font-normal font-['Inter'] leading-none">
-                {depositAddress}
-              </div>
-              <div className="size- inline-flex justify-start items-start gap-2">
-                <div className="size- inline-flex justify-start items-start">
-                  <div
-                    onClick={() => {
-                      navigator.clipboard.writeText(depositAddress ?? "");
-                    }}
-                    className="cursor-pointer pl-2 pr-4 py-2 bg-main_light rounded-[10px] flex justify-center items-center gap-2 overflow-hidden"
-                  >
-                    <CopyIcon />
-                    <div className="justify-center text-black text-sm font-normal font-['DM_Sans'] leading-normal">
-                      Copy address
-                    </div>
-                  </div>
-                </div>
-                <OpenQrDialog
-                  network={
-                    translateNetwork(selectedToken?.blockchain) as Network
-                  }
-                  depositAddress={depositAddress}
-                  value={debouncedAmountIn}
-                />
-              </div>
-            </div>
-          )}
+        <DepositAddressSection
+          selectedToken={selectedToken}
+          strategy={strategy}
+          connectedEVMWallet={connectedEVMWallet}
+          depositAddress={depositAddress}
+          errors={errors}
+          debouncedAmountIn={debouncedAmountIn}
+        />
 
-        {renderActionButtons(
-          selectedToken,
-          strategy,
-          setStrategy,
-          connectWallet,
-          isConnected(),
-          isSubmitting,
-          isValidating,
-          getPublicKey(Network.ARBITRUM) ?? null
-        )}
+        <ActionButtons
+          selectedToken={selectedToken}
+          strategy={strategy}
+          setStrategy={setStrategy}
+          connectWallet={connectWallet}
+          isConnected={isConnected()}
+          isSubmitting={isSubmitting}
+          isValidating={isValidating}
+          connectedEVMWallet={getPublicKey(Network.ARBITRUM) ?? null}
+        />
       </form>
     </div>
   );
