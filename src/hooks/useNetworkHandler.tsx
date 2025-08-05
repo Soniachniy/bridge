@@ -3,10 +3,10 @@ import { basicConfig, Network } from "@/config";
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useAppKit } from "@reown/appkit/react";
-import { Account, Transaction } from "@near-wallet-selector/core";
+import { Transaction } from "@near-wallet-selector/core";
 
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
@@ -81,31 +81,7 @@ const useNetwork = (
 
   /* NEAR */
   const { openModal, signOut, selector, RPCProvider } = useWalletSelector();
-  const [nearAddress, setNearAddress] = useState<Account | null>(null);
   const { accountId } = useWalletSelector();
-
-  const [isNearConnected, setIsNearConnected] = useState(false);
-  const updateIsNearConnected = useCallback(async () => {
-    if (selector) {
-      try {
-        const selectedWalletId = selector?.store.getState().selectedWalletId;
-        if (!selectedWalletId) {
-          return;
-        }
-        const wallet = await selector.wallet(selectedWalletId);
-        const accounts = await wallet?.getAccounts();
-        setNearAddress(accounts?.[0] ?? null);
-        setIsNearConnected(accounts && accounts.length > 0);
-      } catch (e) {
-        console.warn("Error updating near connected", e);
-        setIsNearConnected(false);
-      }
-    }
-  }, [selector]);
-
-  useEffect(() => {
-    updateIsNearConnected();
-  }, [updateIsNearConnected, selector]);
 
   return {
     isConnected: () => {
@@ -118,7 +94,7 @@ const useNetwork = (
         case Network.ETHEREUM:
           return isConnected;
         case Network.NEAR:
-          return isNearConnected;
+          return accountId?.length > 0;
         case Network.SOLANA:
           return Boolean(publicKey);
         case Network.TON:
