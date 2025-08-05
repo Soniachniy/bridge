@@ -105,19 +105,23 @@ export default function Form() {
 
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
-      if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
-        const { balance, nearBalance } = await getBalance(
-          selectedToken.assetId,
-          selectedToken.contractAddress
-        );
-        if (balance) {
-          setValue("selectedToken", {
-            ...selectedToken,
-            balance: balance,
-            balanceNear: nearBalance,
-            balanceUpdatedAt: Date.now(),
-          });
+      try {
+        if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
+          const { balance, nearBalance } = await getBalance(
+            selectedToken.assetId,
+            selectedToken.contractAddress
+          );
+          if (balance) {
+            setValue("selectedToken", {
+              ...selectedToken,
+              balance: balance,
+              balanceNear: nearBalance,
+              balanceUpdatedAt: Date.now(),
+            });
+          }
         }
+      } catch (e) {
+        console.log(e, "error while getting balance");
       }
     };
     getSelectedTokenBalance();

@@ -82,6 +82,8 @@ const useNetwork = (
   /* NEAR */
   const { openModal, signOut, selector, RPCProvider } = useWalletSelector();
   const [nearAddress, setNearAddress] = useState<Account | null>(null);
+  const { accountId } = useWalletSelector();
+
   const [isNearConnected, setIsNearConnected] = useState(false);
   const updateIsNearConnected = useCallback(async () => {
     if (selector) {
@@ -186,7 +188,7 @@ const useNetwork = (
         case Network.SOLANA:
           return publicKey?.toBase58();
         case Network.NEAR:
-          return nearAddress?.accountId;
+          return accountId;
         case Network.TON:
           return tonWallet?.account?.address;
         default:
@@ -237,7 +239,7 @@ const useNetwork = (
           );
           return { balance: BigInt(balance?.toString() ?? 0), nearBalance: 0n };
         case Network.NEAR:
-          if (!contractAddress || !nearAddress?.accountId) {
+          if (!contractAddress || !accountId) {
             return { balance: 0n, nearBalance: 0n };
           }
           let nearBalance = 0n;
@@ -245,13 +247,11 @@ const useNetwork = (
             "ft_balance_of",
             contractAddress,
             {
-              account_id: nearAddress?.accountId,
+              account_id: accountId,
             }
           );
           if (contractAddress === "wrap.near") {
-            const nativeNearBalance = await RPCProvider.viewAccount(
-              nearAddress?.accountId
-            );
+            const nativeNearBalance = await RPCProvider.viewAccount(accountId);
 
             const balance = BigInt(nativeNearBalance);
             nearBalance =
@@ -373,17 +373,8 @@ const useNetwork = (
           console.log(txHash, "txHash");
           return txHash;
         case Network.NEAR:
-          console.log(
-            selector,
-            nearAddress?.accountId,
-            selectedToken,
-            "selectedToken"
-          );
-          if (
-            !selector ||
-            !nearAddress?.accountId ||
-            !selectedToken.contractAddress
-          ) {
+          console.log(selector, accountId, selectedToken, "selectedToken");
+          if (!selector || !accountId || !selectedToken.contractAddress) {
             return false;
           }
           const wallet = await selector.wallet();
@@ -437,7 +428,7 @@ const useNetwork = (
 
           const nearTransactions: Transaction[] = transactions.map(
             (transaction: ITransaction) => ({
-              signerId: nearAddress?.accountId,
+              signerId: accountId,
               receiverId: transaction.receiverId,
               actions: transaction.functionCalls.map((fc) => ({
                 type: "FunctionCall",

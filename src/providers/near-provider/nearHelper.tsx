@@ -39,7 +39,7 @@ export async function getStorageBalance({
       account_id: accountId,
     }
   );
-  if (!currentBalance.total) {
+  if (!currentBalance) {
     const balanceBounds = await provider.viewFunction(
       "storage_balance_bounds",
       contractId,
