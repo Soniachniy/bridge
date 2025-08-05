@@ -142,6 +142,10 @@ export default function Form() {
   }, [selectedToken]);
 
   const onSubmit = async () => {
+    if (strategy === EStrategy.DEPOSIT) {
+      return;
+    }
+
     await queryClient.invalidateQueries({
       queryKey: [
         "quote",
@@ -349,7 +353,8 @@ export default function Form() {
         {(!isSupportedNetwork(translateNetwork(selectedToken?.blockchain)) ||
           strategy === EStrategy.DEPOSIT) &&
           connectedEVMWallet &&
-          depositAddress && (
+          depositAddress &&
+          Object.values(errors).length === 0 && (
             <div className="self-stretch py-6 inline-flex flex-col justify-start items-center gap-4">
               <div className="size- flex flex-col justify-start items-center gap-1">
                 <div className="justify-center text-gray_text text-2xl font-normal font-['Inter'] leading-normal">

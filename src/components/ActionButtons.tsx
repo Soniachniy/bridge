@@ -121,7 +121,14 @@ export const renderActionButtons = (
 
   if (strategy === EStrategy.DEPOSIT) {
     return (
-      <div className="mt-5 flex grow-1 w-full">
+      <div className="mt-5 flex flex-col grow-1 w-full gap-2">
+        <ActionButton
+          variant="primary"
+          isSubmitButton
+          disabled={isSubmitting || isValidating}
+        >
+          Get deposit address
+        </ActionButton>
         <ActionButton
           variant="secondary"
           onClick={() => {
