@@ -90,7 +90,7 @@ const SelectTokenDialog: FC<Props> = ({
             <div className="relative h-[55px] flex items-center">
               <img
                 src={getTokenIcon(selectedToken)}
-                alt={selectedToken?.symbol ?? "token"}
+                alt={selectedToken?.assetId ?? "token"}
                 className="size-12 rounded-full"
               />
               <img
@@ -104,12 +104,12 @@ const SelectTokenDialog: FC<Props> = ({
           )}
 
           {selectedToken ? (
-            <div className="flex-1 ml-2">
-              <p className="text-left text-sm font-semibold leading-[120%] tracking-[-0.32px] max-w-14 truncate md:max-w-full md:whitespace-normal">
+            <div className="flex-1 flex-col ml-2">
+              <p className="text-left mb-2 text-main_white text-base font-semibold font-['Inter'] leading-normal">
                 {selectedToken?.symbol}
               </p>
-              <p className="text-left text-muted-foreground text-[10px] font-medium leading-[120%]">
-                {selectedToken?.blockchain}
+              <p className="text-left text-main_white text-xs font-normal font-['Inter'] leading-none">
+                {CHAIN_TITLE[selectedToken?.blockchain]}
               </p>
             </div>
           ) : (
@@ -221,7 +221,7 @@ const SelectTokenDialog: FC<Props> = ({
                   <div className="relative shrink-0 mx-2  ">
                     <img
                       src={getTokenIcon(token) ?? "/static/icons/empty.svg"}
-                      alt={token?.symbol ?? "token"}
+                      alt={token?.assetId ?? "token"}
                       className="size-10 rounded-full"
                     />
                     <img

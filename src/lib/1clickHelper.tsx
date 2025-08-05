@@ -131,6 +131,12 @@ export const TOKEN_BY_SYMBOL: Record<string, string> = {
 };
 
 export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
+  "nep141:token.rhealab.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/37529.png",
+  "nep141:eth-0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/64x64/9444.png",
+  "nep141:sol-bb27241c87aa401cc963c360c175dd7ca7035873.omft.near":
+    "https://dd.dexscreener.com/ds-data/tokens/solana/EJZJpNa4tDZ3kYdcRZgaAtaKm3fLJ5akmyPkCaKmfWvd.png?size=lg&key=9f72fc",
   "nep245:v2_1.omni.hot.tg:1117_":
     "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
   "nep245:v2_1.omni.hot.tg:1117_3tsdfyziyc7EJbP2aULWSKU4toBaAcN4FdTgfm5W1mC4ouR":
@@ -300,6 +306,27 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     "https://s2.coinmarketcap.com/static/img/coins/128x128/32994.png",
   "nep141:base-0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/32994.png",
+  "nep245:v2_1.omni.hot.tg:56_11111111111111111111":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/1839.png",
+  "nep245:v2_1.omni.hot.tg:137_11111111111111111111":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/28321.png",
+  "nep141:sol-91914f13d3b54f8126a2824d71632d4b078d7403.omft.near":
+    "https://near-intents.org/static/icons/token/xbtc.png",
+  "nep141:base-0x227d920e20ebac8a40e7d6431b7d724bb64d7245.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/21351.png",
+  "nep141:eth-0xb4b9dc1c77bdbb135ea907fd5a08094d98883a35.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/21351.png",
+  "nep141:arb-0xca7dec8550f43a5e46e3dfb95801f64280e75b27.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/21351.png",
+  "nep245:v2_1.omni.hot.tg:56_28V9BijGeZDBFEEtkAcnJo4tPRH4":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/21351.png",
+  "nep245:v2_1.omni.hot.tg:56_24S22V8GMmQN8t6PbCdRb3mBewAd":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/37529.png",
+  "nep141:eth-0xfa2b947eec368f42195f24f36d2af29f7c24cec2.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/35721.png",
+
+  "nep141:eth-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d.omft.near":
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/36148.png",
 };
 
 export function translateNetwork(network?: string): Network {
