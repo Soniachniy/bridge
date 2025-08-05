@@ -14,6 +14,7 @@ type Props = {
   refundAddress: string | null;
   setError: (key: keyof FormInterface, value: {}) => void;
   clearError: (key: (keyof FormInterface)[]) => void;
+  slippageValue: number;
 };
 
 const useSwapQuote = ({
@@ -24,6 +25,7 @@ const useSwapQuote = ({
   refundAddress,
   setError,
   clearError,
+  slippageValue,
 }: Props) => {
   return useQuery({
     queryKey: [
@@ -40,6 +42,7 @@ const useSwapQuote = ({
           !hyperliquidAddress || !refundAddress,
           tokenIn.assetId,
           tokenIn.blockchain,
+          slippageValue,
           hyperliquidAddress ?? "",
           parseTokenAmount(amountIn, tokenIn.decimals),
           refundAddress ?? ""

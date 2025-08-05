@@ -56,6 +56,7 @@ export const formValidationSchema = z
   .object({
     hyperliquidAddress: z.string(),
     refundAddress: z.string(),
+    slippageValue: z.number(),
     selectedToken: z
       .object({
         assetId: z.string(),
@@ -171,4 +172,5 @@ export interface FormInterface {
   amountOut?: string;
   depositAddress?: string;
   connectedEVMWallet: boolean;
+  slippageValue: number;
 }

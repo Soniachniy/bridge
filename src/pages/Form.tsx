@@ -17,12 +17,13 @@ import CopyIcon from "@/assets/copy-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/useSwapQuote";
-import { fetchTokens } from "@/providers/proxy-provider";
+import { fetchTokens, SLIPPAGE } from "@/providers/proxy-provider";
 import useManualDeposit from "@/hooks/useManualDeposit";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 import { Network } from "@/config";
 import OpenQrDialog from "@/components/open-qr-dialog";
+import SlippageDialog from "@/components/slippage-dialog";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -59,10 +60,11 @@ export default function Form() {
       refundAddress: "",
       depositAddress: "",
       connectedEVMWallet: false,
+      slippageValue: SLIPPAGE,
     },
   });
   const selectedToken = useWatch({ control, name: "selectedToken" });
-
+  const slippageValue = useWatch({ control, name: "slippageValue" });
   const amountIn = useWatch({ control: control, name: "amount" });
   const amountOut = useWatch({ control: control, name: "amountOut" });
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -84,6 +86,7 @@ export default function Form() {
     refundAddress,
     setError: (key: keyof FormInterface, value: {}) => setError(key, value),
     clearError: (key: (keyof FormInterface)[]) => clearErrors(key),
+    slippageValue,
   });
 
   const { connectWallet, getPublicKey, isConnected, getBalance, makeDeposit } =
@@ -213,9 +216,13 @@ export default function Form() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="flex flex-col gap-2">
-          <label htmlFor="from" className="text-white font-thin text-sm">
-            Amount
-          </label>
+          <div className="flex flex-row gap-2 justify-between w-[480px]">
+            <span className="text-white font-thin text-sm">Amount</span>
+            <SlippageDialog
+              slippageValue={slippageValue}
+              setSlippageValue={(value) => setValue("slippageValue", value)}
+            />
+          </div>
           <div className="bg-[#1B2429] rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] w-[480px] h-[75px]">
             <div className="flex grow-1 flex-col gap-1 w-[210px]">
               <div className="flex grow-1 flex-row items-center gap-7">

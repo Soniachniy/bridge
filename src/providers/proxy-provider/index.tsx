@@ -74,6 +74,7 @@ export const getQuote = async (
   dryRun: boolean,
   assetFrom: string,
   blockchain: string,
+  slippageTolerance: number,
   hyperliquidAddress?: string,
   amount?: string,
   refundTo?: string
@@ -87,7 +88,7 @@ export const getQuote = async (
       body: JSON.stringify({
         assetFrom,
         blockchain,
-        slippageTolerance: SLIPPAGE,
+        slippageTolerance,
         amount,
       }),
     });
@@ -103,7 +104,7 @@ export const getQuote = async (
     body: JSON.stringify({
       assetFrom,
       blockchain,
-      slippageTolerance: SLIPPAGE,
+      slippageTolerance,
       hyperliquidAddress,
       amount,
       refundTo,
