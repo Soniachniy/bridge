@@ -3,7 +3,7 @@ import { EStrategy } from "@/pages/Form";
 import { getDepositStatus } from "@/lib/1clickHelper";
 
 export default function useManualDeposit(
-  strategy: EStrategy,
+  strategy: EStrategy | null,
   navigate: (path: string) => void,
   depositAddress?: string
 ) {

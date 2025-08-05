@@ -14,7 +14,6 @@ import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/error-icon.svg?react";
 import ManualIcon from "@/assets/manual.svg?react";
 import CopyIcon from "@/assets/copy-icon.svg?react";
-import QRCodeIcon from "@/assets/qr-code-icon.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/useSwapQuote";
@@ -23,6 +22,7 @@ import useManualDeposit from "@/hooks/useManualDeposit";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 import { Network } from "@/config";
+import OpenQrDialog from "@/components/open-qr-dialog";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -35,7 +35,7 @@ export enum EStrategy {
 }
 
 export default function Form() {
-  const [strategy, setStrategy] = useState<EStrategy>(EStrategy.SWAP);
+  const [strategy, setStrategy] = useState<EStrategy | null>(null);
   const navigate = useNavigate();
   const {
     control,
@@ -134,8 +134,6 @@ export default function Form() {
       );
       if (!isSupported) {
         setStrategy(EStrategy.DEPOSIT);
-      } else {
-        setStrategy(EStrategy.SWAP);
       }
     }
   }, [selectedToken]);
@@ -341,7 +339,8 @@ export default function Form() {
             </div>
           </>
         )}
-        {!isSupportedNetwork(translateNetwork(selectedToken?.blockchain)) &&
+        {(!isSupportedNetwork(translateNetwork(selectedToken?.blockchain)) ||
+          strategy === EStrategy.DEPOSIT) &&
           connectedEVMWallet &&
           depositAddress && (
             <div className="self-stretch py-6 inline-flex flex-col justify-start items-center gap-4">
@@ -370,11 +369,13 @@ export default function Form() {
                     </div>
                   </div>
                 </div>
-                <div className="cursor-pointer flex justify-start items-start">
-                  <div className="size- p-2 bg-main_light rounded-[10px] flex justify-center items-center overflow-hidden">
-                    <QRCodeIcon />
-                  </div>
-                </div>
+                <OpenQrDialog
+                  network={
+                    translateNetwork(selectedToken?.blockchain) as Network
+                  }
+                  depositAddress={depositAddress}
+                  value={debouncedAmountIn}
+                />
               </div>
             </div>
           )}
