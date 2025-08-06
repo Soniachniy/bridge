@@ -16,13 +16,12 @@ import { useWalletSelector } from "@/providers/near-provider";
 import { useTonWallet } from "@tonconnect/ui-react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 
-type Props = {};
-
 export interface AddressRow {
   address: string | null;
   blockChain: Network;
 }
-const ConnectWalletDialog: FC<Props> = ({}) => {
+
+const ConnectWalletDialog: FC = () => {
   const [activeAddress, setActiveAddress] = useState<string | null>(null);
   const { disconnectWallet, connectWallet } = useNetwork(null);
   const [connectedAddresses, setConnectedAddresses] = useState<AddressRow[]>(
@@ -83,7 +82,7 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row  bg-[#97FCE4] text-[#0F1A20] px-4 py-2 rounded-md font-dmSans  items-center border-none gap-2 "
+          className="flex flex-row  bg-main_light text-background px-4 py-2 rounded-md font-dmSans  items-center border-none gap-2 "
         >
           {activeAddress ? (
             <>
@@ -95,15 +94,12 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="flex rounded-3xl bg-main_dark !px-0 !pb-0 !pt-0 outline-none border-none w-full  lg:min-w-[480px] ">
+      <PopoverContent className="flex rounded-3xl bg-main_dark !px-0 !pb-0 !pt-0 outline-none border-none w-full lg:min-w-[480px] ">
         <div className="flex flex-col grow column p-6 gap-5 text-white bg-main_dark rounded-3xl">
           {connectedAddresses.length > 0 && (
             <>
-              {" "}
-              <div className="flex items-center flex-row justify-between h-fit w-full gap-2">
-                <div className="justify-center shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
-                  Connected wallets
-                </div>
+              <div className="flex items-center flex-row justify-between h-fit w-full gap-2 shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
+                Connected wallets
               </div>
               <div className="flex flex-col">
                 {connectedAddresses.map((address) => (
@@ -132,7 +128,6 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
                         </div>
                       </div>
                       <div
-                        data-property-1="Default"
                         className="cursor-pointer p-2 bg-element rounded-lg flex justify-center items-center gap-2"
                         onClick={() => {
                           disconnectWallet(address.blockChain);
@@ -150,10 +145,8 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
           )}
           {connectors.length > 0 && (
             <>
-              <div className="flex items-center flex-row justify-between h-fit w-full gap-2">
-                <div className="justify-center shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
-                  Connect wallets
-                </div>
+              <div className="flex items-center flex-row justify-between h-fit w-full gap-2 shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
+                Connect wallets
               </div>
               <div className="flex flex-col">
                 {connectors.map(({ blockChain }) => (
@@ -161,31 +154,28 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
                     key={blockChain}
                     className="self-stretch h-14 py-2 rounded-lg border-main_light inline-flex justify-start items-center gap-2"
                   >
-                    <div className="flex-1 flex justify-between items-center">
-                      <div className="size- flex justify-start items-center gap-2">
-                        <div className="relative">
-                          <img
-                            src={
-                              CHAIN_ICON[
-                                blockChain as unknown as TokenResponse.blockchain
-                              ]
-                            }
-                            alt={blockChain}
-                            width={20}
-                            height={20}
-                            className="size-10 relative bg-element rounded-full"
-                          />
-                        </div>
-                        <div className="text-center justify-center text-white text-sm font-normal font-['Inter'] leading-none">
-                          {
-                            CHAIN_TITLE[
+                    <div className="flex-1 flex gap-2 justify-between items-center">
+                      <div className="relative">
+                        <img
+                          src={
+                            CHAIN_ICON[
                               blockChain as unknown as TokenResponse.blockchain
                             ]
                           }
-                        </div>
+                          alt={blockChain}
+                          width={20}
+                          height={20}
+                          className="size-10 relative bg-element rounded-full"
+                        />
+                      </div>
+                      <div className="text-left flex-1 text-white text-sm font-normal font-['Inter'] leading-none">
+                        {
+                          CHAIN_TITLE[
+                            blockChain as unknown as TokenResponse.blockchain
+                          ]
+                        }
                       </div>
                       <div
-                        data-property-1="Default"
                         className="cursor-pointer p-2 bg-element rounded-lg flex justify-center items-center gap-2"
                         onClick={() => {
                           connectWallet(blockChain);

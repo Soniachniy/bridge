@@ -4,8 +4,6 @@ import {
 } from "@defuse-protocol/one-click-sdk-typescript";
 import { basicConfig } from "@/config";
 
-export const SLIPPAGE = 50;
-
 export const API_ROUTES = {
   QUOTE: basicConfig.proxyApiPoint + "/api/quote",
   STATUS: basicConfig.proxyApiPoint + "/api/status/",

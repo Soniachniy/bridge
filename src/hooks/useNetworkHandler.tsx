@@ -43,14 +43,13 @@ import { PermitDataResponse } from "@/providers/proxy-provider";
 import {
   checkSwapStorageBalance,
   ITransaction,
-  ONE_YOCTO_NEAR,
-  RESERVED_NEAR_BALANCE,
 } from "@/providers/near-provider/nearHelper";
 import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
 import { UseFormWatch } from "react-hook-form";
 import { isNativeToken, translateNetwork } from "@/lib/1clickHelper";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
 
 const useNetwork = (
   network: Network | null,

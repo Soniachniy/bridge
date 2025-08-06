@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getDepositStatus, translateNetwork } from "@/lib/1clickHelper";
+import { translateNetwork } from "@/lib/1clickHelper";
 
 import { enforcer, formatTokenAmount, isSupportedNetwork } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
@@ -16,13 +16,14 @@ import ManualIcon from "@/assets/manual.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/useSwapQuote";
-import { fetchTokens, SLIPPAGE } from "@/providers/proxy-provider";
-import useManualDeposit from "@/hooks/useManualDeposit";
+import { fetchTokens } from "@/providers/proxy-provider";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 import { Network } from "@/config";
 import SlippageDialog from "@/components/slippage-dialog";
 import DepositAddressSection from "@/components/DepositAddressSection";
+import { SLIPPAGE } from "@/lib/constants";
+import { useTokens } from "@/providers/token-context";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -91,19 +92,7 @@ export default function Form() {
   const { connectWallet, getPublicKey, isConnected, getBalance, makeDeposit } =
     useNetwork(translateNetwork(selectedToken?.blockchain), setValue, watch);
 
-  useManualDeposit(strategy, navigate, depositAddress);
-
-  const { data } = useQuery({
-    queryKey: ["one-click-tokens"],
-    queryFn: async () => {
-      const response = await fetchTokens();
-      return response;
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-  });
+  const data = useTokens();
 
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
@@ -142,18 +131,8 @@ export default function Form() {
 
   const onSubmit = async () => {
     if (strategy === EStrategy.DEPOSIT) {
-      return;
+      return navigate(`/${depositAddress}`);
     }
-
-    await queryClient.invalidateQueries({
-      queryKey: [
-        "quote",
-        debouncedAmountIn,
-        hyperliquidAddress,
-        refundAddress,
-        selectedToken?.assetId,
-      ],
-    });
 
     if (depositAddress && selectedToken) {
       await makeDeposit(
@@ -166,11 +145,7 @@ export default function Form() {
           nearBalance: BigInt(selectedToken.balanceNear ?? "0"),
         }
       );
-
-      const depositStatus = await getDepositStatus(depositAddress);
-      if (depositStatus) {
-        navigate(`/${depositAddress}`);
-      }
+      navigate(`/${depositAddress}`);
     }
   };
 
@@ -187,13 +162,13 @@ export default function Form() {
       </div>
       <div className="flex flex-col justify-center items-center mb-10">
         <div className="flex flex-col gap-2 justify-center items-center w-full">
-          <div className="flex flex-row gap-2 justify-between lg:w-[480px] w-full">
-            <div className="text-white font-thin text-sm text-left w-full lg:w-[480px]">
+          <div className="flex flex-row gap-2 justify-between md:w-[480px] w-full">
+            <div className="text-white font-thin text-sm text-left w-full md:w-[480px]">
               From
             </div>
 
             {strategy && strategy === EStrategy.DEPOSIT && (
-              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end lg:w-[480px] text-right">
+              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end md:w-[480px] text-right">
                 <ManualIcon />
                 Manual deposit
               </div>
@@ -201,7 +176,7 @@ export default function Form() {
           </div>
           <SelectTokenDialog
             {...register("selectedToken")}
-            allTokens={data ?? []}
+            allTokens={Object.values(data ?? {})}
             selectToken={(token) => {
               setValue("selectedToken", {
                 ...token,
@@ -218,14 +193,14 @@ export default function Form() {
         className="flex flex-col justify-center items-center"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="flex flex-row gap-2 justify-between w-full lg:w-[480px] sm:w-full">
+        <div className="flex flex-row gap-2 justify-between w-full md:w-[480px] sm:w-full">
           <span className="text-white font-thin text-sm">Amount</span>
           <SlippageDialog
             slippageValue={slippageValue}
             setSlippageValue={(value) => setValue("slippageValue", value)}
           />
         </div>
-        <div className="bg-[#1B2429] w-full rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] lg:w-[480px] h-[75px] sm:w-full">
+        <div className="bg-[#1B2429] w-full rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] md:w-[480px] h-[75px] sm:w-full">
           <div className="flex grow-1 flex-col gap-1 w-[210px]">
             <div className="flex grow-1 flex-row items-center gap-7">
               <input
@@ -291,18 +266,18 @@ export default function Form() {
           </div>
         </div>
         {errors.amount && (
-          <div className="text-error word-break text-xs lg:w-[480px] sm:w-full font-normal text-left  font-inter">
+          <div className="text-error word-break text-xs md:w-[480px] sm:w-full font-normal text-left  font-inter">
             <span>{errors.amount.message}</span>
           </div>
         )}
 
         {selectedToken && (
           <>
-            <div className="flex flex-col gap-2 mt-6 w-full lg:w-[480px]">
+            <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
               <label className="text-gray_text font-normal text-xs font-inter">
                 Refund address
               </label>
-              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 lg:w-[480px] h-12 sm:w-full">
+              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 md:w-[480px] h-12 sm:w-full">
                 <div className="flex flex-col grow-1 gap-1 w-[210px]">
                   <div className="flex flex-row grow-1 items-center">
                     <input
@@ -340,7 +315,7 @@ export default function Form() {
                 </div>
               </div>
               {errors.refundAddress && (
-                <div className="text-error word-break text-xs lg:w-[480px] font-normal text-left  font-inter">
+                <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
                   <span>{errors.refundAddress.message}</span>
                 </div>
               )}

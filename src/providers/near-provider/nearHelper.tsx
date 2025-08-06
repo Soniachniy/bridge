@@ -1,6 +1,13 @@
 import Big from "big.js";
 import { utils } from "near-api-js";
 
+import {
+  NEAR_TOKEN_CONTRACT_ID,
+  NEAR_TOKEN_ID,
+  STORAGE_TO_REGISTER_FT,
+  STORAGE_TO_REGISTER_WNEAR,
+} from "@/lib/constants";
+
 export interface ITransaction {
   receiverId: string;
   functionCalls: {
@@ -10,18 +17,11 @@ export interface ITransaction {
     args?: object;
   }[];
 }
-export const NEAR_TOKEN_ID = "NEAR";
-export const NEAR_TOKEN_CONTRACT_ID = "wrap.near";
-export const STORAGE_TO_REGISTER_FT = "0.1";
-export const STORAGE_TO_REGISTER_WNEAR = "0.00125";
-export const ONE_YOCTO_NEAR = "0.000000000000000000000001";
 
 export const getGas = (gas?: string) =>
   gas ? new Big(gas) : new Big("100000000000000");
 export const getAmount = (amount?: string) =>
   amount ? new Big(utils.format.parseNearAmount(amount) ?? 0) : new Big("0");
-
-export const RESERVED_NEAR_BALANCE = 100000000000000000000000n;
 
 export async function getStorageBalance({
   accountId,

@@ -5,6 +5,7 @@ import { isAxiosError } from "axios";
 import { FormInterface } from "@/lib/validation";
 import { getQuote } from "@/providers/proxy-provider";
 import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
+import { USDC_DECIMALS } from "@/lib/constants";
 
 type Props = {
   tokenIn: TokenResponse | null;
@@ -64,7 +65,7 @@ const useSwapQuote = ({
         if (response) {
           setFormValue(
             "amountOut",
-            formatTokenAmount(response.data.expectedAmountOut, 6)
+            formatTokenAmount(response.data.expectedAmountOut, USDC_DECIMALS)
           );
           if (Number(response.data.expectedAmountOut) > 0) {
             clearError(["amountOut"]);

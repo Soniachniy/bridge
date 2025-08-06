@@ -21,7 +21,6 @@ import {
   GetExecutionStatusResponse,
   TokenResponse,
 } from "@defuse-protocol/one-click-sdk-typescript";
-import { getStatus } from "@/providers/proxy-provider";
 
 export type OneClickSwapFormValues = {
   amountIn: string;
@@ -391,36 +390,4 @@ export function getNetworkIcon(network: string): React.ReactNode | null {
 }
 export const delay = async (time = 1000): Promise<void> => {
   return new Promise((res) => setTimeout(res, time));
-};
-
-export const getDepositStatus = async (depositAddress: string, retries = 9) => {
-  const timeInterval = 7000;
-  const maxRetries = retries;
-  let attempt = 0;
-
-  let status: boolean | null = false;
-  let data;
-
-  while (attempt < maxRetries) {
-    try {
-      await delay(timeInterval);
-      const statusResponse = await getStatus(depositAddress);
-      if (
-        statusResponse.success &&
-        statusResponse.data.status === "ready_for_permit"
-      ) {
-        status = true;
-        data = statusResponse.data;
-        break;
-      } else {
-        status = false;
-      }
-    } catch (error) {
-      console.error(`Error: while getting status\n\n`, error);
-    }
-
-    attempt++;
-  }
-
-  return { status, data };
 };

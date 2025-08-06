@@ -10,7 +10,7 @@ const BUTTON_TEXTS = {
   proceedTransfer: "Proceed transfer",
   processing: "Processing...",
   sendManually: "Send assets manually",
-  getDepositAddress: "Get deposit address",
+  getDepositAddress: "Confirm deposit",
   connectWallet: "Connect wallet",
 } as const;
 
