@@ -73,7 +73,7 @@ export default function SlippageDialog({
                 setSlippageValue(localSlippageValue);
                 setOpen(false);
               }}
-              className="flex-1 px-4 py-2 bg-main_light rounded-[10px] flex justify-center items-center overflow-hidden cursor-pointer"
+              className="flex-1  py-2 bg-main_light rounded-[10px] flex justify-center items-center overflow-hidden cursor-pointer"
             >
               <div className="text-center justify-center text-main text-sm font-normal font-['DM_Sans'] leading-normal">
                 Apply

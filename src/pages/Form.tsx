@@ -115,7 +115,7 @@ export default function Form() {
         console.log(e, "error while getting balance");
       }
     };
-    console.log("selectedToken?.assetId", selectedToken?.assetId);
+
     getSelectedTokenBalance();
   }, [selectedToken?.assetId]);
 
