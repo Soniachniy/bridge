@@ -51,6 +51,48 @@ export default function useProcessing() {
     depositAddress: string;
   } | null>(null);
 
+  const [isPermitAsked, setIsPermitAsked] = useState(false);
+
+  const signPermit = async (depositAddress: string) => {
+    const permitData = await getPermitData(depositAddress);
+    const { message, types, domain } = permitData.data;
+
+    await switchChain(wagmiAdapter.wagmiConfig, {
+      chainId: Number(domain.chainId),
+    });
+    const signature = await signTypedData(wagmiAdapter.wagmiConfig, {
+      account: message.owner as `0x${string}`,
+      types,
+      primaryType: "Permit",
+      domain: {
+        name: domain.name,
+        version: domain.version,
+        chainId: BigInt(domain.chainId),
+        verifyingContract: domain.verifyingContract as `0x${string}`,
+      },
+      message: {
+        owner: message.owner as `0x${string}`,
+        spender: message.spender as `0x${string}`,
+        value: BigInt(message.value),
+        nonce: BigInt(message.nonce),
+        deadline: BigInt(message.deadline),
+      },
+    });
+    setStage(ProcessingStages.ExecutingDeposit);
+    if (signature) {
+      const r = sliceHex(signature, 0, 32);
+      const s = sliceHex(signature, 32, 64);
+      const vByte = sliceHex(signature, 64, 65);
+      const v = parseInt(vByte, 16);
+
+      await execute(depositAddress, {
+        v: v,
+        r: r,
+        s: s,
+      });
+    }
+  };
+
   useEffect(() => {
     const startPolling = async () => {
       try {
@@ -108,41 +150,9 @@ export default function useProcessing() {
     const processPermit = async () => {
       if (depositAddress) {
         if (stage === ProcessingStages.ReadyForPermit) {
-          const permitData = await getPermitData(depositAddress);
-          const { message, types, domain } = permitData.data;
-          await switchChain(wagmiAdapter.wagmiConfig, {
-            chainId: Number(domain.chainId),
-          });
-
-          const signature = await signTypedData(wagmiAdapter.wagmiConfig, {
-            types,
-            primaryType: "Permit",
-            domain: {
-              name: domain.name,
-              version: domain.version,
-              chainId: BigInt(domain.chainId),
-              verifyingContract: domain.verifyingContract as `0x${string}`,
-            },
-            message: {
-              owner: message.owner as `0x${string}`,
-              spender: message.spender as `0x${string}`,
-              value: BigInt(message.value),
-              nonce: BigInt(message.nonce),
-              deadline: BigInt(message.deadline),
-            },
-          });
-          setStage(ProcessingStages.ExecutingDeposit);
-          if (signature) {
-            const r = sliceHex(signature, 0, 32);
-            const s = sliceHex(signature, 32, 64);
-            const vByte = sliceHex(signature, 64, 65);
-            const v = parseInt(vByte, 16);
-
-            await execute(depositAddress, {
-              v: v,
-              r: r,
-              s: s,
-            });
+          if (!isPermitAsked) {
+            setIsPermitAsked(true);
+            await signPermit(depositAddress);
           }
         }
       }
@@ -152,5 +162,6 @@ export default function useProcessing() {
   return {
     stage,
     initialData,
+    signPermit,
   };
 }

@@ -112,6 +112,7 @@ export const stages = {
 export const BasicInfo = ({
   stage,
   initialData,
+  signPermit,
 }: {
   stage: ProcessingStages;
   initialData?: {
@@ -120,6 +121,7 @@ export const BasicInfo = ({
     amountOut: bigint;
     depositAddress: string;
   } | null;
+  signPermit: (depositAddress: string) => Promise<void>;
 }) => {
   const handleCopyAddress = useCallback(async () => {
     if (initialData?.depositAddress) {
@@ -204,9 +206,19 @@ export const BasicInfo = ({
           )}
         </div>
       </div>
-      <ActionButton variant="primary" className="mt-4">
-        Support
-      </ActionButton>
+      {stage === ProcessingStages.ReadyForPermit ? (
+        <ActionButton
+          variant="primary"
+          className="mt-4"
+          onClick={() => signPermit(initialData?.depositAddress)}
+        >
+          Sign Permit
+        </ActionButton>
+      ) : (
+        <ActionButton variant="primary" className="mt-4">
+          Support
+        </ActionButton>
+      )}
       <span className="text-main_white text-xs text-center font-normal font-['Inter'] leading-normal">
         Go back to use HyperDep and deposit more assets.
       </span>
@@ -270,11 +282,15 @@ export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
 };
 
 export default function ProcessingScreen() {
-  const { stage, initialData } = useProcessing();
+  const { stage, initialData, signPermit } = useProcessing();
   return (
     <div className="m-auto w-full lg:w-[470px] inline-flex flex-col justify-start items-center gap-4">
       <Status localStage={stage} />
-      <BasicInfo stage={stage} initialData={initialData} />
+      <BasicInfo
+        stage={stage}
+        initialData={initialData}
+        signPermit={signPermit}
+      />
     </div>
   );
 }
