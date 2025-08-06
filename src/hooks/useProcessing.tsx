@@ -91,6 +91,9 @@ export default function useProcessing() {
           }
 
           setStage(translateStatus(statusResponse.data.status));
+          if (statusResponse.data.status === "completed") {
+            return;
+          }
         } catch (error) {
           console.error(`Error: while getting status\n\n`, error);
         }
