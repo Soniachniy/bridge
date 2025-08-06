@@ -22,7 +22,6 @@ import {
   getSplTokenBalance,
   createTransferSolanaTransaction,
 } from "@/providers/solana-provider/solana-utils";
-import { useAppKitAccount } from "@reown/appkit/react";
 
 import {
   prepareTransactionRequest,
@@ -61,18 +60,18 @@ const useNetwork = (
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
+
   /* EVM */
   const { open } = useAppKit();
   const { isConnected, address } = useAccount();
-  const evmAccount = useAppKitAccount({ namespace: "eip155" });
   const connectedEVMWallet = watch ? watch("connectedEVMWallet") : null;
 
   useEffect(() => {
-    if (evmAccount.address && !connectedEVMWallet && setValue) {
+    if (address && !connectedEVMWallet && setValue) {
       setValue("connectedEVMWallet", true);
-      setValue("hyperliquidAddress", evmAccount.address);
+      setValue("hyperliquidAddress", address);
     }
-  }, [evmAccount.address]);
+  }, [address]);
 
   /* TON */
   const tonWallet = useTonWallet();

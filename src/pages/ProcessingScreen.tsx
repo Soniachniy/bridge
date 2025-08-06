@@ -232,7 +232,7 @@ export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
   return (
     <div>
       {currentStage.status && (
-        <div className=" flex flex-row text-center justify-start text-main_white text-2xl font-normal font-['Inter'] leading-normal">
+        <div className=" flex flex-row text-center justify-center items-center text-main_white text-2xl font-normal font-['Inter'] leading-normal">
           {successStage.map(({ number }, index) => {
             const isLast = index === successStage.length - 1;
             const isFirst = index === 0;
