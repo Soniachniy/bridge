@@ -115,14 +115,18 @@ export default function Form() {
         console.log(e, "error while getting balance");
       }
     };
+    console.log("selectedToken?.assetId", selectedToken?.assetId);
+    getSelectedTokenBalance();
+  }, [selectedToken?.assetId]);
+
+  useEffect(() => {
     if (selectedToken && selectedToken.blockchain) {
       setValue(
         "refundAddress",
         getPublicKey(translateNetwork(selectedToken.blockchain)) ?? ""
       );
     }
-    getSelectedTokenBalance();
-  }, [selectedToken, hyperliquidAddress, refundAddress]);
+  }, [selectedToken?.blockchain]);
 
   useEffect(() => {
     if (selectedToken) {
@@ -184,6 +188,7 @@ export default function Form() {
             {...register("selectedToken")}
             allTokens={Object.values(data ?? {})}
             selectToken={(token) => {
+              console.log("seold2");
               setValue("selectedToken", {
                 ...token,
                 balance: 0n,
