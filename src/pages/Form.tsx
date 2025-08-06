@@ -115,6 +115,12 @@ export default function Form() {
         console.log(e, "error while getting balance");
       }
     };
+    if (selectedToken && selectedToken.blockchain) {
+      setValue(
+        "refundAddress",
+        getPublicKey(translateNetwork(selectedToken.blockchain)) ?? ""
+      );
+    }
     getSelectedTokenBalance();
   }, [selectedToken, hyperliquidAddress, refundAddress]);
 
