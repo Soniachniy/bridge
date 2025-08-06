@@ -84,7 +84,7 @@ const SelectTokenDialog: FC<Props> = ({
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row gap-2 bg-[#1B2429] rounded-2xl p-4 h-auto items-center border-none gap-2  w-[480px] "
+          className="flex flex-row gap-2 bg-[#1B2429] w-full rounded-2xl p-4 h-auto items-center border-none gap-2  lg:w-[480px] sm:w-full"
         >
           {selectedToken ? (
             <div className="relative h-[55px] flex items-center">

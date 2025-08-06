@@ -180,20 +180,20 @@ export default function Form() {
         <div className="text-2xl text-white font-inter font-normal">
           Bridge to USDC on Arbitrum
         </div>
-        <span className=" text-white font-light text-xs">
+        <span className=" text-white font-light text-center text-xs">
           Select asset and network you want to swap to USDC for Hyperliquid
           deposit.
         </span>
       </div>
       <div className="flex flex-col justify-center items-center mb-10">
-        <div className="flex flex-col gap-2 justify-center items-center">
-          <div className="flex flex-row gap-2 justify-between w-[480px]">
-            <div className="text-white font-thin text-sm text-left  w-[480px]">
+        <div className="flex flex-col gap-2 justify-center items-center w-full">
+          <div className="flex flex-row gap-2 justify-between lg:w-[480px] w-full">
+            <div className="text-white font-thin text-sm text-left w-full lg:w-[480px]">
               From
             </div>
 
             {strategy && strategy === EStrategy.DEPOSIT && (
-              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end w-[480px] text-right">
+              <div className="text-white font-thin text-sm flex flex-row gap-2 items-center justify-end lg:w-[480px] text-right">
                 <ManualIcon />
                 Manual deposit
               </div>
@@ -218,93 +218,91 @@ export default function Form() {
         className="flex flex-col justify-center items-center"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-row gap-2 justify-between w-[480px]">
-            <span className="text-white font-thin text-sm">Amount</span>
-            <SlippageDialog
-              slippageValue={slippageValue}
-              setSlippageValue={(value) => setValue("slippageValue", value)}
-            />
-          </div>
-          <div className="bg-[#1B2429] rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] w-[480px] h-[75px]">
-            <div className="flex grow-1 flex-col gap-1 w-[210px]">
-              <div className="flex grow-1 flex-row items-center gap-7">
-                <input
-                  {...register("amount", {
-                    onChange: (e) => {
-                      const enforcedValue = enforcer(e.target.value);
-                      if (enforcedValue === null) return;
-                      setValue("amount", enforcedValue);
-                    },
-                  })}
-                  type="text"
-                  pattern="^[0-9]*[.,]?[0-9]*$"
-                  className={`${
-                    errors.amount ? "text-error" : "text-white"
-                  } grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
-                  value={amountIn ?? ""}
-                  placeholder="0"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  minLength={1}
-                  maxLength={79}
-                  spellCheck="false"
-                  autoCorrect="off"
-                />
-                <button
-                  type="button"
-                  className="text-[#97FCE4] text-sm font-semibold font-inter leading-[16px] hover:opacity-80 transition-opacity"
-                  onClick={() => {
-                    if (selectedToken?.balance) {
-                      setValue(
-                        "amount",
-                        formatTokenAmount(
-                          selectedToken?.balance ?? 0n,
-                          selectedToken?.decimals
-                        ) ?? "0"
-                      );
-                    }
-                  }}
-                >
-                  Max
-                </button>
-              </div>
-              <div className="flex flex-row gap-1 justify-between">
-                <span className="text-white text-xs font-light font-inter leading-[14px]">
-                  {isLoading ? (
-                    <span className="text-white flex flex-row gap-1 items-center text-xs font-light font-inter leading-[14px]">
-                      Loading <Spinner size="1" />
-                    </span>
-                  ) : amountOut ? (
-                    <span className="text-white text-xs font-light font-inter leading-[14px]">
-                      At least ${amountOut} USDC
-                    </span>
-                  ) : null}
-                </span>
-                <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
-                  {formatTokenAmount(
-                    selectedToken?.balance ?? 0n,
-                    selectedToken?.decimals
-                  )}{" "}
-                  {selectedToken?.symbol}
-                </span>
-              </div>
-            </div>
-          </div>
-          {errors.amount && (
-            <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
-              <span>{errors.amount.message}</span>
-            </div>
-          )}
+        <div className="flex flex-row gap-2 justify-between w-full lg:w-[480px] sm:w-full">
+          <span className="text-white font-thin text-sm">Amount</span>
+          <SlippageDialog
+            slippageValue={slippageValue}
+            setSlippageValue={(value) => setValue("slippageValue", value)}
+          />
         </div>
+        <div className="bg-[#1B2429] w-full rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a] lg:w-[480px] h-[75px] sm:w-full">
+          <div className="flex grow-1 flex-col gap-1 w-[210px]">
+            <div className="flex grow-1 flex-row items-center gap-7">
+              <input
+                {...register("amount", {
+                  onChange: (e) => {
+                    const enforcedValue = enforcer(e.target.value);
+                    if (enforcedValue === null) return;
+                    setValue("amount", enforcedValue);
+                  },
+                })}
+                type="text"
+                pattern="^[0-9]*[.,]?[0-9]*$"
+                className={`${
+                  errors.amount ? "text-error" : "text-white"
+                } grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
+                value={amountIn ?? ""}
+                placeholder="0"
+                inputMode="decimal"
+                autoComplete="off"
+                minLength={1}
+                maxLength={79}
+                spellCheck="false"
+                autoCorrect="off"
+              />
+              <button
+                type="button"
+                className="text-[#97FCE4] text-sm font-semibold font-inter leading-[16px] hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  if (selectedToken?.balance) {
+                    setValue(
+                      "amount",
+                      formatTokenAmount(
+                        selectedToken?.balance ?? 0n,
+                        selectedToken?.decimals
+                      ) ?? "0"
+                    );
+                  }
+                }}
+              >
+                Max
+              </button>
+            </div>
+            <div className="flex flex-row gap-1 justify-between">
+              <span className="text-white text-xs font-light font-inter leading-[14px]">
+                {isLoading ? (
+                  <span className="text-white flex flex-row gap-1 items-center text-xs font-light font-inter leading-[14px]">
+                    Loading <Spinner size="1" />
+                  </span>
+                ) : amountOut ? (
+                  <span className="text-white text-xs font-light font-inter leading-[14px]">
+                    At least ${amountOut} USDC
+                  </span>
+                ) : null}
+              </span>
+              <span className="text-[#9DB2BD] text-xs font-light font-inter leading-[14px]">
+                {formatTokenAmount(
+                  selectedToken?.balance ?? 0n,
+                  selectedToken?.decimals
+                )}{" "}
+                {selectedToken?.symbol}
+              </span>
+            </div>
+          </div>
+        </div>
+        {errors.amount && (
+          <div className="text-error word-break text-xs lg:w-[480px] sm:w-full font-normal text-left  font-inter">
+            <span>{errors.amount.message}</span>
+          </div>
+        )}
 
         {selectedToken && (
           <>
-            <div className="flex flex-col gap-2 mt-6">
+            <div className="flex flex-col gap-2 mt-6 w-full lg:w-[480px]">
               <label className="text-gray_text font-normal text-xs font-inter">
                 Refund address
               </label>
-              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 w-[480px] h-12">
+              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 lg:w-[480px] h-12 sm:w-full">
                 <div className="flex flex-col grow-1 gap-1 w-[210px]">
                   <div className="flex flex-row grow-1 items-center">
                     <input
@@ -342,7 +340,7 @@ export default function Form() {
                 </div>
               </div>
               {errors.refundAddress && (
-                <div className="text-error word-break text-xs w-[480px] font-normal text-left  font-inter">
+                <div className="text-error word-break text-xs lg:w-[480px] font-normal text-left  font-inter">
                   <span>{errors.refundAddress.message}</span>
                 </div>
               )}

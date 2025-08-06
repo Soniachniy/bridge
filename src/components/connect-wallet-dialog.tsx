@@ -95,7 +95,7 @@ const ConnectWalletDialog: FC<Props> = ({}) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="flex rounded-3xl bg-main_dark !px-0 !pb-0 !pt-0 outline-none border-none  min-w-[480px] ">
+      <PopoverContent className="flex rounded-3xl bg-main_dark !px-0 !pb-0 !pt-0 outline-none border-none w-full  lg:min-w-[480px] ">
         <div className="flex flex-col grow column p-6 gap-5 text-white bg-main_dark rounded-3xl">
           {connectedAddresses.length > 0 && (
             <>
