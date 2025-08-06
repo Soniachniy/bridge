@@ -4,7 +4,7 @@ import { translateNetwork } from "@/lib/1clickHelper";
 
 import { enforcer, formatTokenAmount, isSupportedNetwork } from "@/lib/utils";
 import SelectTokenDialog from "@/components/select-token-dialog";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -16,7 +16,7 @@ import ManualIcon from "@/assets/manual.svg?react";
 
 import { createFormValidationSchema, FormInterface } from "@/lib/validation";
 import useSwapQuote from "@/hooks/useSwapQuote";
-import { fetchTokens } from "@/providers/proxy-provider";
+
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@radix-ui/themes";
 import { Network } from "@/config";
@@ -71,7 +71,7 @@ export default function Form() {
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 500 : 0, [
     amountIn,
   ]);
-  const queryClient = useQueryClient();
+
   const hyperliquidAddress = useWatch({ control, name: "hyperliquidAddress" });
   const refundAddress = useWatch({ control, name: "refundAddress" });
   const depositAddress = useWatch({ control, name: "depositAddress" });
