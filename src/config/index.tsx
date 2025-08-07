@@ -20,6 +20,8 @@ import {
   tron,
   gnosis,
 } from "@reown/appkit/networks";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import { translateNetwork } from "@/lib/1clickHelper";
 
 export enum Network {
   ARBITRUM = "arb",
@@ -57,6 +59,29 @@ export const supportedNetworks = {
   [Network.TRON]: false,
   [Network.XRP]: false,
   [Network.ZEC]: false,
+};
+
+export const networkChainId = {
+  [Network.ETHEREUM]: mainnet.id,
+  [Network.POLYGON]: polygon.id,
+  [Network.ARBITRUM]: arbitrum.id,
+  [Network.AURORA]: aurora.id,
+  [Network.BASE]: base.id,
+  [Network.BERA]: berachain.id,
+  [Network.BNB]: bsc.id,
+  [Network.GNOSIS]: gnosis.id,
+  [Network.TRON]: tron.id,
+  [Network.SOLANA]: null,
+  [Network.NEAR]: null,
+  [Network.TON]: null,
+  [Network.DOGE]: null,
+  [Network.BITCOIN]: null,
+  [Network.XRP]: null,
+  [Network.ZEC]: null,
+};
+
+export const getNetworkChainId = (network: TokenResponse.blockchain) => {
+  return networkChainId[translateNetwork(network)];
 };
 
 export const basicConfig = {

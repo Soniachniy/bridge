@@ -1,4 +1,4 @@
-import { basicConfig, Network } from "@/config";
+import { basicConfig, getNetworkChainId, Network } from "@/config";
 
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount } from "wagmi";
@@ -30,6 +30,7 @@ import {
   switchChain,
   waitForTransactionReceipt,
   disconnect,
+  getAccount,
 } from "@wagmi/core";
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
 
@@ -49,6 +50,7 @@ import { UseFormWatch } from "react-hook-form";
 import { isNativeToken, translateNetwork } from "@/lib/1clickHelper";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
+import { networkChainId } from "@/config";
 
 const useNetwork = (
   network: Network | null,
@@ -281,6 +283,15 @@ const useNetwork = (
         case Network.ARBITRUM:
         case Network.POLYGON:
         case Network.ETHEREUM:
+          const account = getAccount(wagmiAdapter.wagmiConfig);
+          if (
+            getNetworkChainId(selectedToken.blockchain) &&
+            account.chainId !== getNetworkChainId(selectedToken.blockchain)
+          ) {
+            await switchChain(wagmiAdapter.wagmiConfig, {
+              chainId: Number(getNetworkChainId(selectedToken.blockchain)),
+            });
+          }
           const request = await prepareTransactionRequest(
             wagmiAdapter.wagmiConfig,
             isNativeToken(network, selectedToken.assetId)
