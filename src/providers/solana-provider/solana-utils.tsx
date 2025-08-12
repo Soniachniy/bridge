@@ -108,7 +108,6 @@ export async function getSplTokenBalance(
   if (!tokenMintAddress) {
     const lamports = await connection.getBalance(userWalletAddress);
 
-    console.log(lamports, "solana balance");
     return lamports;
   }
   const mint = new PublicKey(tokenMintAddress);
@@ -116,7 +115,7 @@ export async function getSplTokenBalance(
   try {
     const ata = await getAssociatedTokenAddress(mint, userWalletAddress);
     const tokenAccount = await getAccount(connection, ata);
-    console.log(tokenAccount, "tokenAccount");
+
     return Number(tokenAccount.amount);
   } catch (err: any) {
     if (err.message.includes("Failed to find account")) {

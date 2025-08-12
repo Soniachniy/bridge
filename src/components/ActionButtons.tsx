@@ -47,8 +47,11 @@ export const ActionButton = memo(
         primary: "bg-main_light text-main",
         secondary: "text-main_light hover:bg-element text-main",
       };
-      return `${baseClasses} ${variantClasses[variant]} ${className}`;
-    }, [variant, className]);
+      const disabledClasses = "opacity-50 cursor-not-allowed";
+      return `${baseClasses} ${variantClasses[variant]} ${className} ${
+        disabled ? disabledClasses : ""
+      }`;
+    }, [variant, className, disabled]);
 
     const containerClasses =
       "self-stretch inline-flex justify-center items-start w-full";

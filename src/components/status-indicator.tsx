@@ -177,7 +177,6 @@ export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
         {Object.values(successStage).map(
           ({ stepNumber, indicatorState }, index) => {
             const isFirst = index === 0;
-            console.log("currentStage", currentStage, stepNumber);
             const secondaryIndicatorState =
               currentStage.stepNumber < stepNumber
                 ? IndicatorState.Empty

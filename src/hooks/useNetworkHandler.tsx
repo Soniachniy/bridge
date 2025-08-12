@@ -68,6 +68,12 @@ const useNetwork = (
     config: wagmiAdapter.wagmiConfig,
   });
 
+  useEffect(() => {
+    if (isConnected && address && setValue) {
+      setValue("hyperliquidAddress", address);
+    }
+  }, [isConnected, address, setValue]);
+
   useAccountEffect({
     config: wagmiAdapter.wagmiConfig,
     onConnect: (account) => {
@@ -319,7 +325,7 @@ const useNetwork = (
                   }),
                 }
           );
-          console.log(request, "request");
+
           const hash = await sendTransaction(wagmiAdapter.wagmiConfig, request);
           const status = await waitForTransactionReceipt(
             wagmiAdapter.wagmiConfig,
@@ -365,7 +371,6 @@ const useNetwork = (
           console.log(txHash, "txHash");
           return txHash;
         case Network.NEAR:
-          console.log(selector, accountId, selectedToken, "selectedToken");
           if (!selector || !accountId || !selectedToken.contractAddress) {
             return false;
           }

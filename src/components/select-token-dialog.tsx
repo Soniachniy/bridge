@@ -3,7 +3,12 @@ import { Dialog } from "@radix-ui/themes";
 import { ChevronDown, SearchIcon, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 
-import { CHAIN_TITLE, CHAIN_ICON, getTokenIcon } from "@/lib/1clickHelper";
+import {
+  CHAIN_TITLE,
+  CHAIN_ICON,
+  getTokenIcon,
+  translateNetwork,
+} from "@/lib/1clickHelper";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,17 +22,25 @@ import {
 
 import { truncateAddress } from "@/lib/utils";
 import { useTokens } from "@/providers/token-context";
+import { useFormContext } from "react-hook-form";
+import { Network } from "@/config";
 
 type Props = {
   selectedToken: TokenResponse | null;
   selectToken: (token: TokenResponse) => void;
+  getPublicKey: (network: Network) => string | null | undefined;
 };
 
-const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
+const SelectTokenDialog: FC<Props> = ({
+  selectToken,
+  selectedToken,
+  getPublicKey,
+}) => {
   const [selectedBlockchain, setSelectedBlockchain] =
     useState<TokenResponse.blockchain>();
   const [search, setSearch] = useState("");
   const allTokens = useTokens();
+  const { setValue } = useFormContext();
 
   const { blockchains } = useMemo(() => {
     const uniqueBlockchains = [
@@ -81,7 +94,7 @@ const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row gap-2 bg-[#1B2429] w-full rounded-2xl p-4 h-auto items-center border-none gap-2  md:w-[480px] sm:w-full"
+          className="flex flex-row gap-1 bg-transparent h-auto items-center border-none !px-0 "
         >
           {selectedToken ? (
             <div className="relative h-[55px] flex items-center">
@@ -101,20 +114,23 @@ const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
           )}
 
           {selectedToken ? (
-            <div className="flex-1 flex-col ml-2">
-              <p className="text-left mb-2 text-main_white text-base font-semibold font-['Inter'] leading-normal">
+            <div className="flex flex-col gap-2 items-start">
+              <p className="justify-center text-white text-sm font-normal font-['Inter'] leading-none">
                 {selectedToken?.symbol}
               </p>
-              <p className="text-left text-main_white text-xs font-normal font-['Inter'] leading-none">
+              <p className="justify-center text-gray_text text-[10px] font-normal font-['Inter'] leading-none">
                 {CHAIN_TITLE[selectedToken?.blockchain]}
               </p>
             </div>
           ) : (
-            <>
-              <span className="grow-2 size-base text-white text-sm font-light">
-                Select chain and token
+            <div className="flex flex-col gap-2 items-start">
+              <span className="justify-center text-white text-sm font-normal font-['Inter'] leading-none">
+                From
               </span>
-            </>
+              <div className="justify-center text-gray_text text-[10px] font-normal font-['Inter'] leading-none">
+                Not Selected
+              </div>
+            </div>
           )}
 
           <ChevronDown color="white" className="w-4 h-4 " />
@@ -123,7 +139,7 @@ const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
       <Dialog.Content
         minWidth={{ initial: "300px", xs: "330px" }}
         minHeight={{ initial: "500px" }}
-        className="mt-1 md:mr-[48px] max-w-xs border-none outline-none bg-main_dark  flex rounded-2xl !px-0 !pb-0 !pt-0"
+        className="mt-1 md:mr-[48px] max-w-xs border-none outline-none bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0"
       >
         <div className="flex flex-col border-none outline-none grow bg-main_dark  p-6  gap-5">
           <Dialog.Title className="text-white">
@@ -213,7 +229,17 @@ const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
                   variant="ghost"
                   size="nosize"
                   className="justify-start  py-2 rounded-md gap-4 hover:bg-element"
-                  onClick={() => selectToken(token)}
+                  onClick={() => {
+                    const address = getPublicKey(
+                      translateNetwork(token.blockchain)
+                    );
+                    if (address) {
+                      setValue("refundAddress", address);
+                    } else {
+                      setValue("refundAddress", "");
+                    }
+                    selectToken(token);
+                  }}
                 >
                   <div className="relative shrink-0 mx-2  ">
                     <img

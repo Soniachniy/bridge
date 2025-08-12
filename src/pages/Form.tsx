@@ -30,6 +30,7 @@ import { InitialView } from "./states/Initial";
 import { Status } from "@/components/status-indicator";
 import { ProcessingStages } from "@/lib/states";
 import { ConfirmationView } from "./states/Confirmation";
+import { DepositView } from "./states/Deposit";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -52,7 +53,7 @@ export default function Form() {
     defaultValues: {
       amount: "",
       strategy: EStrategy.Wallet,
-      amountOut: "",
+      amountOut: "0",
       selectedToken: null,
       hyperliquidAddress: "",
       refundAddress: "",
@@ -86,10 +87,7 @@ export default function Form() {
     name: "depositAddress",
   });
 
-  const {} = useNetwork(
-    translateNetwork(selectedToken?.blockchain),
-    methods.setValue
-  );
+  const {} = useNetwork(translateNetwork(selectedToken?.blockchain));
 
   // useEffect(() => {
   //   const getSelectedTokenBalance = async () => {
@@ -133,11 +131,12 @@ export default function Form() {
   };
 
   const view = BridgeFormMachineContext.useSelector((s) => s.value);
-  console.log(view);
+
   const ViewByState: Record<string, React.ReactNode> = {
     Initial: <InitialView />,
     AssetSelection: <InitialView />,
     WalletConnection: <ConfirmationView />,
+    DetailsReview: <DepositView />,
   };
   console.log("current view", view);
 

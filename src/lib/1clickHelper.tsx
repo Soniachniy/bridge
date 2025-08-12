@@ -123,27 +123,27 @@ export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
 };
 
 export const TOKEN_BY_SYMBOL: Record<string, string> = {
-  USDC: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-  USDT: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
-  BTC: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-  ETH: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+  USDC: "https://s2.coinmarketcap.com/static/img/coins/128x128/3408.png",
+  USDT: "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
+  BTC: "https://s2.coinmarketcap.com/static/img/coins/128x128/1.png",
+  ETH: "https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png",
 };
 
 export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
   "nep141:token.rhealab.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/37529.png",
   "nep141:eth-0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202.omft.near":
-    "https://s2.coinmarketcap.com/static/img/coins/64x64/9444.png",
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/9444.png",
   "nep141:sol-bb27241c87aa401cc963c360c175dd7ca7035873.omft.near":
     "https://dd.dexscreener.com/ds-data/tokens/solana/EJZJpNa4tDZ3kYdcRZgaAtaKm3fLJ5akmyPkCaKmfWvd.png?size=lg&key=9f72fc",
   "nep245:v2_1.omni.hot.tg:1117_":
-    "https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png",
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/11419.png",
   "nep245:v2_1.omni.hot.tg:1117_3tsdfyziyc7EJbP2aULWSKU4toBaAcN4FdTgfm5W1mC4ouR":
     "https://s2.coinmarketcap.com/static/img/coins/64x64/28289.png",
   "nep141:eth.bridge.near":
-    "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png",
   "nep141:bera.omft.near":
-    "https://s2.coinmarketcap.com/static/img/coins/64x64/24647.png",
+    "https://s2.coinmarketcap.com/static/img/coins/128x128/24647.png",
   "nep141:eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near":
     "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
   "nep141:usdt.tether-token.near":
