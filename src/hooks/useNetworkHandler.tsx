@@ -1,7 +1,7 @@
 import { basicConfig, getNetworkChainId, Network } from "@/config";
 
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
-import { useAccount } from "wagmi";
+import { useAccount, useAccountEffect } from "wagmi";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect } from "react";
 
@@ -46,16 +46,15 @@ import {
 } from "@/providers/near-provider/nearHelper";
 import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
 import { FormInterface } from "@/lib/validation";
-import { UseFormWatch } from "react-hook-form";
-import { isNativeToken, translateNetwork } from "@/lib/1clickHelper";
+
+import { isNativeToken } from "@/lib/1clickHelper";
+import { translateTokenToNetwork } from "@/config";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
-import { networkChainId } from "@/config";
 
 const useNetwork = (
   network: Network | null,
-  setValue?: (key: keyof FormInterface, value: any) => void,
-  watch?: UseFormWatch<FormInterface>
+  setValue?: (key: keyof FormInterface, value: any) => void
 ) => {
   /* SOLANA */
   const { publicKey, disconnect: disconnectSolana } = useWallet();
@@ -65,15 +64,23 @@ const useNetwork = (
 
   /* EVM */
   const { open } = useAppKit();
-  const { isConnected, address } = useAccount();
-  const connectedEVMWallet = watch ? watch("connectedEVMWallet") : null;
+  const { isConnected, address } = useAccount({
+    config: wagmiAdapter.wagmiConfig,
+  });
 
-  useEffect(() => {
-    if (address && !connectedEVMWallet && setValue) {
-      setValue("connectedEVMWallet", true);
-      setValue("hyperliquidAddress", address);
-    }
-  }, [address]);
+  useAccountEffect({
+    config: wagmiAdapter.wagmiConfig,
+    onConnect: (account) => {
+      if (account && setValue) {
+        setValue("hyperliquidAddress", account.address);
+      }
+    },
+    onDisconnect: () => {
+      if (setValue) {
+        setValue("hyperliquidAddress", null);
+      }
+    },
+  });
 
   /* TON */
   const tonWallet = useTonWallet();
@@ -321,7 +328,7 @@ const useNetwork = (
           return status.status === "success";
         case Network.SOLANA:
           const solanaNative = isNativeToken(
-            translateNetwork(selectedToken.blockchain),
+            translateTokenToNetwork(selectedToken.blockchain),
             selectedToken.assetId
           );
           const solanaATACreationRequired = await checkSolanaATARequired(

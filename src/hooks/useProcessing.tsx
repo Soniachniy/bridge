@@ -38,9 +38,10 @@ const translateStatus = (status: string) => {
   }
 };
 
-export default function useProcessing() {
+export default function useProcessing(depositAddressParam?: string | null) {
   const tokens = useTokens();
-  const { id: depositAddress } = useParams();
+  const { id: depositAddressFromParams } = useParams();
+  const depositAddress = depositAddressParam || depositAddressFromParams;
   const [stage, setStage] = useState<ProcessingStages>(
     ProcessingStages.Initial
   );

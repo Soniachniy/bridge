@@ -19,7 +19,9 @@
   --color-gray_text: #9db2bd;
   --color-main_white: #ffffff;
   --color-error: #ff6e6e;
+  --color-warning: #FFCC00;
   --color-btn_text: #1fa67d;
+  --color-btn_hov: #50d2c1;
 }
 
 @layer base {

@@ -16,25 +16,22 @@ import {
 } from "@/components/ui/select";
 
 import { truncateAddress } from "@/lib/utils";
+import { useTokens } from "@/providers/token-context";
 
 type Props = {
-  allTokens: TokenResponse[];
   selectedToken: TokenResponse | null;
   selectToken: (token: TokenResponse) => void;
 };
 
-const SelectTokenDialog: FC<Props> = ({
-  allTokens,
-  selectToken,
-  selectedToken,
-}) => {
+const SelectTokenDialog: FC<Props> = ({ selectToken, selectedToken }) => {
   const [selectedBlockchain, setSelectedBlockchain] =
     useState<TokenResponse.blockchain>();
   const [search, setSearch] = useState("");
+  const allTokens = useTokens();
 
   const { blockchains } = useMemo(() => {
     const uniqueBlockchains = [
-      ...new Set(allTokens?.map(({ blockchain }) => blockchain)),
+      ...new Set(Object.values(allTokens).map(({ blockchain }) => blockchain)),
     ];
 
     const blockchains: {
@@ -60,7 +57,7 @@ const SelectTokenDialog: FC<Props> = ({
 
   const filteredTokens = useMemo(() => {
     const lowerSearch = search?.toLowerCase();
-    return allTokens?.filter(({ symbol, blockchain }) => {
+    return Object.values(allTokens).filter(({ symbol, blockchain }) => {
       const matchesSearch = lowerSearch
         ? symbol.toLowerCase().includes(lowerSearch)
         : true;

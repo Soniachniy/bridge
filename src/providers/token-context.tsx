@@ -39,5 +39,5 @@ export const TokenContextProvider = ({
 
 export const useTokens = () => {
   const { tokens } = useContext(TokenContext);
-  return tokens;
+  return tokens ?? {};
 };

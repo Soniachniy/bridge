@@ -8,7 +8,6 @@ import { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import Layout from "./pages/Layout";
 import Form from "./pages/Form";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProcessingScreen from "./pages/ProcessingScreen";
 import { TokenContextProvider } from "./providers/token-context";
 
 declare global {
@@ -26,7 +25,6 @@ createRoot(document.getElementById("root")!).render(
           <Layout>
             <Routes>
               <Route path="/" element={<Form />} />
-              <Route path="/:id" element={<ProcessingScreen />} />
             </Routes>
           </Layout>
         </BrowserRouter>

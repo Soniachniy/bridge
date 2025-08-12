@@ -31,7 +31,6 @@ const STYLES = {
 interface DepositAddressSectionProps {
   selectedToken: TokenResponse | null;
   strategy: EStrategy | null;
-  connectedEVMWallet: boolean;
   depositAddress: string | undefined;
   errors: FieldErrors<FormInterface>;
   debouncedAmountIn: string | null;
@@ -41,7 +40,7 @@ const DepositAddressSection = memo(
   ({
     selectedToken,
     strategy,
-    connectedEVMWallet,
+
     depositAddress,
     errors,
     debouncedAmountIn,
@@ -51,20 +50,16 @@ const DepositAddressSection = memo(
     }, [selectedToken?.blockchain]);
 
     const shouldShowDepositSection = useMemo(() => {
-      if (
-        !connectedEVMWallet ||
-        !depositAddress ||
-        Object.keys(errors).length > 0
-      ) {
+      if (!depositAddress || Object.keys(errors).length > 0) {
         return false;
       }
 
       return (
         !network ||
         !isSupportedNetwork(network) ||
-        strategy === EStrategy.DEPOSIT
+        strategy === EStrategy.Manual
       );
-    }, [network, strategy, connectedEVMWallet, depositAddress, errors]);
+    }, [network, strategy, depositAddress, errors]);
 
     const handleCopyAddress = useCallback(async () => {
       if (depositAddress) {

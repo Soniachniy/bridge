@@ -388,6 +388,7 @@ export function getNetworkIcon(network: string): React.ReactNode | null {
   if (!networkType) return null;
   return NetworkIconMap[networkType];
 }
+
 export const delay = async (time = 1000): Promise<void> => {
   return new Promise((res) => setTimeout(res, time));
 };

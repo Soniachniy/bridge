@@ -21,7 +21,6 @@ import {
   gnosis,
 } from "@reown/appkit/networks";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { translateNetwork } from "@/lib/1clickHelper";
 
 export enum Network {
   ARBITRUM = "arb",
@@ -81,7 +80,7 @@ export const networkChainId = {
 };
 
 export const getNetworkChainId = (network: TokenResponse.blockchain) => {
-  return networkChainId[translateNetwork(network)];
+  return networkChainId[translateTokenToNetwork(network)];
 };
 
 export const basicConfig = {
@@ -124,4 +123,42 @@ export const basicConfig = {
       new PhantomWalletAdapter() as Adapter,
     ],
   },
+};
+
+// Local translation to avoid circular import with `@/lib/1clickHelper`
+export const translateTokenToNetwork = (
+  blockchain: TokenResponse.blockchain
+): Network => {
+  switch (blockchain) {
+    case TokenResponse.blockchain.ARB:
+      return Network.ARBITRUM;
+    case TokenResponse.blockchain.ETH:
+      return Network.ETHEREUM;
+    case TokenResponse.blockchain.NEAR:
+      return Network.NEAR;
+    case TokenResponse.blockchain.ZEC:
+      return Network.ZEC;
+    case TokenResponse.blockchain.BTC:
+      return Network.BITCOIN;
+    case TokenResponse.blockchain.SOL:
+      return Network.SOLANA;
+    case TokenResponse.blockchain.DOGE:
+      return Network.DOGE;
+    case TokenResponse.blockchain.XRP:
+      return Network.XRP;
+    case TokenResponse.blockchain.GNOSIS:
+      return Network.GNOSIS;
+    case TokenResponse.blockchain.BERA:
+      return Network.BERA;
+    case TokenResponse.blockchain.BASE:
+      return Network.BASE;
+    case TokenResponse.blockchain.TRON:
+      return Network.TRON;
+    case TokenResponse.blockchain.TON:
+      return Network.TON;
+    case TokenResponse.blockchain.POL:
+      return Network.POLYGON;
+    default:
+      return Network.ARBITRUM;
+  }
 };

@@ -88,3 +88,15 @@ export const parseTokenAmount = (value: ValueType, decimals: number) => {
 export const isSupportedNetwork = (network: Network) => {
   return supportedNetworks[network];
 };
+
+export const isEVMNetwork = (network: Network) => {
+  return (
+    network === Network.ETHEREUM ||
+    network === Network.BASE ||
+    network === Network.AURORA ||
+    network === Network.ARBITRUM ||
+    network === Network.POLYGON ||
+    network === Network.BERA ||
+    network === Network.DOGE
+  );
+};

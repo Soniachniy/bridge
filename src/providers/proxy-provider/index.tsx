@@ -34,6 +34,10 @@ interface QuoteResponse {
     expiresAt: string;
     recipient: string;
     refundTo: string;
+    fees: {
+      expectedPlatformFee: string;
+      gasFee: string;
+    };
   };
   error?: string;
 }

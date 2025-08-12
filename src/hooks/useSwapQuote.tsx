@@ -67,6 +67,8 @@ const useSwapQuote = ({
             "amountOut",
             formatTokenAmount(response.data.expectedAmountOut, USDC_DECIMALS)
           );
+          setFormValue("platformFee", response.data.fees.expectedPlatformFee);
+          setFormValue("gasFee", response.data.fees.gasFee);
           if (Number(response.data.expectedAmountOut) > 0) {
             clearError(["amountOut"]);
           }

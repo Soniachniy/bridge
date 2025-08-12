@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import { EStrategy } from "@/pages/Form";
 
 export const isValidEVMAddress = (address: string): boolean => {
   const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
@@ -54,9 +55,12 @@ export const evmAddressValidation = z
 
 export const formValidationSchema = z
   .object({
+    strategy: z.enum(["manual", "wallet"]),
     hyperliquidAddress: z.string(),
     refundAddress: z.string(),
     slippageValue: z.number(),
+    platformFee: z.string(),
+    gasFee: z.string(),
     selectedToken: z
       .object({
         assetId: z.string(),
@@ -66,9 +70,6 @@ export const formValidationSchema = z
         decimals: z.number(),
         contractAddress: z.string().optional(),
         blockchain: z.nativeEnum(TokenResponse.blockchain),
-        balance: z.bigint(),
-        balanceNear: z.bigint(),
-        balanceUpdatedAt: z.number(),
       })
       .nullable()
       .refine((token) => token !== null, {
@@ -78,7 +79,7 @@ export const formValidationSchema = z
     amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Amount must be a valid positive number",
     }),
-    amountOut: z.string().optional(),
+    amountOut: z.string(),
     depositAddress: z.string().optional(),
     connectedEVMWallet: z.boolean(),
   })
@@ -134,43 +135,26 @@ export const formValidationSchema = z
     }
   });
 
-export const createFormValidationSchema = (strategy: string | null) => {
-  const baseSchema = formValidationSchema;
-  if (strategy === "swap") {
-    return baseSchema.refine(
-      (data) => {
-        const maxBalance =
-          Number(data.selectedToken?.balance) /
-          Math.pow(10, data.selectedToken?.decimals ?? 1);
-
-        const amount = Number(data.amount);
-        return amount <= maxBalance;
-      },
-      {
-        message: `Amount cannot exceed your balance`,
-        path: ["amount"],
-      }
-    );
-  }
-
-  return baseSchema;
-};
+export const firstStepValidationSchema = formValidationSchema.pick({
+  selectedToken: true,
+  amount: true,
+  amountOut: true,
+  platformFee: true,
+  gasFee: true,
+});
 
 export type FormValidationData = z.infer<FormInterface>;
 
 export interface FormInterface {
-  selectedToken:
-    | (TokenResponse & {
-        balance: bigint;
-        balanceNear: bigint;
-        balanceUpdatedAt: number;
-      })
-    | null;
+  selectedToken: TokenResponse | null;
   amount: string;
   hyperliquidAddress: string;
   refundAddress: string;
-  amountOut?: string;
+  amountOut: string;
   depositAddress?: string;
   connectedEVMWallet: boolean;
   slippageValue: number;
+  platformFee: string;
+  gasFee: string;
+  strategy: EStrategy;
 }
