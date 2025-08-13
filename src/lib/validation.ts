@@ -70,6 +70,9 @@ export const formValidationSchema = z
         decimals: z.number(),
         contractAddress: z.string().optional(),
         blockchain: z.nativeEnum(TokenResponse.blockchain),
+        balance: z.bigint(),
+        balanceNear: z.bigint(),
+        balanceUpdatedAt: z.number(),
       })
       .nullable()
       .refine((token) => token !== null, {
@@ -81,9 +84,24 @@ export const formValidationSchema = z
     }),
     amountOut: z.string(),
     depositAddress: z.string().optional(),
-    connectedEVMWallet: z.boolean(),
   })
   .check((ctx) => {
+    if (ctx.value.strategy === "wallet" && ctx.value.selectedToken) {
+      const decimals = ctx.value.selectedToken.decimals ?? 1;
+      const balanceNumber =
+        Number(ctx.value.selectedToken.balance) / Math.pow(10, decimals);
+      const amountNumber = Number(ctx.value.amount);
+
+      if (amountNumber > balanceNumber) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Amount cannot exceed your balance",
+          input: ctx.value.amount,
+          path: ["amount"],
+          continue: true,
+        });
+      }
+    }
     if (ctx.value.selectedToken?.blockchain === "near") {
       const nearAddressParse = nearAddressSchema.safeParse(
         ctx.value.refundAddress
@@ -93,7 +111,6 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid .near address",
           input: ctx.value.refundAddress,
-          path: ["refundAddress"],
         });
       }
     } else if (ctx.value.selectedToken?.blockchain === "sol") {
@@ -105,7 +122,6 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid Solana address",
           input: ctx.value.refundAddress,
-          path: ["refundAddress"],
         });
       }
     } else if (ctx.value.selectedToken?.blockchain === "ton") {
@@ -117,7 +133,6 @@ export const formValidationSchema = z
           code: "custom",
           message: "Address is not a valid TON address",
           input: ctx.value.refundAddress,
-          path: ["refundAddress"],
         });
       }
     } else {
@@ -134,6 +149,29 @@ export const formValidationSchema = z
       }
     }
   });
+
+// export const createFormValidationSchema = (strategy: EStrategy | null) => {
+//   const baseSchema = formValidationSchema;
+//   console.log(strategy, "strategy");
+//   if (strategy === "wallet") {
+//     return baseSchema.refine(
+//       (data) => {
+//         const maxBalance =
+//           Number(data.selectedToken?.balance) /
+//           Math.pow(10, data.selectedToken?.decimals ?? 1);
+//         console.log(maxBalance, "maxBalance");
+//         const amount = Number(data.amount);
+//         return amount <= maxBalance;
+//       },
+//       {
+//         message: `Amount cannot exceed your balance`,
+//         path: ["amount"],
+//       }
+//     );
+//   }
+
+//   return baseSchema;
+// };
 
 export const createSlippageDialogValidationSchema = (
   blockchain: TokenResponse["blockchain"]
@@ -198,9 +236,9 @@ export type FormValidationData = z.infer<FormInterface>;
 export interface FormInterface {
   selectedToken:
     | (TokenResponse & {
-        balance?: bigint;
-        balanceNear?: bigint;
-        balanceUpdatedAt?: number;
+        balance: bigint;
+        balanceNear: bigint;
+        balanceUpdatedAt: number;
       })
     | null;
   amount: string;

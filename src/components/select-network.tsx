@@ -96,7 +96,7 @@ const SelectNetworkDialog: FC<{
           )}
         </div>
       </DialogTrigger>
-      <DialogContent className="w-[480px] md:w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0">
+      <DialogContent className="flex justify-center items-center w-[480px] md:w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 ">
         <div className="flex w-[480px] md:w-full !ring-0 !shadow-none !border-none flex-col border-none rounded-2xl outline-none grow bg-main_dark p-6 gap-5">
           <DialogTitle className="text-white">
             Select Chain before connect wallet

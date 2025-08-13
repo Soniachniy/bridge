@@ -1,9 +1,5 @@
-import { translateNetwork } from "@/lib/1clickHelper";
-
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import useNetwork from "@/hooks/useNetworkHandler";
 
 import { formValidationSchema } from "@/lib/validation";
 
@@ -16,6 +12,7 @@ import { ProcessingStages } from "@/lib/states";
 
 import { DepositView } from "./states/ManualDeposit";
 import { ProcessingView } from "./states/Processing";
+import { ConfirmationView } from "./states/Confirmation";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -45,12 +42,6 @@ export default function Form() {
       gasFee: "0",
     },
   });
-  const selectedToken = useWatch({
-    control: methods.control,
-    name: "selectedToken",
-  });
-
-  const {} = useNetwork(translateNetwork(selectedToken?.blockchain));
 
   // useEffect(() => {
   //   if (selectedToken) {
@@ -73,8 +64,8 @@ export default function Form() {
   const ViewByState: Record<string, React.ReactNode> = {
     [ProcessingStages.AssetSelection]: <InitialView />,
     [ProcessingStages.ManualDeposit]: <DepositView />,
-    // [ProcessingStages.DetailsReview]: <ConfirmationView />,
-    [ProcessingStages.DetailsReview]: <ProcessingView />,
+    [ProcessingStages.DetailsReview]: <ConfirmationView />,
+    [ProcessingStages.Processing]: <ProcessingView />,
   };
 
   return (

@@ -140,7 +140,7 @@ const SelectTokenDialog: FC<Props> = ({
       <Dialog.Content
         minWidth={{ initial: "300px", xs: "330px" }}
         minHeight={{ initial: "500px" }}
-        className="mt-1 md:mr-[48px] max-w-xs border-none outline-none bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0"
+        className="mt-1 flex justify-center items-center max-w-xs border-none outline-none bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0"
       >
         <div className="flex flex-col border-none outline-none grow bg-main_dark  p-6  gap-5">
           <Dialog.Title className="text-white">

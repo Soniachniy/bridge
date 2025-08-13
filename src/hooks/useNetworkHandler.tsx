@@ -368,7 +368,7 @@ const useNetwork = (
             transactionSolana,
             solanaConnection
           );
-          console.log(txHash, "txHash");
+
           return txHash;
         case Network.NEAR:
           if (!selector || !accountId || !selectedToken.contractAddress) {

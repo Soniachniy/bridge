@@ -21,7 +21,11 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButton } from "@/components/ActionButtons";
 
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
-import { CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
+import {
+  CHAIN_TITLE,
+  getTokenIcon,
+  translateNetwork,
+} from "@/lib/1clickHelper";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { Network } from "@/config";
 import { EStrategy } from "../Form";
@@ -43,7 +47,6 @@ export const InitialView = () => {
     trigger,
     formState: { errors, dirtyFields },
   } = useFormContext();
-  const actorRef = BridgeFormMachineContext.useActorRef();
 
   const selectedToken = watch("selectedToken");
   const amountIn = watch("amount");
@@ -52,11 +55,11 @@ export const InitialView = () => {
   const hyperliquidAddress = watch("hyperliquidAddress");
   const refundAddress = watch("refundAddress");
 
-  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 500 : 0, [
+  useDebounce(() => setDebouncedValue(amountIn), amountIn ? 100 : 0, [
     amountIn,
   ]);
 
-  useSwapQuote({
+  const { isLoading } = useSwapQuote({
     tokenIn: selectedToken,
     amountIn: debouncedAmountIn ?? "",
     setFormValue: (key: keyof FormInterface, value: string) =>
@@ -69,7 +72,7 @@ export const InitialView = () => {
   });
 
   const { connectWallet, getPublicKey, disconnectWallet, getBalance } =
-    useNetwork(null, setValue);
+    useNetwork(translateNetwork(selectedToken?.blockchain), setValue);
 
   useEffect(() => {
     if (hyperliquidAddress && !refundAddress && selectedToken && amountIn) {
@@ -81,11 +84,21 @@ export const InitialView = () => {
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
       try {
-        if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
+        console.log(
+          selectedToken,
+          selectedToken.balanceUpdatedAt,
+          "selectedToken"
+        );
+        if (
+          selectedToken &&
+          selectedToken.balanceUpdatedAt === 0 &&
+          refundAddress
+        ) {
           const { balance, nearBalance } = await getBalance(
             selectedToken.assetId,
             selectedToken.contractAddress
           );
+          console.log(balance, "balance");
           if (balance) {
             setValue("selectedToken", {
               ...selectedToken,
@@ -93,6 +106,7 @@ export const InitialView = () => {
               balanceNear: nearBalance,
               balanceUpdatedAt: Date.now(),
             });
+            trigger("amount");
           }
         }
       } catch (e) {
@@ -124,7 +138,7 @@ export const InitialView = () => {
               onChange: (e) => {
                 const enforcedValue = enforcer(e.target.value);
                 if (enforcedValue === null) return;
-                setValue("amount", enforcedValue);
+                setValue("amount", enforcedValue, { shouldValidate: true });
               },
             })}
             type="text"
@@ -144,13 +158,22 @@ export const InitialView = () => {
           <SelectTokenDialog
             {...register("selectedToken")}
             selectToken={(token) => {
-              setValue("selectedToken", token);
-              actorRef.send({ type: "select_asset" });
+              setValue("selectedToken", {
+                ...token,
+                balance: BigInt(0),
+                balanceNear: BigInt(0),
+                balanceUpdatedAt: 0,
+              });
             }}
             selectedToken={selectedToken}
             getPublicKey={getPublicKey}
           />
         </div>
+        {errors.amount && (
+          <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
+            <span>{errors.amount.message?.toString()}</span>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px] w-full">
         <div className="flex flex-row gap-2 justify-between w-full">
@@ -203,6 +226,11 @@ export const InitialView = () => {
             </div>
           </div>
         </div>
+        {errors.amountOut && (
+          <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
+            <span>{errors.amountOut.message?.toString()}</span>
+          </div>
+        )}
         {showRefundAddress && (
           <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
             <div className="flex flex-row justify-between w-full gap-2 items-center">
@@ -273,6 +301,7 @@ export const InitialView = () => {
         )}
       </div>
       <ConnectButton
+        isLoading={isLoading}
         connectWallet={connectWallet}
         evmAddress={hyperliquidAddress}
       />
@@ -375,12 +404,14 @@ export const InitialView = () => {
 export const ConnectButton = ({
   connectWallet,
   evmAddress,
+  isLoading,
 }: {
+  isLoading: boolean;
   connectWallet: (network: Network) => void;
   evmAddress?: string;
 }) => {
   const actorRef = BridgeFormMachineContext.useActorRef();
-  const { watch } = useFormContext();
+  const { watch, trigger } = useFormContext();
 
   const refundAddress = watch("refundAddress");
   const selectedToken = watch("selectedToken");
@@ -432,14 +463,23 @@ export const ConnectButton = ({
     <div className="flex flex-col">
       <ActionButton
         variant="primary"
-        onClick={() => {
+        onClick={async () => {
+          const isValid = await trigger([
+            "amount",
+            "amountOut",
+            "selectedToken",
+            "depositAddress",
+          ]);
           const screen =
             strategy === EStrategy.Manual
               ? "manual_deposit"
               : "create_transaction";
-          actorRef.send({ type: screen });
+          if (isValid) {
+            actorRef.send({ type: screen });
+          }
         }}
         className="w-full"
+        disabled={isLoading}
       >
         Continue
       </ActionButton>

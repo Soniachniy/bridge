@@ -14,7 +14,6 @@ export default function SlippageDialog() {
   const selectedToken = internalWatch("selectedToken");
   const refundAddress = internalWatch("refundAddress");
   const slippageValue = internalWatch("slippageValue");
-  console.log("refundAddress out", refundAddress);
 
   const { register, setValue, trigger, formState, handleSubmit } = useForm({
     resolver: zodResolver(
@@ -51,7 +50,7 @@ export default function SlippageDialog() {
         </div>
       </DialogTrigger>
       <DialogContent
-        className="border-none outline-none bg-transparent"
+        className="border-none outline-none bg-transparent flex justify-center items-center"
         showCloseButton={false}
       >
         <form className="bg-main_dark self-stretch rounded-3xl p-6 inline-flex flex-col justify-start items-start gap-2">

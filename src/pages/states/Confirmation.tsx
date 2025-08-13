@@ -1,4 +1,9 @@
-import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
+import {
+  CHAIN_ICON,
+  CHAIN_TITLE,
+  getTokenIcon,
+  translateNetwork,
+} from "@/lib/1clickHelper";
 import { useFormContext } from "react-hook-form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { ActionButton } from "@/components/ActionButtons";
@@ -19,8 +24,10 @@ import { FormInterface } from "@/lib/validation";
 export const ConfirmationView = () => {
   const { watch } = useFormContext<FormInterface>();
   const tokens = useTokens();
-  const { makeDeposit } = useNetwork(null);
   const selectedToken = watch("selectedToken");
+  const { makeDeposit } = useNetwork(
+    translateNetwork(selectedToken?.blockchain)
+  );
   const amountOut = watch("amountOut");
   const amountIn: string = watch("amount");
   const depositAddress = watch("depositAddress");
@@ -154,7 +161,10 @@ export const ConfirmationView = () => {
             depositAddress,
             amountIn,
             tokens[selectedToken?.assetId].decimals,
-            { balance: 0n, nearBalance: 0n }
+            {
+              balance: selectedToken.balance,
+              nearBalance: selectedToken.balanceNear,
+            }
           );
         }}
       >
