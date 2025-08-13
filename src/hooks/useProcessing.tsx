@@ -1,5 +1,5 @@
 import { delay } from "@/lib/1clickHelper";
-import { ProcessingStages } from "@/pages/ProcessingScreen";
+
 import { wagmiAdapter } from "@/providers/evm-provider";
 import { execute, getPermitData, getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
@@ -8,33 +8,30 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { sliceHex } from "viem";
 import { signTypedData, switchChain } from "@wagmi/core";
+import { ProcessingStages } from "@/lib/states";
 
 const translateStatus = (status: string) => {
   switch (status) {
     case "pending_deposit":
-      return ProcessingStages.Initial;
+      return ProcessingStages.Processing;
     case "deposit_received":
-      return ProcessingStages.DepositReceived;
+      return ProcessingStages.Processing;
     case "processing":
       return ProcessingStages.Processing;
     case "executing_deposit":
       return ProcessingStages.ExecutingDeposit;
     case "completed":
-      return ProcessingStages.Completed;
+      return ProcessingStages.SuccessScreen;
     case "ready_for_permit":
-      return ProcessingStages.ReadyForPermit;
+      return ProcessingStages.UserPermit;
     case "incomplete_deposit":
-      return ProcessingStages.IncompleteDeposit;
-    case "refunded":
-      return ProcessingStages.Refunded;
+      return ProcessingStages.ManualDepositErrorScreen;
     case "failed":
-      return ProcessingStages.Failed;
+      return ProcessingStages.ErrorScreen;
     case "deposit_failed":
-      return ProcessingStages.DepositFailed;
-    case "unknown":
-      return ProcessingStages.Unknown;
+      return ProcessingStages.ErrorScreen;
     default:
-      return ProcessingStages.Initial;
+      return ProcessingStages.ErrorScreen;
   }
 };
 
@@ -43,7 +40,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
   const { id: depositAddressFromParams } = useParams();
   const depositAddress = depositAddressParam || depositAddressFromParams;
   const [stage, setStage] = useState<ProcessingStages>(
-    ProcessingStages.Initial
+    ProcessingStages.Processing
   );
   const [initialData, setInitialData] = useState<{
     selectedToken: TokenResponse;
@@ -101,7 +98,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
           await getDepositStatus(depositAddress);
         }
       } catch (e) {
-        setStage(ProcessingStages.Failed);
+        setStage(ProcessingStages.ErrorScreen);
       }
     };
     const getDepositStatus = async (depositAddress: string, retries = 40) => {
@@ -150,7 +147,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
   useEffect(() => {
     const processPermit = async () => {
       if (depositAddress) {
-        if (stage === ProcessingStages.ReadyForPermit) {
+        if (stage === ProcessingStages.UserPermit) {
           if (!isPermitAsked) {
             setIsPermitAsked(true);
             await signPermit(depositAddress);

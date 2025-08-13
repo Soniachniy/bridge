@@ -14,84 +14,76 @@ export enum IndicatorState {
 }
 
 export const stages = {
-  [ProcessingStages.Initial]: {
-    stepNumber: 1,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
-  },
   [ProcessingStages.AssetSelection]: {
     stepNumber: 1,
     title: "Choose Asset and Set Amount",
     description:
       "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
   },
-  [ProcessingStages.WalletConnection]: {
+  [ProcessingStages.ManualDeposit]: {
     stepNumber: 2,
-    title: "Connect Wallet",
-    description: "Connect your wallet to proceed with the deposit",
+    title: "Send your deposit manually",
+    description:
+      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
   },
   [ProcessingStages.DetailsReview]: {
-    stepNumber: 3,
+    stepNumber: 2,
     title: "Confirm your deposit",
     description:
-      "Review your details and optionally set a refund address.23h 59m to complete the deposit.",
+      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
   },
   [ProcessingStages.Processing]: {
-    stepNumber: 4,
+    stepNumber: 3,
     indicatorState: IndicatorState.Processing,
-    title: "Choose Asset and Set Amount",
+    title: "Awaiting deposit",
     description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
   },
   [ProcessingStages.UserPermit]: {
-    stepNumber: 4,
+    stepNumber: 3,
     indicatorState: IndicatorState.Warning,
-    title: "Choose Asset and Set Amount",
+    title: "Ready for permit",
     description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+      "Action required: please sign the message to complete your gasless deposit.",
   },
   [ProcessingStages.ErrorScreen]: {
-    stepNumber: 4,
+    stepNumber: 3,
     indicatorState: IndicatorState.Error,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+    title: "Error",
+    description: "Oops! Something went wrong. Please contact support for help.",
   },
   [ProcessingStages.ExecutingDeposit]: {
-    stepNumber: 4,
+    stepNumber: 3,
     indicatorState: IndicatorState.Processing,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+    title: "Executing deposit",
+    description: "Depositing your funds into Hyperliquid. Please wait…",
   },
   [ProcessingStages.SignErrorScreen]: {
-    stepNumber: 4,
+    stepNumber: 3,
     indicatorState: IndicatorState.Warning,
-    title: "Choose Asset and Set Amount",
+    title: "Sign error",
     description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
-  },
-  [ProcessingStages.SuccessScreen]: {
-    stepNumber: 5,
-    indicatorState: IndicatorState.Success,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
-  },
-  [ProcessingStages.SwapErrorScreen]: {
-    stepNumber: 5,
-    indicatorState: IndicatorState.Error,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+      "Please sign the message to complete your gasless deposit. Check the account to be the same as the one you used to connect.",
   },
   [ProcessingStages.ManualDepositErrorScreen]: {
+    stepNumber: 3,
+    indicatorState: IndicatorState.Error,
+    title: "Partially deposited",
+    description: "You should review your deposit amount.",
+  },
+  [ProcessingStages.SuccessScreen]: {
+    stepNumber: 4,
+    indicatorState: IndicatorState.Success,
+    title: "Completed",
+    description:
+      "Success! Your funds have arrived in your Hyperliquid account.",
+  },
+  [ProcessingStages.SwapErrorScreen]: {
     stepNumber: 4,
     indicatorState: IndicatorState.Error,
-    title: "Choose Asset and Set Amount",
+    title: "Swap failed",
     description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+      "Oops! The swap didn’t go through. Please contact support for help.",
   },
 };
 

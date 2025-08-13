@@ -1,13 +1,8 @@
 import SelectTokenDialog from "@/components/select-token-dialog";
-import SlippageDialog from "@/components/slippage-dialog";
-import {
-  enforcer,
-  isEVMNetwork,
-  isSupportedNetwork,
-  truncateAddress,
-} from "@/lib/utils";
+
+import { enforcer, truncateAddress } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
-import { Spinner } from "@radix-ui/themes";
+
 import { useEffect, useState } from "react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import SuccessIcon from "@/assets/success-icon.svg?react";
@@ -24,20 +19,17 @@ import useSwapQuote from "@/hooks/useSwapQuote";
 import { FormInterface } from "@/lib/validation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButton } from "@/components/ActionButtons";
-import SettingsIcon from "@/assets/settings-icon.svg?react";
+
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
-import {
-  CHAIN_ICON,
-  CHAIN_TITLE,
-  getTokenIcon,
-  translateNetwork,
-} from "@/lib/1clickHelper";
+import { CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { Network } from "@/config";
 import { EStrategy } from "../Form";
 import useNetwork from "@/hooks/useNetworkHandler";
 import SelectNetworkDialog from "@/components/select-network";
 import InfoIcon from "@/assets/warning-icon.svg?react";
+import LogoutIcon from "@/assets/logout-icon.svg?react";
+import SlippageDialog from "@/components/slippage-dialog";
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -64,7 +56,7 @@ export const InitialView = () => {
     amountIn,
   ]);
 
-  const { isLoading } = useSwapQuote({
+  useSwapQuote({
     tokenIn: selectedToken,
     amountIn: debouncedAmountIn ?? "",
     setFormValue: (key: keyof FormInterface, value: string) =>
@@ -76,22 +68,44 @@ export const InitialView = () => {
     slippageValue,
   });
 
-  const { connectWallet, getPublicKey } = useNetwork(null, setValue);
+  const { connectWallet, getPublicKey, disconnectWallet, getBalance } =
+    useNetwork(null, setValue);
 
   useEffect(() => {
     if (hyperliquidAddress && !refundAddress && selectedToken && amountIn) {
       setShowRefundAddress(true);
+      setValue("strategy", EStrategy.Manual);
     }
   }, [selectedToken, amountIn, hyperliquidAddress, refundAddress]);
 
+  useEffect(() => {
+    const getSelectedTokenBalance = async () => {
+      try {
+        if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
+          const { balance, nearBalance } = await getBalance(
+            selectedToken.assetId,
+            selectedToken.contractAddress
+          );
+          if (balance) {
+            setValue("selectedToken", {
+              ...selectedToken,
+              balance: balance,
+              balanceNear: nearBalance,
+              balanceUpdatedAt: Date.now(),
+            });
+          }
+        }
+      } catch (e) {
+        console.log(e, "error while getting balance");
+      }
+    };
+
+    getSelectedTokenBalance();
+  }, [selectedToken?.assetId]);
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-row gap-2 align-center justify-center">
-        <div className="flex align-center justify-center text-gray_text text-xs font-normal font-['Inter']">
-          Advanced Settings
-        </div>
-        <SettingsIcon className="w-4 h-4" />
-      </div>
+      <SlippageDialog />
 
       <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px] w-full">
         <div className="flex flex-row gap-2 justify-between w-full">
@@ -100,6 +114,7 @@ export const InitialView = () => {
           </div>
           <SelectNetworkDialog
             connectWallet={connectWallet}
+            disconnectWallet={disconnectWallet}
             getPublicKey={getPublicKey}
           />
         </div>
@@ -151,8 +166,12 @@ export const InitialView = () => {
             </div>
           ) : (
             <div className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline ">
-              <WalletIcon />
+              <WalletIcon fill="#97fce4" className="self-center" />
               {truncateAddress(getPublicKey(Network.ARBITRUM))}
+              <LogoutIcon
+                onClick={() => disconnectWallet(Network.ARBITRUM)}
+                className="w-4 h-4 self-center"
+              />
             </div>
           )}
         </div>
@@ -413,7 +432,13 @@ export const ConnectButton = ({
     <div className="flex flex-col">
       <ActionButton
         variant="primary"
-        onClick={() => actorRef.send({ type: "proceed" })}
+        onClick={() => {
+          const screen =
+            strategy === EStrategy.Manual
+              ? "manual_deposit"
+              : "create_transaction";
+          actorRef.send({ type: screen });
+        }}
         className="w-full"
       >
         Continue

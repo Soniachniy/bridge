@@ -50,7 +50,7 @@ export default function OpenQrDialog({
     <Dialog>
       <DialogTrigger>
         <div className="cursor-pointer flex justify-start items-start">
-          <div className="size- p-2 bg-main_light rounded-[10px] flex justify-center items-center overflow-hidden">
+          <div className="size-7 bg-main_light rounded-[6px] flex justify-center items-center overflow-hidden">
             <QRCodeIcon />
           </div>
         </div>

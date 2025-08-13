@@ -1,36 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
-
 import { translateNetwork } from "@/lib/1clickHelper";
-
-import { enforcer, formatTokenAmount, isSupportedNetwork } from "@/lib/utils";
-import SelectTokenDialog from "@/components/select-token-dialog";
 
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDebounce } from "@/hooks/useDebounce";
+
 import useNetwork from "@/hooks/useNetworkHandler";
 
-import SuccessIcon from "@/assets/success-icon.svg?react";
-import ErrorIcon from "@/assets/form-error-icon.svg?react";
-import ManualIcon from "@/assets/manual.svg?react";
+import { formValidationSchema } from "@/lib/validation";
 
-import { formValidationSchema, FormInterface } from "@/lib/validation";
-import useSwapQuote from "@/hooks/useSwapQuote";
-
-// import { useNavigate } from "react-router-dom";
-import { Network } from "@/config";
-import SlippageDialog from "@/components/slippage-dialog";
-import DepositAddressSection from "@/components/DepositAddressSection";
 import { SLIPPAGE } from "@/lib/constants";
-import { useTokens } from "@/providers/token-context";
-import useProcessing from "@/hooks/useProcessing";
 
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 import { InitialView } from "./states/Initial";
 import { Status } from "@/components/status-indicator";
 import { ProcessingStages } from "@/lib/states";
-import { ConfirmationView } from "./states/Confirmation";
-import { DepositView } from "./states/Deposit";
+
+import { DepositView } from "./states/ManualDeposit";
+import { ProcessingView } from "./states/Processing";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -43,9 +28,6 @@ export enum EStrategy {
 }
 
 export default function Form() {
-  const actorRef = BridgeFormMachineContext.useActorRef();
-
-  // const navigate = useNavigate();
   const methods = useForm({
     resolver: zodResolver(formValidationSchema),
     mode: "onChange",
@@ -67,52 +49,8 @@ export default function Form() {
     control: methods.control,
     name: "selectedToken",
   });
-  const slippageValue = useWatch({
-    control: methods.control,
-    name: "slippageValue",
-  });
-  const amountIn = useWatch({ control: methods.control, name: "amount" });
-  const amountOut = useWatch({ control: methods.control, name: "amountOut" });
-
-  const hyperliquidAddress = useWatch({
-    control: methods.control,
-    name: "hyperliquidAddress",
-  });
-  const refundAddress = useWatch({
-    control: methods.control,
-    name: "refundAddress",
-  });
-  const depositAddress = useWatch({
-    control: methods.control,
-    name: "depositAddress",
-  });
 
   const {} = useNetwork(translateNetwork(selectedToken?.blockchain));
-
-  // useEffect(() => {
-  //   const getSelectedTokenBalance = async () => {
-  //     try {
-  //       if (selectedToken && selectedToken.balanceUpdatedAt === 0) {
-  //         const { balance, nearBalance } = await getBalance(
-  //           selectedToken.assetId,
-  //           selectedToken.contractAddress
-  //         );
-  //         if (balance) {
-  //           setValue("selectedToken", {
-  //             ...selectedToken,
-  //             balance: balance,
-  //             balanceNear: nearBalance,
-  //             balanceUpdatedAt: Date.now(),
-  //           });
-  //         }
-  //       }
-  //     } catch (e) {
-  //       console.log(e, "error while getting balance");
-  //     }
-  //   };
-
-  //   getSelectedTokenBalance();
-  // }, [selectedToken?.assetId]);
 
   // useEffect(() => {
   //   if (selectedToken) {
@@ -133,12 +71,11 @@ export default function Form() {
   const view = BridgeFormMachineContext.useSelector((s) => s.value);
 
   const ViewByState: Record<string, React.ReactNode> = {
-    Initial: <InitialView />,
-    AssetSelection: <InitialView />,
-    WalletConnection: <ConfirmationView />,
-    DetailsReview: <DepositView />,
+    [ProcessingStages.AssetSelection]: <InitialView />,
+    [ProcessingStages.ManualDeposit]: <DepositView />,
+    // [ProcessingStages.DetailsReview]: <ConfirmationView />,
+    [ProcessingStages.DetailsReview]: <ProcessingView />,
   };
-  console.log("current view", view);
 
   return (
     <div className="p-4 w-full min-h-96">

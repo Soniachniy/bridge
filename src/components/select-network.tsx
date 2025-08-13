@@ -26,13 +26,17 @@ import { useTokens } from "@/providers/token-context";
 
 import { truncateAddress } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
+import { FormInterface } from "@/lib/validation";
+import WalletIcon from "@/assets/wallet-icon.svg?react";
+import LogoutIcon from "@/assets/logout-icon.svg?react";
 
 const SelectNetworkDialog: FC<{
   connectWallet: (network: Network) => void;
+  disconnectWallet: (network: Network) => void;
   getPublicKey: (network: Network) => string | null | undefined;
-}> = ({ connectWallet, getPublicKey }) => {
-  const { watch } = useFormContext();
-  const selectedToken: TokenResponse | undefined = watch("selectedToken");
+}> = ({ connectWallet, getPublicKey, disconnectWallet }) => {
+  const { watch } = useFormContext<FormInterface>();
+  const selectedToken = watch("selectedToken");
   const [open, setOpen] = useState(false);
 
   const allTokens = useTokens();
@@ -64,11 +68,26 @@ const SelectNetworkDialog: FC<{
   }, [selectedToken?.blockchain, getPublicKey]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!selectedToken) {
+          return setOpen(open);
+        }
+        connectWallet(translateNetwork(selectedToken?.blockchain));
+      }}
+    >
       <DialogTrigger>
         <div className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline">
           {walletAddress ? (
-            truncateAddress(walletAddress)
+            <div className="flex flex-row gap-2 justify-center align-center">
+              <WalletIcon fill="#97fce4" className="self-center" />
+              {truncateAddress(walletAddress)}
+              <LogoutIcon
+                onClick={() => disconnectWallet(Network.ARBITRUM)}
+                className="w-4 h-4 self-center"
+              />
+            </div>
           ) : (
             <>
               Connect Source Wallet{" "}

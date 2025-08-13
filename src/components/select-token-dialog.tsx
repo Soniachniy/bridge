@@ -24,6 +24,7 @@ import { truncateAddress } from "@/lib/utils";
 import { useTokens } from "@/providers/token-context";
 import { useFormContext } from "react-hook-form";
 import { Network } from "@/config";
+import { EStrategy } from "@/pages/Form";
 
 type Props = {
   selectedToken: TokenResponse | null;
@@ -94,7 +95,7 @@ const SelectTokenDialog: FC<Props> = ({
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row gap-1 bg-transparent h-auto items-center border-none !px-0 "
+          className="flex flex-row gap-1 hover:bg-transparent bg-transparent h-auto items-center border-none !px-0 "
         >
           {selectedToken ? (
             <div className="relative h-[55px] flex items-center">
@@ -133,7 +134,7 @@ const SelectTokenDialog: FC<Props> = ({
             </div>
           )}
 
-          <ChevronDown color="white" className="w-4 h-4 " />
+          <ChevronDown color="white" className="w-4 h-4" />
         </Button>
       </Dialog.Trigger>
       <Dialog.Content
@@ -235,8 +236,10 @@ const SelectTokenDialog: FC<Props> = ({
                     );
                     if (address) {
                       setValue("refundAddress", address);
+                      setValue("strategy", EStrategy.Wallet);
                     } else {
                       setValue("refundAddress", "");
+                      setValue("strategy", EStrategy.Manual);
                     }
                     selectToken(token);
                   }}

@@ -1,16 +1,3 @@
-import { ActionButton } from "@/components/ActionButtons";
-import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
-import { USDC_DECIMALS } from "@/lib/constants";
-import { cn, formatTokenAmount } from "@/lib/utils";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { useCallback } from "react";
-
-import SuccessIcon from "@/assets/success-icon-transparent.svg?react";
-
-import useProcessing from "@/hooks/useProcessing";
-import { BridgeFormMachineContext } from "@/providers/machine-provider";
-import { useEffect } from "react";
-
 // export const BasicInfo = ({
 //   stage,
 //   initialData,
@@ -25,15 +12,6 @@ import { useEffect } from "react";
 //   } | null;
 //   signPermit: (depositAddress: string) => Promise<void>;
 // }) => {
-//   const handleCopyAddress = useCallback(async () => {
-//     if (initialData?.depositAddress) {
-//       try {
-//         await navigator.clipboard.writeText(initialData.depositAddress);
-//       } catch (error) {
-//         console.error("Failed to copy address:", error);
-//       }
-//     }
-//   }, [initialData?.depositAddress]);
 
 //   if (!initialData) {
 //     return null;

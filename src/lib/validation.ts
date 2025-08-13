@@ -135,6 +135,56 @@ export const formValidationSchema = z
     }
   });
 
+export const createSlippageDialogValidationSchema = (
+  blockchain: TokenResponse["blockchain"]
+) =>
+  z
+    .object({
+      slippageValue: z
+        .number()
+        .min(0, "Slippage value must be between 0 and 100")
+        .max(100, "Slippage value must be between 0 and 100"),
+      refundAddress: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      const address = data.refundAddress?.trim() ?? "";
+      if (address === "") return; // allow empty in dialog; main form enforces required
+
+      if (blockchain === "near") {
+        if (!nearAddressSchema.safeParse(address).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid NEAR address",
+          });
+        }
+      } else if (blockchain === "sol") {
+        if (!solanaAddressSchema.safeParse(address).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid Solana address",
+          });
+        }
+      } else if (blockchain === "ton") {
+        if (!tonAddressSchema.safeParse(address).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid TON address",
+          });
+        }
+      } else {
+        if (!evmAddressValidation.safeParse(address).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid EVM address",
+          });
+        }
+      }
+    });
+
 export const firstStepValidationSchema = formValidationSchema.pick({
   selectedToken: true,
   amount: true,
@@ -146,7 +196,13 @@ export const firstStepValidationSchema = formValidationSchema.pick({
 export type FormValidationData = z.infer<FormInterface>;
 
 export interface FormInterface {
-  selectedToken: TokenResponse | null;
+  selectedToken:
+    | (TokenResponse & {
+        balance?: bigint;
+        balanceNear?: bigint;
+        balanceUpdatedAt?: number;
+      })
+    | null;
   amount: string;
   hyperliquidAddress: string;
   refundAddress: string;

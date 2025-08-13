@@ -86,8 +86,8 @@ const ConnectWalletDialog: FC = () => {
         >
           {activeAddress ? (
             <>
-              <WalletIcon />
-              {truncateAddress(activeAddress)}
+              <WalletIcon fill="black" />
+              Connected
             </>
           ) : (
             "Connect Wallet"
