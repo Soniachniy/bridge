@@ -1,11 +1,6 @@
-import { memo, useCallback, useMemo } from "react";
-import { EStrategy } from "@/pages/Form";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { Network } from "@/config";
-import { getShortAddress, isSupportedNetwork } from "@/lib/utils";
-import { translateNetwork } from "@/lib/1clickHelper";
+import { memo, useMemo } from "react";
 
-const BUTTON_TEXTS = {
+export const BUTTON_TEXTS = {
   connectEVM: "Connect EVM wallet",
   proceedTransfer: "Proceed transfer",
   processing: "Processing...",
@@ -14,7 +9,7 @@ const BUTTON_TEXTS = {
   connectWallet: "Connect wallet",
 } as const;
 
-const BUTTON_STYLES = {
+export const BUTTON_STYLES = {
   container: "flex grow-1 w-full",
   containerWithMargin: "mt-10 flex grow-1 w-full",
   containerWithGap:
