@@ -2,8 +2,9 @@ import { basicConfig, getNetworkChainId, Network } from "@/config";
 
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount, useAccountEffect } from "wagmi";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useEffect } from "react";
+import { HOT } from "@hot-wallet/sdk";
 
 import { useAppKit } from "@reown/appkit/react";
 import { Transaction } from "@near-wallet-selector/core";
@@ -61,11 +62,24 @@ const useNetwork = (
   setValue?: (key: keyof FormInterface, value: any) => void
 ) => {
   /* SOLANA */
-  const { publicKey, disconnect: disconnectSolana } = useWallet();
+  const {
+    publicKey,
+    disconnect: disconnectSolana,
+    wallet: solanaWallet,
+    wallets,
+  } = useWallet();
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
-
+  const { connection } = useConnection();
+  console.log(
+    connection,
+    solanaConnection,
+    solanaWallet,
+    solanaWallet?.adapter.name,
+    wallets,
+    "connection"
+  );
   /* EVM */
   const { open } = useAppKit();
   const { isConnected, address } = useAccount({
@@ -380,11 +394,21 @@ const useNetwork = (
             "confirmed"
           );
           transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
+          if (solanaWallet?.adapter.name === "HOT") {
+            const tx = await HOT.request("solana:signAndSendTransaction", {
+              transaction: Buffer.from(transactionSolana.serialize()).toString(
+                "base64"
+              ),
+              sendOptions: { maxRetries: 3 },
+            });
+
+            const signature = tx.signature;
+            return signature;
+          }
           const txHash = await sendTransactionSolana(
             transactionSolana,
             solanaConnection
           );
-
           return txHash;
         case Network.NEAR:
           if (!selector || !accountId || !selectedToken.contractAddress) {
