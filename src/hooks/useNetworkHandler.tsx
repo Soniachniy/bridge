@@ -8,7 +8,11 @@ import { useEffect } from "react";
 import { useAppKit } from "@reown/appkit/react";
 import { Transaction } from "@near-wallet-selector/core";
 
-import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
+import {
+  useTonWallet,
+  useTonConnectUI,
+  toUserFriendlyAddress,
+} from "@tonconnect/ui-react";
 import { getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/providers/evm-provider";
 import {
@@ -179,7 +183,7 @@ const useNetwork = (
         case Network.NEAR:
           return accountId;
         case Network.TON:
-          return tonWallet?.account?.address ?? "";
+          return toUserFriendlyAddress(tonWallet?.account?.address ?? "");
         default:
           return null;
       }
