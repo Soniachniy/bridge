@@ -92,7 +92,8 @@ export const InitialView = () => {
         ) {
           const { balance, nearBalance } = await getBalance(
             selectedToken.assetId,
-            selectedToken.contractAddress
+            selectedToken.contractAddress,
+            selectedToken.blockchain
           );
           if (balance) {
             setValue("selectedToken", {
@@ -300,22 +301,16 @@ export const InitialView = () => {
           </div>
         )}
       </div>
-      <ConnectButton
-        isLoading={isLoading}
-        connectWallet={connectWallet}
-        evmAddress={hyperliquidAddress}
-      />
+      <ConnectButton isLoading={isLoading} evmAddress={hyperliquidAddress} />
     </div>
   );
 };
 
 export const ConnectButton = ({
-  connectWallet,
   evmAddress,
   isLoading,
 }: {
   isLoading: boolean;
-  connectWallet: (network: Network) => void;
   evmAddress?: string;
 }) => {
   const actorRef = BridgeFormMachineContext.useActorRef();
