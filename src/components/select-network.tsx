@@ -100,7 +100,9 @@ const SelectNetworkDialog: FC<{
               <WalletIcon fill="#97fce4" className="self-center" />
               {truncateAddress(walletAddress)}
               <LogoutIcon
-                onClick={() => disconnectWallet(Network.ARBITRUM)}
+                onClick={() =>
+                  disconnectWallet(translateNetwork(selectedToken?.blockchain))
+                }
                 className="w-4 h-4 self-center"
               />
             </div>

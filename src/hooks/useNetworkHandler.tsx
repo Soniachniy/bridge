@@ -478,6 +478,13 @@ const useNetwork = (
               })),
             })
           );
+          // console.log(nearTransactions, wallet.id, "nearTransactions");
+
+          //   const tx = await HOT.request("near:signAndSendTransactions", {
+          //     transactions: nearTransactions,
+          //   });
+          //   return tx.transactions[0].hash;
+
           const trx = await wallet.signAndSendTransactions({
             transactions: nearTransactions,
           });
