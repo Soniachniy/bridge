@@ -67,11 +67,14 @@ export const machine = createMachine({
         back_to_asset_selection: {
           target: "AssetSelection",
         },
+        sign_permit: {
+          target: "UserPermit",
+        },
       },
     },
     [ProcessingStages.Processing]: {
       on: {
-        success: {
+        sign_permit: {
           target: "UserPermit",
         },
         error: {

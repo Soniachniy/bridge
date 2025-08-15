@@ -36,7 +36,7 @@ export const ProcessingView = () => {
       <div className="flex flex-col self-center inline-flex justify-between items-start mx-4 my-8 w-[480px] xs:w-full">
         <div className="size- inline-flex flex-row justify-between items-center gap-1 w-full my-auto bg-main_dark px-6 py-4 rounded-2xl">
           <div className="text-center justify-center text-main_light text-sm font-semibold font-['Inter'] leading-none">
-            ≥{formatTokenAmount(amountOut, USDC_DECIMALS)} USDC
+            ≥{amountOut} USDC
           </div>
 
           <div className="text-center justify-center text-white text-xs font-normal font-['Inter'] leading-none">

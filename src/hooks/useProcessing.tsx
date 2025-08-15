@@ -3,7 +3,7 @@ import { delay } from "@/lib/1clickHelper";
 import { wagmiAdapter } from "@/providers/evm-provider";
 import { execute, getPermitData, getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { sliceHex } from "viem";
@@ -43,7 +43,7 @@ const redirectToStage = (stage: ProcessingStages) => {
     case ProcessingStages.Processing:
       return "start_processing";
     case ProcessingStages.UserPermit:
-      return "success";
+      return "sign_permit";
     case ProcessingStages.ExecutingDeposit:
       return "signed";
     case ProcessingStages.SuccessScreen:
@@ -62,13 +62,6 @@ export default function useProcessing(depositAddressParam?: string | null) {
   const tokens = useTokens();
   const { id: depositAddressFromParams } = useParams();
   const depositAddress = depositAddressParam || depositAddressFromParams;
-
-  const [initialData, setInitialData] = useState<{
-    selectedToken: TokenResponse;
-    amountIn: bigint;
-    amountOut: bigint;
-    depositAddress: string;
-  } | null>(null);
 
   const [isPermitAsked, setIsPermitAsked] = useState(false);
   const view = BridgeFormMachineContext.useSelector((s) => s.value);
@@ -98,7 +91,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
         deadline: BigInt(message.deadline),
       },
     });
-    actorRef.send({ type: "executing_deposit" });
+    actorRef.send({ type: "signed" });
     if (signature) {
       const r = sliceHex(signature, 0, 32);
       const s = sliceHex(signature, 32, 64);
@@ -123,7 +116,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
         actorRef.send({ type: "error" });
       }
     };
-    const getDepositStatus = async (depositAddress: string, retries = 40) => {
+    const getDepositStatus = async (depositAddress: string, retries = 80) => {
       const timeInterval = 7000;
       const maxRetries = retries;
       let attempt = 0;
@@ -132,25 +125,6 @@ export default function useProcessing(depositAddressParam?: string | null) {
         try {
           await delay(timeInterval);
           const statusResponse = await getStatus(depositAddress);
-
-          if (!initialData?.selectedToken) {
-            const selectedToken = tokens?.[statusResponse.data.assetFrom];
-            if (selectedToken) {
-              setInitialData({
-                selectedToken: {
-                  assetId: statusResponse.data.assetFrom,
-                  blockchain: selectedToken?.blockchain,
-                  decimals: selectedToken?.decimals,
-                  price: selectedToken?.price ?? 0,
-                  priceUpdatedAt: selectedToken?.priceUpdatedAt ?? "0",
-                  symbol: selectedToken?.symbol,
-                },
-                amountIn: statusResponse.data.amountIn,
-                amountOut: statusResponse.data.minAmountOut,
-                depositAddress: statusResponse.data.depositAddress,
-              });
-            }
-          }
 
           const stage = translateStatus(statusResponse.data.status);
           if (stage !== view) {
@@ -188,8 +162,6 @@ export default function useProcessing(depositAddressParam?: string | null) {
   }, [view, depositAddress]);
 
   return {
-    view,
-    initialData,
     signPermit,
   };
 }

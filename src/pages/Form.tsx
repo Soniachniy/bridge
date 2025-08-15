@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { formValidationSchema } from "@/lib/validation";
 
-import { SLIPPAGE } from "@/lib/constants";
+import { SLIPPAGE, USDC_DECIMALS } from "@/lib/constants";
 
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 import { InitialView } from "./states/Initial";
@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
+import { formatTokenAmount } from "@/lib/utils";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -97,7 +98,10 @@ export default function Form() {
               balanceUpdatedAt: 0,
             });
             methods.setValue("amount", statusResponse.data.amountIn);
-            methods.setValue("amountOut", statusResponse.data.minAmountOut);
+            methods.setValue(
+              "amountOut",
+              formatTokenAmount(statusResponse.data.minAmountOut, USDC_DECIMALS)
+            );
             methods.setValue(
               "hyperliquidAddress",
               statusResponse.data.hyperliquidAddress
