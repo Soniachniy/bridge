@@ -160,6 +160,16 @@ export const ProcessingView = () => {
             Sign permit
           </ActionButton>
         )}
+        <ActionButton
+          variant="quaternary"
+          className="mt-4"
+          disabled={!depositAddress}
+          onClick={() => {
+            window.open("https://t.me/hyperdep", "_blank");
+          }}
+        >
+          Support
+        </ActionButton>
       </div>
     </>
   );

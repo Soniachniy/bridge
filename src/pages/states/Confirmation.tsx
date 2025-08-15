@@ -40,7 +40,7 @@ export const ConfirmationView = () => {
 
   return (
     <>
-      <div className="flex flex-col self-center inline-flex justify-between items-start mx-4 my-8 w-[480px] xs:w-full">
+      <div className="flex flex-col self-center inline-flex justify-between items-start mx-4 my-8 md:w-[480px] w-full">
         <div className="size- inline-flex flex-row justify-between items-center gap-1 w-full my-auto bg-main_dark px-6 py-4 rounded-2xl">
           <div className="text-center justify-center text-main_light text-sm font-semibold font-['Inter'] leading-none">
             ≥{amountOut} USDC
