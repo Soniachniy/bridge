@@ -13,7 +13,7 @@ import { truncateAddress } from "@/lib/utils";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletSelector } from "@/providers/near-provider";
-import { toUserFriendlyAddress, useTonWallet } from "@tonconnect/ui-react";
+import { useTonWallet } from "@tonconnect/ui-react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import { cn } from "@/lib/utils";
 
@@ -53,8 +53,7 @@ const ConnectWalletDialog: FC = () => {
           blockChain: Network.NEAR,
         },
         {
-          address:
-            toUserFriendlyAddress(tonWallet?.account?.address ?? "") ?? null,
+          address: tonWallet?.account?.address ?? "" ?? null,
           blockChain: Network.TON,
         },
       ].filter((address) => address.address !== null)
