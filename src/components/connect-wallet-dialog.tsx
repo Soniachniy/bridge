@@ -53,8 +53,9 @@ const ConnectWalletDialog: FC = () => {
           blockChain: Network.NEAR,
         },
         {
-          address:
-            toUserFriendlyAddress(tonWallet?.account?.address ?? "") ?? null,
+          address: tonWallet?.account?.address
+            ? toUserFriendlyAddress(tonWallet?.account?.address)
+            : null,
           blockChain: Network.TON,
         },
       ].filter((address) => address.address !== null)

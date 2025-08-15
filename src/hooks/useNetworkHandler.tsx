@@ -183,7 +183,9 @@ const useNetwork = (
         case Network.NEAR:
           return accountId;
         case Network.TON:
-          return toUserFriendlyAddress(tonWallet?.account?.address ?? "");
+          return tonWallet?.account?.address
+            ? toUserFriendlyAddress(tonWallet?.account?.address)
+            : null;
         default:
           return null;
       }
