@@ -34,6 +34,7 @@ import SelectNetworkDialog from "@/components/select-network";
 import InfoIcon from "@/assets/warning-icon.svg?react";
 import LogoutIcon from "@/assets/logout-icon.svg?react";
 import SlippageDialog from "@/components/slippage-dialog";
+import { Loader } from "lucide-react";
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -84,11 +85,6 @@ export const InitialView = () => {
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
       try {
-        console.log(
-          selectedToken,
-          selectedToken.balanceUpdatedAt,
-          "selectedToken"
-        );
         if (
           selectedToken &&
           selectedToken.balanceUpdatedAt === 0 &&
@@ -98,7 +94,6 @@ export const InitialView = () => {
             selectedToken.assetId,
             selectedToken.contractAddress
           );
-          console.log(balance, "balance");
           if (balance) {
             setValue("selectedToken", {
               ...selectedToken,
@@ -200,11 +195,16 @@ export const InitialView = () => {
         </div>
         <div className="flex flex-row gap-2 align-center justify-between w-full bg-[#1B2429] rounded-2xl px-4">
           <span
-            className={`grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none self-center ${
+            className={`grow-1 relative border-none outline-none text-2xl font-light bg-transparent font-inter leading-none self-center ${
               Number(amountOut) === 0 ? "text-gray_text" : "text-main_light"
             }`}
           >
             {amountOut ?? "0"}
+            {isLoading && (
+              <span className="text-gray_text flex flex-row gap-1 items-center text-xs font-normal font-['Inter'] absolute bottom-[-16px]">
+                Loading <Loader className="size-4 animate-spin" />
+              </span>
+            )}
           </span>
 
           <div className="flex flex-row gap-2 px-2 py-2 items-center">
@@ -309,98 +309,6 @@ export const InitialView = () => {
   );
 };
 
-{
-  /* <div className="flex flex-col justify-center items-center mb-10">
-        <div className="flex flex-col gap-2 justify-center items-center w-full">
-          <div className="flex flex-row gap-2 justify-between md:w-[480px] w-full">
-            <div className="text-white font-thin text-sm text-left w-full md:w-[480px]">
-              Asset
-            </div>
-          </div>
-          <SelectTokenDialog
-            {...register("selectedToken")}
-            selectToken={(token) => {
-              setValue("selectedToken", token);
-              actorRef.send({ type: "select_asset" });
-            }}
-            selectedToken={selectedToken}
-          />
-        </div>
-      </div>
-      <div className="flex flex-row gap-2 justify-between w-full md:w-[480px] sm:w-full">
-        <span className="text-white font-thin text-sm">Amount</span>
-        <SlippageDialog
-          slippageValue={slippageValue}
-          setSlippageValue={(value) => setValue("slippageValue", value)}
-        />
-      </div>
-      <div className="bg-[#1B2429] w-full rounded-2xl p-3 flex flex-row justify-between items-center gap-7 hover:bg-[#29343a]  h-[75px] md:w-[480px] sm:w-full">
-        <div className="flex grow-1 flex-col gap-1 w-[210px]">
-          <div className="flex grow-1 flex-row items-center gap-7">
-            <input
-              {...register("amount", {
-                onChange: (e) => {
-                  const enforcedValue = enforcer(e.target.value);
-                  if (enforcedValue === null) return;
-                  setValue("amount", enforcedValue);
-                },
-              })}
-              type="text"
-              pattern="^[0-9]*[.,]?[0-9]*$"
-              className={`${
-                errors.amount ? "text-error" : "text-white"
-              } grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
-              value={amountIn ?? ""}
-              placeholder="0"
-              inputMode="decimal"
-              autoComplete="off"
-              minLength={1}
-              maxLength={79}
-              spellCheck="false"
-              autoCorrect="off"
-            />
-          </div>
-          <div className="flex flex-row gap-1 justify-between">
-            <span className="text-white text-xs font-light font-inter leading-[14px]">
-              {isLoading ? (
-                <span className="text-white flex flex-row gap-1 items-center text-xs font-light font-inter leading-[14px]">
-                  Loading <Spinner size="1" />
-                </span>
-              ) : amountOut ? (
-                <span className="text-white text-xs font-light font-inter leading-[14px]">
-                  ≥ {amountOut} USDC at Hyperliquid Perps
-                </span>
-              ) : null}
-            </span>
-          </div>
-        </div>
-      </div>
-      {errors.amount && (
-        <div className="text-error word-break text-xs md:w-[480px] sm:w-full font-normal text-left  font-inter">
-          <span>{errors.amount?.message?.toString()}</span>
-        </div>
-      )}
-      <ActionButton
-        variant="primary"
-        className="mt-10"
-        onClick={async () => {
-          const isValid = await trigger([
-            "amount",
-            "amountOut",
-            "selectedToken",
-            "platformFee",
-            "gasFee",
-          ]);
-          console.log("isValid", isValid);
-          if (isValid) {
-            actorRef.send({ type: "proceed" });
-          }
-        }}
-      >
-        Next
-      </ActionButton> */
-}
-
 export const ConnectButton = ({
   connectWallet,
   evmAddress,
@@ -488,53 +396,4 @@ export const ConnectButton = ({
       </div>
     </div>
   );
-  // return (
-  //   <>
-  //     <div className="my-2 w-full flex flex-row items-center justify-center gap-2">
-  //       <WalletIcon stroke={"#50D2C1"} />
-  //       <span className="justify-center text-main_light text-base font-normal font-['Inter'] leading-normal">
-  //         {truncateAddress(evmAddress)}
-  //       </span>
-  //     </div>
-  //     <ActionButton
-  //       variant="primary"
-  //       onClick={() =>
-  //         connectWallet(
-  //           translateNetwork(selectedBlockchain ?? TokenResponse.blockchain.ETH)
-  //         )
-  //       }
-  //       className="w-full"
-  //     >
-  //       {`Connect ${
-  //         CHAIN_TITLE[selectedBlockchain ?? TokenResponse.blockchain.ETH]
-  //       } wallet`}
-  //     </ActionButton>
-  //     <div className=" mt-4 self-stretch px-4 py-2 bg-teal-200/10 rounded-2xl inline-flex justify-start items-center gap-2">
-  //       <div className="size-6 relative flex items-center justify-center">
-  //         <InfoIcon stroke="#97FCE4" />
-  //       </div>
-  //       <div className="flex-1 justify-start text-main_light text-xs font-normal font-['Inter'] leading-none">
-  //         Your wallet is connected, but we don't currently support the selected
-  //         chain for automated deposits.
-  //       </div>
-  //     </div>
-  //     <div className="my-8 self-stretch text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
-  //       or
-  //     </div>
-  //     <ActionButton
-  //       variant="secondary"
-  //       className="w-full rounded-xl outline outline-1 outline-offset-[-1px] outline-main_light"
-  //       onClick={() => {
-  //         setValue("strategy", EStrategy.Manual);
-  //         actorRef.send({ type: "manual_deposit" });
-  //       }}
-  //     >
-  //       Send from external wallets
-  //     </ActionButton>
-  //     <div className=" mt-2 text-center justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
-  //       Send assets manually if you prefer to deposit from external wallet or
-  //       CEX
-  //     </div>
-  //   </>
-  // );
 };

@@ -13,6 +13,9 @@ import { useFormContext } from "react-hook-form";
 import { FormInterface } from "@/lib/validation";
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
 import useProcessing from "@/hooks/useProcessing";
+import { ActionButton } from "@/components/ActionButtons";
+import { BridgeFormMachineContext } from "@/providers/machine-provider";
+import { ProcessingStages } from "@/lib/states";
 
 export const ProcessingView = () => {
   const { watch } = useFormContext<FormInterface>();
@@ -25,14 +28,15 @@ export const ProcessingView = () => {
   const selectedToken = watch("selectedToken");
 
   const depositAddress = watch("depositAddress");
-  useProcessing(depositAddress);
+  const { signPermit } = useProcessing(depositAddress);
 
+  const view = BridgeFormMachineContext.useSelector((s) => s.value);
   return (
     <>
       <div className="flex flex-col self-center inline-flex justify-between items-start mx-4 my-8 w-[480px] xs:w-full">
         <div className="size- inline-flex flex-row justify-between items-center gap-1 w-full my-auto bg-main_dark px-6 py-4 rounded-2xl">
           <div className="text-center justify-center text-main_light text-sm font-semibold font-['Inter'] leading-none">
-            ≥{amountOut} USDC
+            ≥{formatTokenAmount(amountOut, USDC_DECIMALS)} USDC
           </div>
 
           <div className="text-center justify-center text-white text-xs font-normal font-['Inter'] leading-none">
@@ -123,14 +127,16 @@ export const ProcessingView = () => {
             </div>
           </div>
 
-          <div className="flex flex-row justify-between w-full">
-            <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
-              Refund address:
+          {refundAddress && (
+            <div className="flex flex-row justify-between w-full">
+              <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
+                Refund address:
+              </div>
+              <div className="justify-start text-white text-xs font-normal font-['Inter'] leading-none">
+                {refundAddress}
+              </div>
             </div>
-            <div className="justify-start text-white text-xs font-normal font-['Inter'] leading-none">
-              {refundAddress}
-            </div>
-          </div>
+          )}
           <div className="flex flex-row justify-between w-full">
             <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
               Hyperliquid address:
@@ -140,6 +146,20 @@ export const ProcessingView = () => {
             </div>
           </div>
         </div>
+        {view === ProcessingStages.UserPermit && (
+          <ActionButton
+            variant="tertiary"
+            className="mt-4"
+            disabled={!depositAddress}
+            onClick={() => {
+              if (depositAddress) {
+                signPermit(depositAddress);
+              }
+            }}
+          >
+            Sign permit
+          </ActionButton>
+        )}
       </div>
     </>
   );

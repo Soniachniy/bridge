@@ -13,6 +13,10 @@ import { ProcessingStages } from "@/lib/states";
 import { DepositView } from "./states/ManualDeposit";
 import { ProcessingView } from "./states/Processing";
 import { ConfirmationView } from "./states/Confirmation";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { getStatus } from "@/providers/proxy-provider";
+import { useTokens } from "@/providers/token-context";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -25,6 +29,10 @@ export enum EStrategy {
 }
 
 export default function Form() {
+  const { id: depositAddressFromParams } = useParams();
+  const navigate = useNavigate();
+
+  const actorRef = BridgeFormMachineContext.useActorRef();
   const methods = useForm({
     resolver: zodResolver(formValidationSchema),
     mode: "onChange",
@@ -43,22 +51,11 @@ export default function Form() {
     },
   });
 
-  // useEffect(() => {
-  //   if (selectedToken) {
-  //     const isSupported = isSupportedNetwork(
-  //       translateNetwork(selectedToken.blockchain)
-  //     );
-  //     if (!isSupported) {
-  //       setStrategy(EStrategy.DEPOSIT);
-  //       actorRef.send({ type: "manual_deposit" });
-  //     }
-  //   }
-  // }, [selectedToken]);
-
   const onSubmit = async () => {
     // TODO: Implement onSubmit
   };
 
+  const tokens = useTokens();
   const view = BridgeFormMachineContext.useSelector((s) => s.value);
 
   const ViewByState: Record<string, React.ReactNode> = {
@@ -66,7 +63,61 @@ export default function Form() {
     [ProcessingStages.ManualDeposit]: <DepositView />,
     [ProcessingStages.DetailsReview]: <ConfirmationView />,
     [ProcessingStages.Processing]: <ProcessingView />,
+    [ProcessingStages.AwaitingDeposit]: <ProcessingView />,
+    [ProcessingStages.UserPermit]: <ProcessingView />,
+    [ProcessingStages.ExecutingDeposit]: <ProcessingView />,
+    [ProcessingStages.SuccessScreen]: <ProcessingView />,
   };
+
+  useEffect(() => {
+    if (depositAddressFromParams) {
+      const getData = async () => {
+        const statusResponse = await getStatus(depositAddressFromParams);
+        console.log(statusResponse, "statusResponse");
+        if (!statusResponse.success) {
+          navigate("/");
+        }
+        if (
+          statusResponse.data.status === "pending_deposit" ||
+          statusResponse.data.status === "deposit_received" ||
+          statusResponse.data.status === "processing" ||
+          statusResponse.data.status === "ready_for_permit"
+        ) {
+          const selectedToken = tokens?.[statusResponse.data.assetFrom];
+          if (selectedToken) {
+            methods.setValue("selectedToken", {
+              assetId: statusResponse.data.assetFrom,
+              blockchain: selectedToken?.blockchain,
+              decimals: selectedToken?.decimals,
+              price: selectedToken?.price ?? 0,
+              priceUpdatedAt: selectedToken?.priceUpdatedAt ?? "0",
+              symbol: selectedToken?.symbol,
+              balance: 0n,
+              balanceNear: 0n,
+              balanceUpdatedAt: 0,
+            });
+            methods.setValue("amount", statusResponse.data.amountIn);
+            methods.setValue("amountOut", statusResponse.data.minAmountOut);
+            methods.setValue(
+              "hyperliquidAddress",
+              statusResponse.data.hyperliquidAddress
+            );
+            methods.setValue(
+              "refundAddress",
+              statusResponse.data.refundAddress
+            );
+
+            methods.setValue(
+              "depositAddress",
+              statusResponse.data.depositAddress
+            );
+            actorRef.send({ type: "retry_processing" });
+          }
+        }
+      };
+      getData();
+    }
+  }, [depositAddressFromParams, tokens]);
 
   return (
     <div className="p-4 w-full min-h-96">
@@ -88,80 +139,6 @@ export default function Form() {
           {ViewByState[String(view)] ?? null}
         </form>
       </FormProvider>
-      {/* 
-        {selectedToken && (
-          <>
-            <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
-              <label className="text-gray_text font-normal text-xs font-inter">
-                Refund address
-              </label>
-              <div className="bg-element rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 md:w-[480px] h-12 sm:w-full">
-                <div className="flex flex-col grow-1 gap-1 w-[210px]">
-                  <div className="flex flex-row grow-1 items-center">
-                    <input
-                      type="text"
-                      {...register("refundAddress")}
-                      className="text-white border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                      placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
-                      autoComplete="off"
-                      spellCheck="false"
-                      autoCorrect="off"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-row justify-end items-center gap-1">
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    {refundAddress && errors.refundAddress && <ErrorIcon />}
-                    {refundAddress &&
-                      dirtyFields.refundAddress &&
-                      !errors.refundAddress && <SuccessIcon />}
-                  </div>
-                  <div className="flex flex-row justify-end items-center gap-1">
-                    <div
-                      onClick={async () => {
-                        const text =
-                          await window.navigator.clipboard.readText();
-                        setValue("refundAddress", text);
-                        trigger("refundAddress");
-                      }}
-                      className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
-                    >
-                      paste
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {errors.refundAddress && (
-                <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
-                  <span>{errors.refundAddress.message}</span>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-        <DepositAddressSection
-          selectedToken={selectedToken}
-          strategy={strategy}
-          connectedEVMWallet={connectedEVMWallet}
-          depositAddress={depositAddress}
-          errors={errors}
-          debouncedAmountIn={debouncedAmountIn}
-        />
-
-        <ActionButtons
-          selectedToken={selectedToken}
-          strategy={strategy}
-          setStrategy={wrappedSetStrategy}
-          connectWallet={wrappedConnectWallet}
-          isConnected={isConnected()}
-          isSubmitting={isSubmitting}
-          isValidating={isValidating}
-          connectedEVMWallet={getPublicKey(Network.ARBITRUM) ?? null}
-        />
-        {/* Inline Processing Status */}
-      {/* {depositAddress && <InlineProcessing depositAddress={depositAddress} />} */}
-      {/* </form> */}
     </div>
   );
 }

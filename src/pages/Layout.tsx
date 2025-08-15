@@ -1,15 +1,17 @@
-import { useNavigate } from "react-router-dom";
 import ConnectWalletDialog from "@/components/connect-wallet-dialog";
+import { BridgeFormMachineContext } from "@/providers/machine-provider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
+  const actorRef = BridgeFormMachineContext.useActorRef();
   return (
     <div className="flex flex-col min-h-screen bg-[#0F1A20] justify-between">
       <header>
         <div className="flex justify-between items-center mx-4 md:mx-20 my-4">
           <div
             className="flex items-center gap-2"
-            onClick={() => navigate("/")}
+            onClick={() => {
+              actorRef.send({ type: "back_to_asset_selection" });
+            }}
           >
             <img
               src="/logo-extended.svg"

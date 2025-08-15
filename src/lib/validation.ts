@@ -150,29 +150,6 @@ export const formValidationSchema = z
     }
   });
 
-// export const createFormValidationSchema = (strategy: EStrategy | null) => {
-//   const baseSchema = formValidationSchema;
-//   console.log(strategy, "strategy");
-//   if (strategy === "wallet") {
-//     return baseSchema.refine(
-//       (data) => {
-//         const maxBalance =
-//           Number(data.selectedToken?.balance) /
-//           Math.pow(10, data.selectedToken?.decimals ?? 1);
-//         console.log(maxBalance, "maxBalance");
-//         const amount = Number(data.amount);
-//         return amount <= maxBalance;
-//       },
-//       {
-//         message: `Amount cannot exceed your balance`,
-//         path: ["amount"],
-//       }
-//     );
-//   }
-
-//   return baseSchema;
-// };
-
 export const createSlippageDialogValidationSchema = (
   blockchain: TokenResponse["blockchain"]
 ) =>

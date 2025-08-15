@@ -24,20 +24,26 @@ export const stages = {
     stepNumber: 2,
     title: "Send your deposit manually",
     description:
-      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
+      "Review your details and optionally set a refund address. 24 hours to complete the deposit.",
   },
   [ProcessingStages.DetailsReview]: {
     stepNumber: 2,
     title: "Confirm your deposit",
     description:
-      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
+      "Review your details and optionally set a refund address. 24 hours to complete the deposit.",
   },
-  [ProcessingStages.Processing]: {
+  [ProcessingStages.AwaitingDeposit]: {
     stepNumber: 3,
     indicatorState: IndicatorState.Processing,
     title: "Awaiting deposit",
     description:
-      "Review your details and optionally set a refund address. 23h 59m to complete the deposit.",
+      "Review your details and optionally set a refund address. 24 hours to complete the deposit.",
+  },
+  [ProcessingStages.Processing]: {
+    stepNumber: 3,
+    indicatorState: IndicatorState.Processing,
+    title: "Processing your deposit",
+    description: "We are processing your deposit. This may take a few minutes.",
   },
   [ProcessingStages.UserPermit]: {
     stepNumber: 3,
@@ -106,8 +112,19 @@ const StatusIndicator = ({
           {stepNumber}
         </div>
       );
-    case IndicatorState.Filled:
     case IndicatorState.Processing:
+      return (
+        <div
+          className={cn(
+            "flex text-center border-1 border-background border-solid justify-center items-center rounded-full w-6 h-6 text-xs font-normal font-['Inter'] leading-normal",
+            "bg-element text-black"
+          )}
+        >
+          <div className="loader animate-spin" />
+        </div>
+      );
+
+    case IndicatorState.Filled:
       return (
         <div
           className={cn(
@@ -149,45 +166,42 @@ const StatusIndicator = ({
             "bg-warning text-black"
           )}
         >
-          <WarningIcon />
+          <WarningIcon stroke={"black"} />
         </div>
       );
   }
 };
 
 export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
+  const currentStage = stages[localStage];
+
   const successStage = Object.values(stages).reduce((acc, stage) => {
     if (!acc[stage.stepNumber]) {
-      acc[stage.stepNumber] = stage;
+      if (stage.stepNumber === currentStage.stepNumber) {
+        acc[stage.stepNumber] = currentStage;
+      } else {
+        acc[stage.stepNumber] = stage;
+      }
     }
     return acc;
   }, {} as Record<number, { stepNumber: number; title: string; description: string; indicatorState?: IndicatorState }>);
-  const currentStage = stages[localStage];
+  console.log(successStage, "successStage");
   return (
     <div>
       <div className="mb-4 flex flex-row text-center justify-center items-center text-main_white text-2xl font-normal font-['Inter'] leading-normal">
         {Object.values(successStage).map(
           ({ stepNumber, indicatorState }, index) => {
-            const isFirst = index === 0;
+            const isLast = index === Object.values(successStage).length - 1;
             const secondaryIndicatorState =
               currentStage.stepNumber < stepNumber
                 ? IndicatorState.Empty
                 : IndicatorState.Filled;
+
             return (
               <div
                 key={stepNumber}
                 className="flex flex-row justify-center items-center"
               >
-                {!isFirst && (
-                  <div
-                    className={cn(
-                      "w-[70px] h-[2px] bg-main_light",
-                      currentStage.stepNumber < stepNumber - 1
-                        ? "bg-element"
-                        : "bg-main_light"
-                    )}
-                  />
-                )}
                 <StatusIndicator
                   indicatorState={
                     secondaryIndicatorState === IndicatorState.Empty
@@ -196,6 +210,16 @@ export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
                   }
                   stepNumber={stepNumber}
                 />
+                {!isLast && (
+                  <div
+                    className={cn(
+                      "w-[70px] h-[2px] bg-main_light",
+                      currentStage.stepNumber > stepNumber
+                        ? "bg-main_light"
+                        : "bg-element"
+                    )}
+                  />
+                )}
               </div>
             );
           }

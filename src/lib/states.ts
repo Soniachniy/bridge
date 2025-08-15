@@ -4,6 +4,7 @@ export enum ProcessingStages {
   AssetSelection = "AssetSelection",
   DetailsReview = "DetailsReview",
   ManualDeposit = "ManualDeposit",
+  AwaitingDeposit = "AwaitingDeposit",
   Processing = "Processing",
   UserPermit = "UserPermit",
   ErrorScreen = "ErrorScreen",
@@ -27,14 +28,20 @@ export const machine = createMachine({
         manual_deposit: {
           target: "ManualDeposit",
         },
+        retry_processing: {
+          target: "Processing",
+        },
       },
       description:
         "The user selects the asset and blockchain, and fills in the desired amount of tokens. Validation occurs to determine if the form is completely filled out.",
     },
     [ProcessingStages.DetailsReview]: {
       on: {
-        start_processing: {
-          target: "Processing",
+        awaiting_deposit: {
+          target: "AwaitingDeposit",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
         },
       },
       description:
@@ -42,12 +49,25 @@ export const machine = createMachine({
     },
     [ProcessingStages.ManualDeposit]: {
       on: {
-        start_processing: {
-          target: "Processing",
+        awaiting_deposit: {
+          target: "AwaitingDeposit",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
         },
       },
       description:
         "The user reviews all previously filled data. They may change the refund address if desired. The deposit address is shown if manual deposit was selected.",
+    },
+    [ProcessingStages.AwaitingDeposit]: {
+      on: {
+        start_processing: {
+          target: "Processing",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
+        },
+      },
     },
     [ProcessingStages.Processing]: {
       on: {
@@ -56,6 +76,9 @@ export const machine = createMachine({
         },
         error: {
           target: "ErrorScreen",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
         },
       },
       description:
@@ -69,6 +92,9 @@ export const machine = createMachine({
         sign_error: {
           target: "SignErrorScreen",
         },
+        back_to_asset_selection: {
+          target: "AssetSelection",
+        },
       },
       description:
         "Data from the server is presented that requires signing with the user's EVM wallet. The machine waits until the user performs the signing.",
@@ -76,6 +102,9 @@ export const machine = createMachine({
     [ProcessingStages.ErrorScreen]: {
       on: {
         retry: {
+          target: "AssetSelection",
+        },
+        back_to_asset_selection: {
           target: "AssetSelection",
         },
       },
@@ -93,6 +122,9 @@ export const machine = createMachine({
         manual_deposit_error: {
           target: "ManualDepositErrorScreen",
         },
+        back_to_asset_selection: {
+          target: "AssetSelection",
+        },
       },
       description:
         "The deposit is executed. Upon completion, the success screen is displayed.",
@@ -101,6 +133,9 @@ export const machine = createMachine({
       on: {
         retry_sign: {
           target: "UserPermit",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
         },
       },
       description:
@@ -114,6 +149,9 @@ export const machine = createMachine({
     [ProcessingStages.SwapErrorScreen]: {
       on: {
         retry_swap: {
+          target: "AssetSelection",
+        },
+        back_to_asset_selection: {
           target: "AssetSelection",
         },
       },

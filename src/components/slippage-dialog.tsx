@@ -66,7 +66,7 @@ export default function SlippageDialog() {
             <div className="mt-4 justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
               Set slippage tolerance value
             </div>
-            <div className="mt-2 flex flex-row gap-2 border-element hover:border-main_light focus-within:border-main_light border-2 rounded-xl p-2 w-full">
+            <div className="mt-2 flex flex-row gap-2 h-10 border-element hover:border-main_light focus-within:border-main_light border-2 rounded-xl p-2 w-full">
               <input
                 type="number"
                 {...register("slippageValue", {
@@ -110,7 +110,7 @@ export default function SlippageDialog() {
               refunded to this address.
             </div>
             <div className="mt-2 flex flex-row gap-2 border-element hover:border-main_light focus-within:border-main_light border-2 rounded-xl w-full">
-              <div className="bg-[#1B2429] rounded-xl grow-1 p-2 flex flex-row justify-between items-center gap-7 md:w-[480px] h-12 sm:w-full">
+              <div className="bg-[#1B2429] rounded-xl grow-1 p-2 flex flex-row justify-between items-center gap-7 md:w-[480px] h-10 sm:w-full">
                 <div className="flex flex-row grow-1 items-center">
                   <input
                     type="text"

@@ -9,21 +9,22 @@ import { useParams } from "react-router-dom";
 import { sliceHex } from "viem";
 import { signTypedData, switchChain } from "@wagmi/core";
 import { ProcessingStages } from "@/lib/states";
+import { BridgeFormMachineContext } from "@/providers/machine-provider";
 
-const translateStatus = (status: string) => {
+export const translateStatus = (status: string) => {
   switch (status) {
     case "pending_deposit":
-      return ProcessingStages.Processing;
+      return ProcessingStages.AwaitingDeposit;
     case "deposit_received":
       return ProcessingStages.Processing;
     case "processing":
       return ProcessingStages.Processing;
+    case "ready_for_permit":
+      return ProcessingStages.UserPermit;
     case "executing_deposit":
       return ProcessingStages.ExecutingDeposit;
     case "completed":
       return ProcessingStages.SuccessScreen;
-    case "ready_for_permit":
-      return ProcessingStages.UserPermit;
     case "incomplete_deposit":
       return ProcessingStages.ManualDepositErrorScreen;
     case "failed":
@@ -35,13 +36,33 @@ const translateStatus = (status: string) => {
   }
 };
 
+const redirectToStage = (stage: ProcessingStages) => {
+  switch (stage) {
+    case ProcessingStages.AwaitingDeposit:
+      return "awaiting_deposit";
+    case ProcessingStages.Processing:
+      return "start_processing";
+    case ProcessingStages.UserPermit:
+      return "success";
+    case ProcessingStages.ExecutingDeposit:
+      return "signed";
+    case ProcessingStages.SuccessScreen:
+      return "success";
+    case ProcessingStages.ErrorScreen:
+      return "swap_error";
+    case ProcessingStages.ManualDepositErrorScreen:
+      return "manual_deposit_error";
+    default:
+      return;
+  }
+};
+
 export default function useProcessing(depositAddressParam?: string | null) {
+  const actorRef = BridgeFormMachineContext.useActorRef();
   const tokens = useTokens();
   const { id: depositAddressFromParams } = useParams();
   const depositAddress = depositAddressParam || depositAddressFromParams;
-  const [stage, setStage] = useState<ProcessingStages>(
-    ProcessingStages.Processing
-  );
+
   const [initialData, setInitialData] = useState<{
     selectedToken: TokenResponse;
     amountIn: bigint;
@@ -50,6 +71,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
   } | null>(null);
 
   const [isPermitAsked, setIsPermitAsked] = useState(false);
+  const view = BridgeFormMachineContext.useSelector((s) => s.value);
 
   const signPermit = async (depositAddress: string) => {
     const permitData = await getPermitData(depositAddress);
@@ -76,7 +98,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
         deadline: BigInt(message.deadline),
       },
     });
-    setStage(ProcessingStages.ExecutingDeposit);
+    actorRef.send({ type: "executing_deposit" });
     if (signature) {
       const r = sliceHex(signature, 0, 32);
       const s = sliceHex(signature, 32, 64);
@@ -98,7 +120,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
           await getDepositStatus(depositAddress);
         }
       } catch (e) {
-        setStage(ProcessingStages.ErrorScreen);
+        actorRef.send({ type: "error" });
       }
     };
     const getDepositStatus = async (depositAddress: string, retries = 40) => {
@@ -130,7 +152,14 @@ export default function useProcessing(depositAddressParam?: string | null) {
             }
           }
 
-          setStage(translateStatus(statusResponse.data.status));
+          const stage = translateStatus(statusResponse.data.status);
+          if (stage !== view) {
+            const newView = redirectToStage(stage);
+            if (newView) {
+              actorRef.send({ type: newView });
+            }
+          }
+
           if (statusResponse.data.status === "completed") {
             return;
           }
@@ -147,7 +176,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
   useEffect(() => {
     const processPermit = async () => {
       if (depositAddress) {
-        if (stage === ProcessingStages.UserPermit) {
+        if (view === ProcessingStages.UserPermit) {
           if (!isPermitAsked) {
             setIsPermitAsked(true);
             await signPermit(depositAddress);
@@ -156,9 +185,10 @@ export default function useProcessing(depositAddressParam?: string | null) {
       }
     };
     processPermit();
-  }, [stage, depositAddress]);
+  }, [view, depositAddress]);
+
   return {
-    stage,
+    view,
     initialData,
     signPermit,
   };

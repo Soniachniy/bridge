@@ -448,6 +448,7 @@ const useNetwork = (
               lastOutcome.status,
               "SuccessValue"
             );
+            console.log(successStatus, lastOutcome, trx, "successStatus");
             if (successStatus) {
               return true;
             } else return false;

@@ -25,6 +25,7 @@ createRoot(document.getElementById("root")!).render(
           <Layout>
             <Routes>
               <Route path="/" element={<Form />} />
+              <Route path="/:id" element={<Form />} />
             </Routes>
           </Layout>
         </BrowserRouter>
