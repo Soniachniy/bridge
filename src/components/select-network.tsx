@@ -24,7 +24,7 @@ import { Network } from "@/config";
 
 import { useTokens } from "@/providers/token-context";
 
-import { truncateAddress } from "@/lib/utils";
+import { isSupportedNetwork, truncateAddress } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 import { FormInterface } from "@/lib/validation";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
@@ -50,16 +50,32 @@ const SelectNetworkDialog: FC<{
       blockchain: TokenResponse.blockchain;
       icon: string;
       title: string;
-    }[] = uniqueBlockchains.map((blockchain) => {
+    }[] = uniqueBlockchains
+      .map((blockchain) => {
+        return {
+          blockchain,
+          icon: CHAIN_ICON[blockchain],
+          title: CHAIN_TITLE[blockchain],
+        };
+      })
+      .filter((item) => isSupportedNetwork(translateNetwork(item.blockchain)));
+
+    return { blockchains };
+  }, [allTokens]);
+
+  console.log(
+    blockchains,
+    [
+      ...new Set(Object.values(allTokens).map(({ blockchain }) => blockchain)),
+    ].map((blockchain) => {
       return {
         blockchain,
         icon: CHAIN_ICON[blockchain],
         title: CHAIN_TITLE[blockchain],
       };
-    });
-    return { blockchains };
-  }, [allTokens]);
-
+    }),
+    "blockchains"
+  );
   const walletAddress = useMemo(() => {
     return (
       selectedToken?.blockchain &&

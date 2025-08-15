@@ -14,9 +14,13 @@ import XrpIcon from "@/assets/networks/xrp.png";
 import GnosisIcon from "@/assets/networks/gnosis.png";
 import PolygonIcon from "@/assets/networks/polygon.png";
 import TronIcon from "@/assets/networks/tron.png";
-import ZecIcon from "@/assets/networks/zec.png";
+import OpIcon from "@/assets/networks/op.png";
+import CardanoIcon from "@/assets/networks/cardano.png";
+import SuiIcon from "@/assets/networks/sui.png";
+import AvaxIcon from "@/assets/networks/avax.png";
 
 import { Network } from "@/config";
+
 import {
   GetExecutionStatusResponse,
   TokenResponse,
@@ -66,12 +70,15 @@ export const NetworkIconMap = {
     <img src={PolygonIcon} alt="Polygon" className="w-6 h-6" />
   ),
   [Network.TRON]: <img src={TronIcon} alt="Tron" className="w-6 h-6" />,
-  [Network.ZEC]: <img src={ZecIcon} alt="ZEC" className="w-6 h-6" />,
+  [Network.ZEC]: <img src={TronIcon} alt="ZEC" className="w-6 h-6" />,
+  [Network.SUI]: <img src={SuiIcon} alt="SUI" className="w-6 h-6" />,
+  [Network.CARDANO]: <img src={CardanoIcon} alt="SUI" className="w-6 h-6" />,
+  [Network.OP]: <img src={OpIcon} alt="OP" className="w-6 h-6" />,
+  [Network.AVAX]: <img src={AvaxIcon} alt="AVAX" className="w-6 h-6" />,
 };
 
-export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
+export const CHAIN_TITLE: Record<TokenResponse.blockchain | string, string> = {
   [TokenResponse.blockchain.NEAR]: "Near",
-
   [TokenResponse.blockchain.ETH]: "Ethereum Mainnet",
   [TokenResponse.blockchain.BASE]: "Base",
   [TokenResponse.blockchain.ARB]: "Arbitrum One",
@@ -79,19 +86,17 @@ export const CHAIN_TITLE: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.BERA]: "Berachain",
   [TokenResponse.blockchain.BSC]: "BNB Smart Chain Mainnet",
   [TokenResponse.blockchain.POL]: "Polygon Mainnet",
-
   [TokenResponse.blockchain.SOL]: "Solana",
-
   [TokenResponse.blockchain.BTC]: "Bitcoin",
   [TokenResponse.blockchain.TON]: "Ton",
   [TokenResponse.blockchain.DOGE]: "Dogecoin",
   [TokenResponse.blockchain.XRP]: "XRP",
   [TokenResponse.blockchain.ZEC]: "Zcash",
-
   [TokenResponse.blockchain.TRON]: "Tron",
   [TokenResponse.blockchain.SUI]: "SUI",
   [TokenResponse.blockchain.OP]: "Optimism",
   [TokenResponse.blockchain.AVAX]: "Avalanche",
+  cardano: "Cardano",
 };
 
 export const getTokenIcon = (asset: TokenResponse) => {
@@ -101,7 +106,7 @@ export const getTokenIcon = (asset: TokenResponse) => {
   );
 };
 
-export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
+export const CHAIN_ICON: Record<TokenResponse.blockchain | string, string> = {
   [TokenResponse.blockchain.NEAR]: "/networks/near.svg",
   [TokenResponse.blockchain.ETH]: "/networks/evm.svg",
   [TokenResponse.blockchain.BASE]: "/networks/base.svg",
@@ -117,9 +122,10 @@ export const CHAIN_ICON: Record<TokenResponse.blockchain, string> = {
   [TokenResponse.blockchain.XRP]: "/networks/xrp.png",
   [TokenResponse.blockchain.ZEC]: "/networks/zec.png",
   [TokenResponse.blockchain.TRON]: "/networks/tron.png",
-  [TokenResponse.blockchain.SUI]: "/networks/tron.png",
-  [TokenResponse.blockchain.AVAX]: "/networks/tron.png",
-  [TokenResponse.blockchain.OP]: "/networks/tron.png",
+  [TokenResponse.blockchain.AVAX]: "/networks/avax.png",
+  [TokenResponse.blockchain.OP]: "/networks/op.png",
+  [TokenResponse.blockchain.SUI]: "/networks/sui.png",
+  сardano: "https://s2.coinmarketcap.com/static/img/coins/128x128/2010.png",
 };
 
 export const TOKEN_BY_SYMBOL: Record<string, string> = {
@@ -127,6 +133,8 @@ export const TOKEN_BY_SYMBOL: Record<string, string> = {
   USDT: "https://s2.coinmarketcap.com/static/img/coins/128x128/825.png",
   BTC: "https://s2.coinmarketcap.com/static/img/coins/128x128/1.png",
   ETH: "https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png",
+  SUI: "https://s2.coinmarketcap.com/static/img/coins/128x128/20947.png",
+  Cardano: "https://s2.coinmarketcap.com/static/img/coins/128x128/2010.png",
 };
 
 export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
@@ -356,6 +364,14 @@ export function translateNetwork(network?: string): Network {
       return Network.TRON;
     case "ton":
       return Network.TON;
+    case "sui":
+      return Network.SUI;
+    case "cardano":
+      return Network.CARDANO;
+    case "op":
+      return Network.OP;
+    case "avax":
+      return Network.AVAX;
   }
   return Network.ARBITRUM;
 }
@@ -377,6 +393,10 @@ export const NATIVE_TOKENS_BY_DEFUSE_ID: Record<Network, string | undefined> = {
   [Network.ZEC]: "nep141:zec.omft.near",
   [Network.TRON]: "nep141:tron.omft.near",
   [Network.AURORA]: "nep141:aurora",
+  [Network.SUI]: "nep141:sui.omft.near",
+  [Network.CARDANO]: "nep141:cardano.omft.near",
+  [Network.OP]: "nep141:op.omft.near",
+  [Network.AVAX]: "nep141:avax.omft.near",
 };
 
 export const isNativeToken = (blockchain: Network, assetId: string) => {

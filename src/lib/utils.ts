@@ -86,7 +86,7 @@ export const parseTokenAmount = (value: ValueType, decimals: number) => {
 };
 
 export const isSupportedNetwork = (network: Network) => {
-  return supportedNetworks[network];
+  return supportedNetworks[network] ?? false;
 };
 
 export const isEVMNetwork = (network: Network) => {

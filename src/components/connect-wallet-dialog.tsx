@@ -15,6 +15,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletSelector } from "@/providers/near-provider";
 import { useTonWallet } from "@tonconnect/ui-react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
+import { cn } from "@/lib/utils";
 
 export interface AddressRow {
   address: string | null;
@@ -82,15 +83,18 @@ const ConnectWalletDialog: FC = () => {
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row  bg-main_light text-background px-4 py-2 rounded-md font-dmSans  items-center border-none gap-2 "
+          className={cn(
+            activeAddress ? "text-main_light" : "text-main_white",
+            "flex flex-row bg-main_dark  px-4 py-2 rounded-md font-dmSans items-center border-none gap-2"
+          )}
         >
           {activeAddress ? (
             <>
-              <WalletIcon fill="black" />
+              <WalletIcon fill="#97fce4" />
               Connected
             </>
           ) : (
-            "Connect Wallet"
+            "Connect"
           )}
         </Button>
       </PopoverTrigger>

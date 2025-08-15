@@ -95,7 +95,7 @@ const SelectTokenDialog: FC<Props> = ({
         <Button
           type="button"
           variant="outline"
-          className="flex flex-row gap-1 hover:bg-transparent bg-transparent h-auto items-center border-none !px-0 "
+          className="flex flex-row gap-1 hover:bg-transparent focus:bg-transparent active:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-offset-transparent outline-none bg-transparent h-auto items-center border-none !px-0 "
         >
           {selectedToken ? (
             <div className="relative h-[55px] flex items-center">
@@ -142,7 +142,7 @@ const SelectTokenDialog: FC<Props> = ({
         minHeight={{ initial: "500px" }}
         className="mt-1 flex justify-center items-center max-w-xs border-none outline-none bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0"
       >
-        <div className="flex flex-col border-none outline-none grow bg-main_dark  p-6  gap-5">
+        <div className="flex min-h-[500px] flex-col border-none outline-none grow bg-main_dark  p-6  gap-5">
           <Dialog.Title className="text-white">
             Select Token & Network
           </Dialog.Title>

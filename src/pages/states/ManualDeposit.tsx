@@ -199,7 +199,7 @@ export const DepositView = () => {
       <ActionButton
         variant="primary"
         onClick={() => {
-          actorRef.send({ type: "start_processing" });
+          actorRef.send({ type: "awaiting_deposit" });
         }}
         className="w-full"
       >

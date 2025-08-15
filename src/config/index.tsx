@@ -17,6 +17,8 @@ import {
   polygon,
   bsc,
   berachain,
+  optimism,
+  avalanche,
   tron,
   gnosis,
 } from "@reown/appkit/networks";
@@ -39,6 +41,10 @@ export enum Network {
   TRON = "tron",
   XRP = "xrp",
   ZEC = "zec",
+  SUI = "sui",
+  CARDANO = "cardano",
+  OP = "op",
+  AVAX = "avax",
 }
 
 export const supportedNetworks = {
@@ -58,6 +64,10 @@ export const supportedNetworks = {
   [Network.TRON]: false,
   [Network.XRP]: false,
   [Network.ZEC]: false,
+  [Network.SUI]: false,
+  [Network.CARDANO]: false,
+  [Network.OP]: true,
+  [Network.AVAX]: true,
 };
 
 export const networkChainId = {
@@ -77,6 +87,10 @@ export const networkChainId = {
   [Network.BITCOIN]: null,
   [Network.XRP]: null,
   [Network.ZEC]: null,
+  [Network.SUI]: null,
+  [Network.CARDANO]: null,
+  [Network.OP]: optimism.id,
+  [Network.AVAX]: avalanche.id,
 };
 
 export const getNetworkChainId = (network: TokenResponse.blockchain) => {
@@ -108,6 +122,8 @@ export const basicConfig = {
       berachain,
       tron,
       gnosis,
+      optimism,
+      avalanche,
     ] as [AppKitNetwork, ...AppKitNetwork[]],
   },
   tonConfig: {
@@ -158,6 +174,12 @@ export const translateTokenToNetwork = (
       return Network.TON;
     case TokenResponse.blockchain.POL:
       return Network.POLYGON;
+    case TokenResponse.blockchain.SUI:
+      return Network.SUI;
+    case TokenResponse.blockchain.OP:
+      return Network.OP;
+    case TokenResponse.blockchain.AVAX:
+      return Network.AVAX;
     default:
       return Network.ARBITRUM;
   }

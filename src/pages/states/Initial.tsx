@@ -178,7 +178,7 @@ export const InitialView = () => {
           {!hyperliquidAddress ? (
             <div
               onClick={() => connectWallet(Network.ARBITRUM)}
-              className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline "
+              className="flex cursor-pointer flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline "
             >
               Connect Hyperliquid Wallet
             </div>
@@ -329,11 +329,7 @@ export const ConnectButton = ({
   if (!evmAddress) {
     return (
       <div className="flex flex-col">
-        <ActionButton
-          variant="primary"
-          onClick={() => connectWallet(Network.ARBITRUM)}
-          className="w-full"
-        >
+        <ActionButton variant="primary" disabled className="w-full">
           Continue
         </ActionButton>
         <div className=" mt-2 text-center justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
