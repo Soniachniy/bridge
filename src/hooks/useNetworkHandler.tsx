@@ -187,7 +187,8 @@ const useNetwork = (
 
     getBalance: async (
       assetId: string,
-      contractAddress?: string
+      contractAddress?: string,
+      blockchain?: TokenResponse.blockchain
     ): Promise<{
       balance: bigint;
       nearBalance: bigint;
@@ -200,11 +201,19 @@ const useNetwork = (
         case Network.POLYGON:
         case Network.ETHEREUM:
           let balanceEVM = 0n;
+          const chainId = getNetworkChainId(
+            blockchain ?? (network as unknown as TokenResponse.blockchain)
+          );
+          if (!chainId) {
+            return { balance: 0n, nearBalance: 0n };
+          }
           if (isNativeToken(network, assetId)) {
             const { value: nativeBalanceEVM } = await getBalance(
               wagmiAdapter.wagmiConfig,
+
               {
                 address: address as `0x${string}`,
+                chainId: chainId,
               }
             );
             balanceEVM = nativeBalanceEVM;
@@ -214,6 +223,7 @@ const useNetwork = (
               {
                 address: address as `0x${string}`,
                 token: contractAddress as `0x${string}`,
+                chainId: chainId,
               }
             );
             balanceEVM = tokenBalanceEVM;
