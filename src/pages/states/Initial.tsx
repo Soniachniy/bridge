@@ -141,7 +141,7 @@ export const InitialView = () => {
             pattern="^[0-9]*[.,]?[0-9]*$"
             className={`${
               errors.amount ? "text-error" : "text-white"
-            } grow-1 border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
+            } grow-1 w-full border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
             value={amountIn ?? ""}
             placeholder="0"
             inputMode="decimal"
