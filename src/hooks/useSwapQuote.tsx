@@ -73,8 +73,9 @@ const useSwapQuote = ({
             clearError(["amountOut"]);
           }
 
-          if (response.data.depositAddress)
+          if (response.data.depositAddress) {
             setFormValue("depositAddress", response.data.depositAddress);
+          }
           if (Boolean(hyperliquidAddress)) {
             clearError(["hyperliquidAddress", "refundAddress"]);
           }

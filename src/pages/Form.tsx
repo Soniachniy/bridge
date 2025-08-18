@@ -74,8 +74,10 @@ export default function Form() {
     if (depositAddressFromParams) {
       const getData = async () => {
         const statusResponse = await getStatus(depositAddressFromParams);
-        console.log(statusResponse, "statusResponse");
-        if (!statusResponse.success) {
+        if (
+          !statusResponse.success ||
+          statusResponse.data.status === "completed"
+        ) {
           navigate("/");
         }
         if (

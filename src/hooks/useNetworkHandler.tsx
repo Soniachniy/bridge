@@ -72,14 +72,7 @@ const useNetwork = (
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
   const { connection } = useConnection();
-  console.log(
-    connection,
-    solanaConnection,
-    solanaWallet,
-    solanaWallet?.adapter.name,
-    wallets,
-    "connection"
-  );
+
   /* EVM */
   const { open } = useAppKit();
   const { isConnected, address } = useAccount({
@@ -115,8 +108,10 @@ const useNetwork = (
   const { accountId } = useWalletSelector();
 
   return {
-    isConnected: () => {
-      switch (network) {
+    isConnected: (localNetwork?: Network) => {
+      const currentNetwork = localNetwork ?? network;
+
+      switch (currentNetwork) {
         case Network.BASE:
         case Network.AURORA:
         case Network.BNB:
@@ -394,17 +389,7 @@ const useNetwork = (
             "confirmed"
           );
           transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
-          if (solanaWallet?.adapter.name === "HOT") {
-            const tx = await HOT.request("solana:signAndSendTransaction", {
-              transaction: Buffer.from(transactionSolana.serialize()).toString(
-                "base64"
-              ),
-              sendOptions: { maxRetries: 3 },
-            });
-
-            const signature = tx.signature;
-            return signature;
-          }
+          transactionSolana.feePayer = publicKey;
           const txHash = await sendTransactionSolana(
             transactionSolana,
             solanaConnection
@@ -478,12 +463,6 @@ const useNetwork = (
               })),
             })
           );
-          // console.log(nearTransactions, wallet.id, "nearTransactions");
-
-          //   const tx = await HOT.request("near:signAndSendTransactions", {
-          //     transactions: nearTransactions,
-          //   });
-          //   return tx.transactions[0].hash;
 
           const trx = await wallet.signAndSendTransactions({
             transactions: nearTransactions,
@@ -495,7 +474,6 @@ const useNetwork = (
               lastOutcome.status,
               "SuccessValue"
             );
-            console.log(successStatus, lastOutcome, trx, "successStatus");
             if (successStatus) {
               return true;
             } else return false;

@@ -29,19 +29,20 @@ import { useFormContext } from "react-hook-form";
 import { FormInterface } from "@/lib/validation";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import LogoutIcon from "@/assets/logout-icon.svg?react";
+import { EStrategy } from "@/pages/Form";
 
 const SelectNetworkDialog: FC<{
   connectWallet: (network: Network) => void;
   disconnectWallet: (network: Network) => void;
   getPublicKey: (network: Network) => string | null | undefined;
 }> = ({ connectWallet, getPublicKey, disconnectWallet }) => {
-  const { watch } = useFormContext<FormInterface>();
+  const { watch, setValue } = useFormContext<FormInterface>();
   const selectedToken = watch("selectedToken");
   const [open, setOpen] = useState(false);
 
   const allTokens = useTokens();
 
-  const { blockchains } = useMemo(() => {
+  const { blockchains, mainTokens } = useMemo(() => {
     const uniqueBlockchains = [
       ...new Set(Object.values(allTokens).map(({ blockchain }) => blockchain)),
     ];
@@ -60,22 +61,15 @@ const SelectNetworkDialog: FC<{
       })
       .filter((item) => isSupportedNetwork(translateNetwork(item.blockchain)));
 
-    return { blockchains };
+    const mainTokens = Object.values(allTokens).reduce((acc, token) => {
+      if (!acc[token.blockchain]) {
+        acc[token.blockchain] = token;
+      }
+      return acc;
+    }, {} as Record<TokenResponse["blockchain"], TokenResponse>);
+    return { blockchains, mainTokens };
   }, [allTokens]);
 
-  console.log(
-    blockchains,
-    [
-      ...new Set(Object.values(allTokens).map(({ blockchain }) => blockchain)),
-    ].map((blockchain) => {
-      return {
-        blockchain,
-        icon: CHAIN_ICON[blockchain],
-        title: CHAIN_TITLE[blockchain],
-      };
-    }),
-    "blockchains"
-  );
   const walletAddress = useMemo(() => {
     return (
       selectedToken?.blockchain &&
@@ -91,6 +85,13 @@ const SelectNetworkDialog: FC<{
           return setOpen(open);
         }
         connectWallet(translateNetwork(selectedToken?.blockchain));
+        setValue("selectedToken", {
+          ...mainTokens[selectedToken?.blockchain],
+          balance: 0n,
+          balanceNear: 0n,
+          balanceUpdatedAt: 0,
+        });
+        setValue("strategy", EStrategy.Wallet);
       }}
     >
       <DialogTrigger>
@@ -128,6 +129,12 @@ const SelectNetworkDialog: FC<{
               onValueChange={(val) => {
                 connectWallet(translateNetwork(val));
                 setOpen(false);
+                setValue("selectedToken", {
+                  ...mainTokens[val as TokenResponse["blockchain"]],
+                  balance: 0n,
+                  balanceNear: 0n,
+                  balanceUpdatedAt: 0,
+                });
               }}
               disabled={blockchains.length === 1}
             >

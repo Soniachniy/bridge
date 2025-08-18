@@ -3,7 +3,7 @@ import SelectTokenDialog from "@/components/select-token-dialog";
 import { enforcer, truncateAddress } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/form-error-icon.svg?react";
@@ -38,7 +38,6 @@ import { Loader } from "lucide-react";
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
-  const [showRefundAddress, setShowRefundAddress] = useState(false);
   const {
     register,
     setValue,
@@ -55,6 +54,7 @@ export const InitialView = () => {
   const slippageValue = watch("slippageValue");
   const hyperliquidAddress = watch("hyperliquidAddress");
   const refundAddress = watch("refundAddress");
+  const strategy = watch("strategy");
 
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 100 : 0, [
     amountIn,
@@ -72,15 +72,13 @@ export const InitialView = () => {
     slippageValue,
   });
 
-  const { connectWallet, getPublicKey, disconnectWallet, getBalance } =
-    useNetwork(translateNetwork(selectedToken?.blockchain), setValue);
-
-  useEffect(() => {
-    if (hyperliquidAddress && !refundAddress && selectedToken && amountIn) {
-      setShowRefundAddress(true);
-      setValue("strategy", EStrategy.Manual);
-    }
-  }, [selectedToken, amountIn, hyperliquidAddress, refundAddress]);
+  const {
+    connectWallet,
+    isConnected,
+    getPublicKey,
+    disconnectWallet,
+    getBalance,
+  } = useNetwork(translateNetwork(selectedToken?.blockchain), setValue);
 
   useEffect(() => {
     const getSelectedTokenBalance = async () => {
@@ -113,6 +111,13 @@ export const InitialView = () => {
     getSelectedTokenBalance();
   }, [selectedToken?.assetId]);
 
+  const connectWalletHandler = useCallback(
+    (network: Network) => {
+      if (!isConnected(network)) connectWallet(network);
+    },
+    [connectWallet, isConnected]
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <SlippageDialog />
@@ -123,7 +128,7 @@ export const InitialView = () => {
             From
           </div>
           <SelectNetworkDialog
-            connectWallet={connectWallet}
+            connectWallet={connectWalletHandler}
             disconnectWallet={disconnectWallet}
             getPublicKey={getPublicKey}
           />
@@ -232,7 +237,7 @@ export const InitialView = () => {
             <span>{errors.amountOut.message?.toString()}</span>
           </div>
         )}
-        {showRefundAddress && (
+        {!isConnected(selectedToken?.blockchain) && (
           <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
             <div className="flex flex-row justify-between w-full gap-2 items-center">
               <label className="text-gray_text font-normal text-xs font-inter">

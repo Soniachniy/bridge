@@ -185,29 +185,31 @@ export const Status = ({ localStage }: { localStage: ProcessingStages }) => {
     }
     return acc;
   }, {} as Record<number, { stepNumber: number; title: string; description: string; indicatorState?: IndicatorState }>);
-  console.log(successStage, "successStage");
+
   return (
     <div>
       <div className="mb-4 flex flex-row text-center justify-center items-center text-main_white text-2xl font-normal font-['Inter'] leading-normal">
         {Object.values(successStage).map(
           ({ stepNumber, indicatorState }, index) => {
             const isLast = index === Object.values(successStage).length - 1;
-            const secondaryIndicatorState =
-              currentStage.stepNumber < stepNumber
-                ? IndicatorState.Empty
-                : IndicatorState.Filled;
+            const isCurrent = currentStage.stepNumber === stepNumber;
+            const isPassed = currentStage.stepNumber > stepNumber;
+            const isEmpty = currentStage.stepNumber < stepNumber;
 
+            const currentState = isEmpty
+              ? IndicatorState.Empty
+              : isPassed
+              ? IndicatorState.Filled
+              : isCurrent
+              ? indicatorState ?? IndicatorState.Filled
+              : IndicatorState.Empty;
             return (
               <div
                 key={stepNumber}
                 className="flex flex-row justify-center items-center"
               >
                 <StatusIndicator
-                  indicatorState={
-                    secondaryIndicatorState === IndicatorState.Empty
-                      ? IndicatorState.Empty
-                      : indicatorState ?? secondaryIndicatorState
-                  }
+                  indicatorState={currentState}
                   stepNumber={stepNumber}
                 />
                 {!isLast && (
