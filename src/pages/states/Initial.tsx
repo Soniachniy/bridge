@@ -59,7 +59,7 @@ export const InitialView = () => {
     amountIn,
   ]);
 
-  const { isLoading } = useSwapQuote({
+  const { isFetching } = useSwapQuote({
     tokenIn: selectedToken,
     amountIn: debouncedAmountIn ?? "",
     setFormValue: (key: keyof FormInterface, value: string) =>
@@ -69,6 +69,7 @@ export const InitialView = () => {
     setError: (key: keyof FormInterface, value: {}) => setError(key, value),
     clearError: (key: (keyof FormInterface)[]) => clearErrors(key),
     slippageValue,
+    trigger,
   });
 
   const {
@@ -205,7 +206,7 @@ export const InitialView = () => {
             }`}
           >
             {amountOut ?? "0"}
-            {isLoading && (
+            {isFetching && (
               <span className="text-gray_text flex flex-row gap-1 items-center text-xs font-normal font-['Inter'] absolute bottom-[-16px]">
                 Loading <Loader className="size-4 animate-spin" />
               </span>
@@ -305,7 +306,7 @@ export const InitialView = () => {
           </div>
         )}
       </div>
-      <ConnectButton isLoading={isLoading} evmAddress={hyperliquidAddress} />
+      <ConnectButton isLoading={isFetching} evmAddress={hyperliquidAddress} />
     </div>
   );
 };
@@ -318,8 +319,10 @@ export const ConnectButton = ({
   evmAddress?: string;
 }) => {
   const actorRef = BridgeFormMachineContext.useActorRef();
-  const { watch, trigger } = useFormContext();
-
+  const {
+    watch,
+    formState: { isValid },
+  } = useFormContext();
   const refundAddress = watch("refundAddress");
   const selectedToken = watch("selectedToken");
   const amountIn = watch("amount");
@@ -367,12 +370,9 @@ export const ConnectButton = ({
       <ActionButton
         variant="primary"
         onClick={async () => {
-          const isValid = await trigger([
-            "amount",
-            "amountOut",
-            "selectedToken",
-            "depositAddress",
-          ]);
+          if (!isValid) {
+            return;
+          }
           const screen =
             strategy === EStrategy.Manual
               ? "manual_deposit"
@@ -382,7 +382,7 @@ export const ConnectButton = ({
           }
         }}
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading || !isValid}
       >
         Continue
       </ActionButton>

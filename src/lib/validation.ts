@@ -85,67 +85,67 @@ export const formValidationSchema = z
     amountOut: z.string(),
     depositAddress: z.string().optional(),
   })
-  .check((ctx) => {
-    if (ctx.value.strategy === "wallet" && ctx.value.selectedToken) {
-      const decimals = ctx.value.selectedToken.decimals ?? 1;
+  .superRefine((data, ctx) => {
+    // Balance validation
+    if (data.strategy === "wallet" && data.selectedToken) {
+      const decimals = data.selectedToken.decimals ?? 1;
       const balanceNumber =
-        Number(ctx.value.selectedToken.balance) / Math.pow(10, decimals);
-      const amountNumber = Number(ctx.value.amount);
+        Number(data.selectedToken.balance) / Math.pow(10, decimals);
+      const amountNumber = Number(data.amount);
 
       if (amountNumber > balanceNumber) {
-        ctx.issues.push({
-          code: "custom",
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
           message: "Amount cannot exceed your balance",
-          input: ctx.value.amount,
           path: ["amount"],
-          continue: true,
         });
       }
     }
-    if (ctx.value.selectedToken?.blockchain === "near") {
-      const nearAddressParse = nearAddressSchema.safeParse(
-        ctx.value.refundAddress
-      );
-      if (!nearAddressParse.success) {
-        ctx.issues.push({
-          code: "custom",
-          message: "Address is not a valid .near address",
-          input: ctx.value.refundAddress,
-        });
-      }
-    } else if (ctx.value.selectedToken?.blockchain === "sol") {
-      const solanaAddressParse = solanaAddressSchema.safeParse(
-        ctx.value.refundAddress
-      );
-      if (!solanaAddressParse.success) {
-        ctx.issues.push({
-          code: "custom",
-          message: "Address is not a valid Solana address",
-          input: ctx.value.refundAddress,
-        });
-      }
-    } else if (ctx.value.selectedToken?.blockchain === "ton") {
-      const tonAddressParse = tonAddressSchema.safeParse(
-        ctx.value.refundAddress
-      );
-      if (!tonAddressParse.success) {
-        ctx.issues.push({
-          code: "custom",
-          message: "Address is not a valid TON address",
-          input: ctx.value.refundAddress,
-        });
-      }
-    } else {
-      const evmAddressParse = evmAddressValidation.safeParse(
-        ctx.value.refundAddress
-      );
-      if (!evmAddressParse.success) {
-        ctx.issues.push({
-          code: "custom",
-          message: "Address is not a valid EVM address",
-          input: ctx.value.refundAddress,
-          path: ["refundAddress"],
-        });
+
+    // Address validation based on blockchain
+    if (data.refundAddress && data.selectedToken?.blockchain) {
+      if (data.selectedToken.blockchain === "near") {
+        const nearAddressParse = nearAddressSchema.safeParse(
+          data.refundAddress
+        );
+        if (!nearAddressParse.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Address is not a valid .near address",
+            path: ["refundAddress"],
+          });
+        }
+      } else if (data.selectedToken.blockchain === "sol") {
+        const solanaAddressParse = solanaAddressSchema.safeParse(
+          data.refundAddress
+        );
+        if (!solanaAddressParse.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Address is not a valid Solana address",
+            path: ["refundAddress"],
+          });
+        }
+      } else if (data.selectedToken.blockchain === "ton") {
+        const tonAddressParse = tonAddressSchema.safeParse(data.refundAddress);
+        if (!tonAddressParse.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Address is not a valid TON address",
+            path: ["refundAddress"],
+          });
+        }
+      } else {
+        const evmAddressParse = evmAddressValidation.safeParse(
+          data.refundAddress
+        );
+        if (!evmAddressParse.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Address is not a valid EVM address",
+            path: ["refundAddress"],
+          });
+        }
       }
     }
   });

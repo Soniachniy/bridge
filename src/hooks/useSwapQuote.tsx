@@ -16,6 +16,7 @@ type Props = {
   setError: (key: keyof FormInterface, value: {}) => void;
   clearError: (key: (keyof FormInterface)[]) => void;
   slippageValue: number;
+  trigger: () => void;
 };
 
 const useSwapQuote = ({
@@ -27,6 +28,7 @@ const useSwapQuote = ({
   setError,
   clearError,
   slippageValue,
+  trigger,
 }: Props) => {
   return useQuery({
     queryKey: [
@@ -77,7 +79,8 @@ const useSwapQuote = ({
             setFormValue("depositAddress", response.data.depositAddress);
           }
           if (Boolean(hyperliquidAddress)) {
-            clearError(["hyperliquidAddress", "refundAddress"]);
+            clearError(["amount", "hyperliquidAddress", "refundAddress"]);
+            trigger();
           }
         }
         return response;
