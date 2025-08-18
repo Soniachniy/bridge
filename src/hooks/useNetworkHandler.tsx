@@ -391,11 +391,31 @@ const useNetwork = (
           );
           transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
           transactionSolana.feePayer = publicKey;
+          // if (solanaWallet?.adapter.name === "HOT") {
+          //   const tx = await HOT.request("solana:signAndSendTransaction", {
+          //     transaction: Buffer.from(transactionSolana.serialize()).toString(
+          //       "base64"
+          //     ),
+          //     sendOptions: { maxRetries: 3 },
+          //   });
+          //   console.log(tx, "tx");
+          //   const signature = tx.signature;
+          //   const txHash = await solanaConnection.confirmTransaction({
+          //     blockhash: latestBlockHash.blockhash,
+          //     lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+          //     signature: signature,
+          //   });
+          //   console.log(txHash, "tx");
+
+          //   return txHash;
+          // } else {
           const txHash = await sendTransactionSolana(
             transactionSolana,
             solanaConnection
           );
+          console.log(txHash, "txHash");
           return txHash;
+        // }
         case Network.NEAR:
           if (!selector || !accountId || !selectedToken.contractAddress) {
             return false;
