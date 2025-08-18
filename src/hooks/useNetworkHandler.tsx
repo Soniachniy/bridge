@@ -368,10 +368,11 @@ const useNetwork = (
             solanaNative,
             selectedToken.contractAddress
           );
-
+          console.log(solanaATACreationRequired, "solanaATACreationRequired");
           if (!publicKey) {
             return false;
           }
+
           const transactionSolana = solanaNative
             ? createTransferSolanaTransaction(
                 publicKey.toBase58(),
@@ -385,7 +386,7 @@ const useNetwork = (
                 selectedToken.contractAddress as `0x${string}`,
                 !solanaATACreationRequired
               );
-
+          console.log(transactionSolana, "transactionSolana");
           const latestBlockHash = await solanaConnection.getLatestBlockhash(
             "confirmed"
           );
