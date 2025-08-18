@@ -83,17 +83,7 @@ const SelectNetworkDialog: FC<{
     <Dialog
       open={open}
       onOpenChange={(open) => {
-        if (!selectedToken) {
-          return setOpen(open);
-        }
-        connectWallet(translateNetwork(selectedToken?.blockchain));
-        setValue("selectedToken", {
-          ...mainTokens[selectedToken?.blockchain],
-          balance: 0n,
-          balanceNear: 0n,
-          balanceUpdatedAt: 0,
-        });
-        setValue("strategy", EStrategy.Wallet);
+        setOpen(open);
       }}
     >
       <DialogTrigger>
@@ -145,8 +135,8 @@ const SelectNetworkDialog: FC<{
                   balanceNear: 0n,
                   balanceUpdatedAt: 0,
                 });
+                setValue("strategy", EStrategy.Wallet);
               }}
-              disabled={blockchains.length === 1}
             >
               <SelectTrigger className="w-full border-1 border-element border-solid hover:border-1  hover:border-element outline-none text-black min-h-[42px] border-1 border-element hover:border-main_light focus:outline-none  focus:ring-offset-0 active:ring-offset-0 focus-within:ring-offset-0 bg-main_dark text-white">
                 <SelectValue
