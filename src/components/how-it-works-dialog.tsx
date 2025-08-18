@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -9,6 +10,7 @@ import {
 import { FC } from "react";
 
 import QuestionMarkIcon from "@/assets/question-icon.svg?react";
+import { XIcon } from "lucide-react";
 
 const HowItWorksDialog: FC = () => {
   return (
@@ -23,11 +25,20 @@ const HowItWorksDialog: FC = () => {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="flex justify-center items-center md:w-[480px] w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 ">
+      <DialogContent
+        showCloseButton={false}
+        className="flex  justify-center items-center md:w-[480px] w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 "
+      >
+        <DialogClose className=" top-6 right-6 absolute" asChild>
+          <button>
+            <XIcon className="w-4 h-4 text-main_dark" stroke="#fff" />
+          </button>
+        </DialogClose>
         <div className="flex md:w-[480px] w-full !ring-0 !shadow-none !border-none flex-col border-none rounded-2xl outline-none grow bg-main_dark p-6 gap-5">
           <DialogTitle className="text-white text-center">
             How it works
           </DialogTitle>
+
           <DialogDescription className="sr-only" />
           <div className="grid w-full text-white items-center border-element focus:outline-none focus:ring-0 focus:border-element active:outline-none active:ring-0 active:border-none outline-none bg-main_dark">
             <div className="self-stretch flex flex-col justify-start items-center gap-6">

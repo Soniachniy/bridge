@@ -1,6 +1,7 @@
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -30,6 +31,7 @@ import { FormInterface } from "@/lib/validation";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import LogoutIcon from "@/assets/logout-icon.svg?react";
 import { EStrategy } from "@/pages/Form";
+import { XIcon } from "lucide-react";
 
 const SelectNetworkDialog: FC<{
   connectWallet: (network: Network) => void;
@@ -115,7 +117,15 @@ const SelectNetworkDialog: FC<{
           )}
         </div>
       </DialogTrigger>
-      <DialogContent className="flex justify-center items-center w-[480px] md:w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 ">
+      <DialogContent
+        showCloseButton={false}
+        className="flex justify-center items-center w-[480px] md:w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 "
+      >
+        <DialogClose className=" top-6 right-6 absolute" asChild>
+          <button>
+            <XIcon className="w-4 h-4 text-main_dark" stroke="#fff" />
+          </button>
+        </DialogClose>
         <div className="flex w-[480px] md:w-full !ring-0 !shadow-none !border-none flex-col border-none rounded-2xl outline-none grow bg-main_dark p-6 gap-5">
           <DialogTitle className="text-white">
             Select Chain before connect wallet
