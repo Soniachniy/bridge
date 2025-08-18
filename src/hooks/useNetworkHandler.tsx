@@ -25,6 +25,7 @@ import {
   checkSolanaATARequired,
   getSplTokenBalance,
   createTransferSolanaTransaction,
+  getSolanaNativeBalance,
 } from "@/providers/solana-provider/solana-utils";
 
 import {
@@ -239,7 +240,15 @@ const useNetwork = (
 
           return { balance: balanceEVM, nearBalance: 0n };
         case Network.SOLANA:
-          if (!publicKey) return { balance: 0n, nearBalance: 0n };
+          if (!publicKey || !contractAddress)
+            return { balance: 0n, nearBalance: 0n };
+          const solanaNative = isNativeToken(Network.SOLANA, contractAddress);
+          if (solanaNative) {
+            const balance = await getSolanaNativeBalance({
+              userAddress: publicKey.toBase58(),
+            });
+            return { balance: balance ?? 0n, nearBalance: 0n };
+          }
           const balance = await getSplTokenBalance(
             publicKey,
             contractAddress as `0x${string}`

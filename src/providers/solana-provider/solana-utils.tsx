@@ -96,6 +96,25 @@ export const checkSolanaATARequired = async (
   return !ataExists;
 };
 
+export const getSolanaNativeBalance = async ({
+  userAddress,
+}: {
+  userAddress: string;
+}): Promise<bigint | null> => {
+  try {
+    const connection = new Connection(
+      basicConfig.solanaConfig.endpoint,
+      "confirmed"
+    );
+
+    const publicKey = new PublicKey(userAddress);
+    const balance = await connection.getBalance(publicKey);
+    return BigInt(balance);
+  } catch (err: unknown) {
+    return null;
+  }
+};
+
 export async function getSplTokenBalance(
   userWalletAddress: PublicKey,
   tokenMintAddress?: string
