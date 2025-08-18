@@ -1,4 +1,5 @@
 import ConnectWalletDialog from "@/components/connect-wallet-dialog";
+import HowItWorksDialog from "@/components/how-it-works-dialog";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className="w-full h-full cursor-pointer"
             />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-row items-center gap-2">
+            <HowItWorksDialog />
             <ConnectWalletDialog />
           </div>
         </div>

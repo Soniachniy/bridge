@@ -237,7 +237,7 @@ export const InitialView = () => {
             <span>{errors.amountOut.message?.toString()}</span>
           </div>
         )}
-        {!isConnected(selectedToken?.blockchain) && (
+        {selectedToken && !isConnected(selectedToken?.blockchain) && (
           <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
             <div className="flex flex-row justify-between w-full gap-2 items-center">
               <label className="text-gray_text font-normal text-xs font-inter">
