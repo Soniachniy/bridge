@@ -54,7 +54,6 @@ export const InitialView = () => {
   const slippageValue = watch("slippageValue");
   const hyperliquidAddress = watch("hyperliquidAddress");
   const refundAddress = watch("refundAddress");
-  const strategy = watch("strategy");
 
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 100 : 0, [
     amountIn,

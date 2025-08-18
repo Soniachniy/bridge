@@ -2,9 +2,8 @@ import { basicConfig, getNetworkChainId, Network } from "@/config";
 
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount, useAccountEffect } from "wagmi";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect } from "react";
-import { HOT } from "@hot-wallet/sdk";
 
 import { useAppKit } from "@reown/appkit/react";
 import { Transaction } from "@near-wallet-selector/core";
@@ -62,16 +61,10 @@ const useNetwork = (
   setValue?: (key: keyof FormInterface, value: any) => void
 ) => {
   /* SOLANA */
-  const {
-    publicKey,
-    disconnect: disconnectSolana,
-    wallet: solanaWallet,
-    wallets,
-  } = useWallet();
+  const { publicKey, disconnect: disconnectSolana } = useWallet();
   const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
-  const { connection } = useConnection();
 
   /* EVM */
   const { open } = useAppKit();
