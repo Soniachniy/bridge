@@ -240,9 +240,8 @@ const useNetwork = (
 
           return { balance: balanceEVM, nearBalance: 0n };
         case Network.SOLANA:
-          if (!publicKey || !contractAddress)
-            return { balance: 0n, nearBalance: 0n };
-          const solanaNative = isNativeToken(Network.SOLANA, contractAddress);
+          if (!publicKey) return { balance: 0n, nearBalance: 0n };
+          const solanaNative = isNativeToken(Network.SOLANA, assetId);
           if (solanaNative) {
             const balance = await getSolanaNativeBalance({
               userAddress: publicKey.toBase58(),
