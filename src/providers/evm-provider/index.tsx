@@ -19,7 +19,7 @@ const metadata = {
   name: "HyperDep",
   description: "HyperDep",
   url: "https://hyperdep.now/",
-  icons: ["https://avatars.githubusercontent.com/u/179229932"],
+  icons: ["https://hyperdep.now/logo.svg"],
 };
 
 export const wagmiAdapter = new WagmiAdapter({
