@@ -3,7 +3,7 @@ import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
-import { Adapter } from "@solana/wallet-adapter-base";
+
 import { WalletModuleFactory } from "@near-wallet-selector/core";
 import { BrowserWallet } from "@near-wallet-selector/core";
 
@@ -134,10 +134,7 @@ export const basicConfig = {
     endpoint:
       "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
     autoConnect: true,
-    wallets: [
-      new HotWalletAdapter() as Adapter,
-      new PhantomWalletAdapter() as Adapter,
-    ],
+    wallets: [new HotWalletAdapter(), new PhantomWalletAdapter()],
   },
 };
 

@@ -1,4 +1,4 @@
-import { basicConfig, getNetworkChainId, Network } from "@/config";
+import { getNetworkChainId, Network } from "@/config";
 
 import { convertGas, useWalletSelector } from "@/providers/near-provider";
 import { useAccount, useAccountEffect } from "wagmi";
@@ -41,7 +41,6 @@ import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
 
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
-import { Connection } from "@solana/web3.js";
 import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
 
 import { PermitDataResponse } from "@/providers/proxy-provider";
@@ -57,13 +56,19 @@ import { translateTokenToNetwork } from "@/config";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
 
+import { useConnection } from "@solana/wallet-adapter-react";
+
 const useNetwork = (
   network: Network | null,
   setValue?: (key: keyof FormInterface, value: any) => void
 ) => {
   /* SOLANA */
-  const { publicKey, disconnect: disconnectSolana } = useWallet();
-  const solanaConnection = new Connection(basicConfig.solanaConfig.endpoint);
+  const {
+    publicKey,
+    disconnect: disconnectSolana,
+    wallet: solanaWallet,
+  } = useWallet();
+  const { connection: solanaConnection } = useConnection();
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();
 
@@ -386,37 +391,33 @@ const useNetwork = (
                 selectedToken.contractAddress as `0x${string}`,
                 !solanaATACreationRequired
               );
-          console.log(transactionSolana, "transactionSolana");
+
           const latestBlockHash = await solanaConnection.getLatestBlockhash(
             "confirmed"
           );
-          transactionSolana.recentBlockhash = await latestBlockHash.blockhash;
-          transactionSolana.feePayer = publicKey;
-          // if (solanaWallet?.adapter.name === "HOT") {
-          //   const tx = await HOT.request("solana:signAndSendTransaction", {
-          //     transaction: Buffer.from(transactionSolana.serialize()).toString(
-          //       "base64"
-          //     ),
-          //     sendOptions: { maxRetries: 3 },
-          //   });
-          //   console.log(tx, "tx");
-          //   const signature = tx.signature;
-          //   const txHash = await solanaConnection.confirmTransaction({
-          //     blockhash: latestBlockHash.blockhash,
-          //     lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-          //     signature: signature,
-          //   });
-          //   console.log(txHash, "tx");
+          transactionSolana.recentBlockhash = latestBlockHash.blockhash;
 
-          //   return txHash;
-          // } else {
-          const txHash = await sendTransactionSolana(
-            transactionSolana,
-            solanaConnection
-          );
-          console.log(txHash, "txHash");
-          return txHash;
-        // }
+          console.log(solanaWallet?.adapter.name, "solanaWallet?.adapter.name");
+          if (solanaWallet?.adapter.name === "HOT Wallet") {
+            // TEMP FIX UNTIL HOT WALLET SUPPORT
+            try {
+              const txHash = await sendTransactionSolana(
+                transactionSolana,
+                solanaConnection
+              );
+              return txHash;
+            } catch (e) {
+              console.log(e, "e");
+
+              return true;
+            }
+          } else {
+            const txHash = await sendTransactionSolana(
+              transactionSolana,
+              solanaConnection
+            );
+            return txHash;
+          }
         case Network.NEAR:
           if (!selector || !accountId || !selectedToken.contractAddress) {
             return false;
