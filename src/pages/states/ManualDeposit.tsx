@@ -38,7 +38,7 @@ export const DepositView = () => {
   }, [depositAddress]);
 
   return (
-    <div className="flex flex-col gap-6 md:w-[480px] sm:w-full">
+    <div className="flex flex-col gap-6 md:w-[480px] w-full">
       <div className="flex flex-col gap-4 w-full">
         <div className="flex flex-col gap-2 w-full">
           <div className="justify-start text-gray_text text-base font-semibold font-['Inter'] leading-normal">

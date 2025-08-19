@@ -122,7 +122,7 @@ export const InitialView = () => {
     <div className="flex flex-col gap-6">
       <SlippageDialog />
 
-      <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px] w-full">
+      <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px]">
         <div className="flex flex-row gap-2 justify-between w-full">
           <div className="self-stretch justify-start text-gray_text text-base font-semibold font-['Inter']">
             From
@@ -299,7 +299,7 @@ export const InitialView = () => {
               </div>
             </div>
             {errors.refundAddress && (
-              <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
+              <div className="text-error word-break text-xs w-full md:w-[480px] font-normal text-left  font-inter">
                 <span>{errors.refundAddress.message?.toString()}</span>
               </div>
             )}

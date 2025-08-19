@@ -63,7 +63,7 @@ const useSwapQuote = ({
             const token = tokens[tokenIn.assetId];
             if (response?.error?.includes("Amount too low") && token?.price) {
               const minAmount = removeTrailingZeros(
-                Big(Math.round(MIN_AMOUNT / token.price)).toFixed(3)
+                Big(Math.round(MIN_AMOUNT / token.price)).toFixed(8)
               );
 
               setError("amount", {
@@ -74,12 +74,19 @@ const useSwapQuote = ({
                 message: response?.error || "Failed to fetch quote",
               });
             }
-            setFormValue("amountOut", "0");
           } else if (response?.error?.includes("refundTo")) {
             setError("refundAddress", {
               message: response?.error || "Failed to fetch quote",
             });
           }
+          if (response?.error?.includes("Failed to get quote")) {
+            setError("amountOut", {
+              message: response?.error || "Failed to fetch quote",
+            });
+          }
+          setFormValue("amountOut", "0");
+          setFormValue("depositAddress", "");
+
           return null;
         }
         if (response) {
