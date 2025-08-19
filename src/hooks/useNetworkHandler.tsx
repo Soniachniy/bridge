@@ -398,26 +398,27 @@ const useNetwork = (
           transactionSolana.recentBlockhash = latestBlockHash.blockhash;
 
           console.log(solanaWallet?.adapter.name, "solanaWallet?.adapter.name");
-          if (solanaWallet?.adapter.name === "HOT Wallet") {
-            // TEMP FIX UNTIL HOT WALLET SUPPORT
-            try {
-              const txHash = await sendTransactionSolana(
-                transactionSolana,
-                solanaConnection
-              );
-              return txHash;
-            } catch (e) {
-              console.log(e, "e");
+          // if (solanaWallet?.adapter.name === "HOT Wallet") {
+          //   // TEMP FIX UNTIL HOT WALLET SUPPORT
+          //   try {
+          //     const txHash = await sendTransactionSolana(
+          //       transactionSolana,
+          //       solanaConnection
+          //     );
+          //     return txHash;
+          //   } catch (e) {
+          //     console.log(e, "e");
 
-              return true;
-            }
-          } else {
-            const txHash = await sendTransactionSolana(
-              transactionSolana,
-              solanaConnection
-            );
-            return txHash;
-          }
+          //     return true;
+          //   }
+          // } else {
+          const txHash = await sendTransactionSolana(
+            transactionSolana,
+            solanaConnection
+          );
+          console.log(txHash, "txHash");
+          return txHash;
+        // }
         case Network.NEAR:
           if (!selector || !accountId || !selectedToken.contractAddress) {
             return false;
