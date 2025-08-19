@@ -41,7 +41,7 @@ const SelectNetworkDialog: FC<{
   const { watch, setValue } = useFormContext<FormInterface>();
   const selectedToken = watch("selectedToken");
   const [open, setOpen] = useState(false);
-
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const allTokens = useTokens();
 
   const { blockchains, mainTokens } = useMemo(() => {
@@ -82,17 +82,24 @@ const SelectNetworkDialog: FC<{
   return (
     <Dialog
       open={open}
-      onOpenChange={(open) => {
-        if (selectedToken) {
-          setOpen(false);
-          connectWallet(translateNetwork(selectedToken?.blockchain));
-          setValue("strategy", EStrategy.Wallet);
-          return;
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        // Close the dropdown when dialog closes
+        if (!isOpen) {
+          setDropdownOpen(false);
         }
-        setOpen(open);
       }}
     >
-      <DialogTrigger>
+      <DialogTrigger
+        onClick={(e) => {
+          // If we already have a selected token, connect wallet directly instead of opening dialog
+          if (selectedToken) {
+            e.preventDefault();
+            connectWallet(translateNetwork(selectedToken?.blockchain));
+            setValue("strategy", EStrategy.Wallet);
+          }
+        }}
+      >
         <div className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline">
           {walletAddress ? (
             <div className="flex flex-row gap-2 justify-center align-center">
@@ -116,6 +123,16 @@ const SelectNetworkDialog: FC<{
       <DialogContent
         showCloseButton={false}
         className="flex justify-center items-center w-[480px] md:w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 "
+        onInteractOutside={(e) => {
+          // Prevent dialog from closing when clicking on select dropdown
+          const target = e.target as Element;
+          if (
+            target.closest("[data-radix-select-content]") ||
+            target.closest("[data-radix-popper-content-wrapper]")
+          ) {
+            e.preventDefault();
+          }
+        }}
       >
         <DialogClose className=" top-6 right-6 absolute" asChild>
           <button>
@@ -132,8 +149,10 @@ const SelectNetworkDialog: FC<{
               Select Network
             </Label>
             <Select
+              open={dropdownOpen}
               onValueChange={(val) => {
                 connectWallet(translateNetwork(val));
+                setDropdownOpen(false);
                 setOpen(false);
                 setValue("selectedToken", {
                   ...mainTokens[val as TokenResponse["blockchain"]],
@@ -143,6 +162,7 @@ const SelectNetworkDialog: FC<{
                 });
                 setValue("strategy", EStrategy.Wallet);
               }}
+              onOpenChange={setDropdownOpen}
             >
               <SelectTrigger className="w-full border-1 border-element border-solid hover:border-1  hover:border-element outline-none text-black min-h-[42px] border-1 border-element hover:border-main_light focus:outline-none  focus:ring-offset-0 active:ring-offset-0 focus-within:ring-offset-0 bg-main_dark text-white">
                 <SelectValue
@@ -154,7 +174,12 @@ const SelectNetworkDialog: FC<{
                   Select Network
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="bg-main_dark text-white ">
+              <SelectContent
+                className="bg-main_dark text-white z-[100]"
+                position="popper"
+                side="bottom"
+                align="start"
+              >
                 {blockchains.map(({ blockchain, title, icon }) => (
                   <SelectItem
                     key={`${blockchain}-${title}`}
