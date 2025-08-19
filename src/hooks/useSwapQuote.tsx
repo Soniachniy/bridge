@@ -58,10 +58,10 @@ const useSwapQuote = ({
           refundAddress ?? ""
         );
         if (!response?.success) {
-          const isAmountError = response?.error?.includes("Amount too small");
+          const isAmountError = response?.error?.includes("Amount");
           if (isAmountError) {
             const token = tokens[tokenIn.assetId];
-            if (response?.error?.includes("Amount too small") && token?.price) {
+            if (response?.error?.includes("Amount too low") && token?.price) {
               const minAmount = removeTrailingZeros(
                 Big(Math.round(MIN_AMOUNT / token.price)).toFixed(3)
               );
