@@ -18,7 +18,7 @@ const queryClientConfig = {
 const metadata = {
   name: "HyperDep",
   description: "HyperDep",
-  url: "https://bridge-lyart-three.vercel.app/",
+  url: "https://hyperdep.now/",
   icons: ["https://avatars.githubusercontent.com/u/179229932"],
 };
 

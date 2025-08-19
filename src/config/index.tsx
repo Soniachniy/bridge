@@ -110,7 +110,7 @@ export const basicConfig = {
     ],
   },
   evmConfig: {
-    projectId: "2c00d113200749f27e7e970776874f1c",
+    projectId: "bde78605c842813c95fe91c9b4ed1f92",
     adapters: [WagmiAdapter],
     networks: [
       mainnet,
