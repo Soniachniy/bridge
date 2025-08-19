@@ -2,6 +2,7 @@ import { TonConnect, TonConnectUIProvider } from "@tonconnect/ui-react";
 import { PropsWithChildren } from "react";
 
 import { basicConfig } from "@/config";
+import "@hot-wallet/sdk/adapter/ton";
 
 export const TonProvider = ({ children }: PropsWithChildren) => {
   const connector = new TonConnect({

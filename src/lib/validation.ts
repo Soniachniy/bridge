@@ -2,6 +2,8 @@ import { z } from "zod";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { EStrategy } from "@/pages/Form";
 
+export const MIN_AMOUNT = 5;
+
 export const isValidEVMAddress = (address: string): boolean => {
   const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
   return evmAddressRegex.test(address);

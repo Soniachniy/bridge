@@ -2,10 +2,16 @@ import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 
-import { FormInterface } from "@/lib/validation";
+import { FormInterface, MIN_AMOUNT } from "@/lib/validation";
 import { getQuote } from "@/providers/proxy-provider";
-import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
+import {
+  formatTokenAmount,
+  parseTokenAmount,
+  removeTrailingZeros,
+} from "@/lib/utils";
 import { USDC_DECIMALS } from "@/lib/constants";
+import { useTokens } from "@/providers/token-context";
+import Big from "big.js";
 
 type Props = {
   tokenIn: TokenResponse | null;
@@ -30,6 +36,7 @@ const useSwapQuote = ({
   slippageValue,
   trigger,
 }: Props) => {
+  const tokens = useTokens();
   return useQuery({
     queryKey: [
       "quote",
@@ -53,10 +60,21 @@ const useSwapQuote = ({
         if (!response?.success) {
           const isAmountError = response?.error?.includes("Amount too small");
           if (isAmountError) {
-            setError("amount", {
-              message: response?.error || "Failed to fetch quote",
-            });
-            setFormValue("amountOut", "");
+            const token = tokens[tokenIn.assetId];
+            if (response?.error?.includes("Amount too small") && token?.price) {
+              const minAmount = removeTrailingZeros(
+                Big(Math.round(MIN_AMOUNT / token.price)).toFixed(3)
+              );
+
+              setError("amount", {
+                message: `Amount too small. Min amount is ${minAmount} ${token.symbol}`,
+              });
+            } else {
+              setError("amount", {
+                message: response?.error || "Failed to fetch quote",
+              });
+            }
+            setFormValue("amountOut", "0");
           } else if (response?.error?.includes("refundTo")) {
             setError("refundAddress", {
               message: response?.error || "Failed to fetch quote",

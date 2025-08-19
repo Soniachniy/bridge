@@ -89,6 +89,13 @@ export const isSupportedNetwork = (network: Network) => {
   return supportedNetworks[network] ?? false;
 };
 
+export const removeTrailingZeros = (amount: string) => {
+  if (amount.includes(".") || amount.includes(",")) {
+    return amount.replace(/\.?0*$/, "");
+  }
+  return amount;
+};
+
 export const isEVMNetwork = (network: Network) => {
   return (
     network === Network.ETHEREUM ||

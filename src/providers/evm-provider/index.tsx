@@ -4,6 +4,7 @@ import { basicConfig } from "@/config";
 
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { createAppKit } from "@reown/appkit/react";
+import "@hot-wallet/sdk/adapter/evm";
 
 const queryClientConfig = {
   defaultOptions: {

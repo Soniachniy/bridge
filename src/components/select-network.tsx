@@ -83,6 +83,12 @@ const SelectNetworkDialog: FC<{
     <Dialog
       open={open}
       onOpenChange={(open) => {
+        if (selectedToken) {
+          setOpen(false);
+          connectWallet(translateNetwork(selectedToken?.blockchain));
+          setValue("strategy", EStrategy.Wallet);
+          return;
+        }
         setOpen(open);
       }}
     >
