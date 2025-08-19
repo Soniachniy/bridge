@@ -5,7 +5,7 @@ import { basicConfig } from "@/config";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { createAppKit } from "@reown/appkit/react";
 import "@hot-wallet/sdk/adapter/evm";
-import { injected, metaMask } from "wagmi/connectors";
+import { injected } from "wagmi/connectors";
 
 const queryClientConfig = {
   defaultOptions: {
@@ -26,7 +26,7 @@ const metadata = {
 export const wagmiAdapter = new WagmiAdapter({
   networks: basicConfig.evmConfig.networks,
   projectId: basicConfig.evmConfig.projectId,
-  connectors: [injected(), metaMask()],
+  connectors: [injected()],
   ssr: true,
 });
 
