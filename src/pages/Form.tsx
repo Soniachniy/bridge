@@ -129,10 +129,12 @@ export default function Form() {
     <div className="p-4 w-full min-h-96">
       <div className="flex flex-col justify-center items-center mb-6">
         <div className="mb-2 text-center justify-start text-main_white text-4xl font-bold font-['Inter']">
-          Deposit to Hyperliquid
+          Deposit to Hyperliquid from Any Chain
         </div>
         <span className="mb-4 text-center justify-start text-main_white text-base font-normal font-['Inter'] leading-normal">
-          Fastest way to trade on Hyperliquid Pers — from any chain.
+          A fast and friendly way to top up your Hyperliquid account.
+          <br /> We hide the complexity of bridges: just connect your wallet,
+          pick an asset, and we do the rest.
         </span>
       </div>
       <Status localStage={view as ProcessingStages} />

@@ -16,9 +16,8 @@ export enum IndicatorState {
 export const stages = {
   [ProcessingStages.AssetSelection]: {
     stepNumber: 1,
-    title: "Choose Asset and Set Amount",
-    description:
-      "Select the chain, token and amount you want to deposit to Hyperliquid Perps",
+    title: "Start a deposit",
+    description: "",
   },
   [ProcessingStages.ManualDeposit]: {
     stepNumber: 2,

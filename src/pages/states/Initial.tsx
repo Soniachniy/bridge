@@ -125,7 +125,7 @@ export const InitialView = () => {
       <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px]">
         <div className="flex flex-row gap-2 justify-between w-full">
           <div className="self-stretch justify-start text-gray_text text-base font-semibold font-['Inter']">
-            From
+            Pick your asset and network
           </div>
           <SelectNetworkDialog
             connectWallet={connectWalletHandler}
