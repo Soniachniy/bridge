@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import { getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
 import { formatTokenAmount } from "@/lib/utils";
-
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 export enum EDepositMethod {
   WALLET = "wallet",
   EXCHANGE = "exchange",
@@ -32,6 +32,7 @@ export enum EStrategy {
 export default function Form() {
   const { id: depositAddressFromParams } = useParams();
   const navigate = useNavigate();
+  const tokens = useTokens();
 
   const actorRef = BridgeFormMachineContext.useActorRef();
   const methods = useForm({
@@ -42,7 +43,14 @@ export default function Form() {
       amount: "",
       strategy: EStrategy.Wallet,
       amountOut: "0",
-      selectedToken: null,
+      selectedToken: {
+        assetId:
+          "nep141:tron-d28a265909efecdcee7c5028585214ea0b96f015.omft.near",
+        blockchain: TokenResponse.blockchain.TRON,
+        contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        decimals: 6,
+        symbol: "USDT",
+      },
       hyperliquidAddress: "",
       refundAddress: "",
       depositAddress: "",
@@ -56,7 +64,6 @@ export default function Form() {
     // TODO: Implement onSubmit
   };
 
-  const tokens = useTokens();
   const view = BridgeFormMachineContext.useSelector((s) => s.value);
 
   const ViewByState: Record<string, React.ReactNode> = {
