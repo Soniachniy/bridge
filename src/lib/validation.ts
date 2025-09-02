@@ -99,7 +99,7 @@ export const formValidationSchema = z
         Number(data.selectedToken.balance) / Math.pow(10, decimals);
       const amountNumber = Number(data.amount);
 
-      if (amountNumber > balanceNumber) {
+      if (amountNumber > balanceNumber && amountNumber !== 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Amount cannot exceed your balance",

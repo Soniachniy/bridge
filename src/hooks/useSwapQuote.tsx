@@ -74,6 +74,9 @@ const useSwapQuote = ({
         }
 
         if (!response?.success) {
+          if (amountIn === "0") {
+            return null;
+          }
           const isAmountError = response?.error?.includes("Amount");
           if (isAmountError) {
             const token = tokens[tokenIn.assetId];

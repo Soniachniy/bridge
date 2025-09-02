@@ -153,6 +153,9 @@ export const InitialView = () => {
                   balanceNear: BigInt(0),
                   balanceUpdatedAt: 0,
                 });
+                if (selectedToken.assetId !== token.assetId) {
+                  setValue("amount", "0", { shouldValidate: false });
+                }
               }}
               selectedToken={selectedToken}
               getPublicKey={getPublicKey}
@@ -365,7 +368,6 @@ export const ConnectButton = ({
               : "create_transaction";
           if (isValid) {
             actorRef.send({ type: screen });
-            actorRef.send({ type: "start_processing" });
           }
         }}
         className="w-full"

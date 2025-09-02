@@ -81,7 +81,6 @@ const SelectTokenDialog: FC<Props> = ({
     <Dialog.Root
       onOpenChange={(open) => {
         if (open) return;
-        setSelectedBlockchain(undefined);
         setSearch("");
       }}
     >
