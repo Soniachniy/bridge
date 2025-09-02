@@ -4,7 +4,7 @@ import { wagmiAdapter } from "@/providers/evm-provider";
 import { execute, getPermitData, getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { sliceHex } from "viem";
 import { signTypedData, switchChain } from "@wagmi/core";
@@ -67,7 +67,7 @@ export const getNextView = (status: ServerStages) => {
 
 export default function useProcessing(depositAddressParam?: string | null) {
   const actorRef = BridgeFormMachineContext.useActorRef();
-
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [currentStage, setCurrentStage] = useState<ServerStages>(
     depositAddressParam ? ServerStages.pending_deposit : ServerStages.idle
   );
@@ -129,36 +129,30 @@ export default function useProcessing(depositAddressParam?: string | null) {
       }
     };
 
-    const getDepositStatus = async (depositAddress: string, retries = 800) => {
-      const timeInterval = 7000;
-      const maxRetries = retries;
-      let attempt = 0;
+    const getDepositStatus = async (depositAddress: string) => {
+      try {
+        const statusResponse = await getStatus(depositAddress);
+        setCurrentStage(statusResponse.data.status);
 
-      while (attempt < maxRetries) {
-        try {
-          await delay(timeInterval);
-          const statusResponse = await getStatus(depositAddress);
-          setCurrentStage(statusResponse.data.status);
-
-          if (statusResponse.data.status === "processing") {
-            actorRef.send({ type: "start_processing" });
-          }
-
-          if (statusResponse.data.status === "completed") {
-            actorRef.send({ type: "success" });
-
-            return;
-          }
-        } catch (error) {
-          console.error(`Error: while getting status\n\n`, error);
+        if (statusResponse.data.status === "processing") {
+          actorRef.send({ type: "start_processing" });
         }
 
-        attempt++;
+        if (statusResponse.data.status === "completed") {
+          actorRef.send({ type: "success" });
+
+          return;
+        }
+      } catch (error) {
+        console.error(`Error: while getting status\n\n`, error);
       }
     };
     if (currentStage !== ServerStages.idle) {
-      startPolling();
+      intervalRef.current = setInterval(startPolling, 7000);
     }
+    return () => {
+      intervalRef.current && clearInterval(intervalRef.current);
+    };
   }, [depositAddress, tokens, currentStage]);
 
   useEffect(() => {
