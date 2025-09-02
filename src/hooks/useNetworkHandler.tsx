@@ -63,11 +63,7 @@ const useNetwork = (
   setValue?: (key: keyof FormInterface, value: any) => void
 ) => {
   /* SOLANA */
-  const {
-    publicKey,
-    disconnect: disconnectSolana,
-    wallet: solanaWallet,
-  } = useWallet();
+  const { publicKey, disconnect: disconnectSolana } = useWallet();
   const { connection: solanaConnection } = useConnection();
   const { setVisible } = useWalletModal();
   const { sendTransaction: sendTransactionSolana } = useWallet();

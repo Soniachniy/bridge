@@ -8,7 +8,7 @@ import SuccessIcon from "@/assets/success-icon.svg?react";
 export const SuccessScreen = () => {
   const { watch } = useFormContext<FormInterface>();
   const amountOut = watch("amountOut");
-  const selectedToken = watch("selectedToken");
+
   const actorRef = BridgeFormMachineContext.useActorRef();
 
   const goToMainPage = () => {

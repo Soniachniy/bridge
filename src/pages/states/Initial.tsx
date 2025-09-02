@@ -307,7 +307,7 @@ export const ConnectButton = ({
   const actorRef = BridgeFormMachineContext.useActorRef();
   const {
     watch,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = useFormContext();
   const refundAddress = watch("refundAddress");
   const selectedToken = watch("selectedToken");
@@ -365,6 +365,7 @@ export const ConnectButton = ({
               : "create_transaction";
           if (isValid) {
             actorRef.send({ type: screen });
+            actorRef.send({ type: "start_processing" });
           }
         }}
         className="w-full"

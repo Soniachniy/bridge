@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { ServerStages, stageToStep } from "@/hooks/useProcessing";
 
 const stages = {
-  [ServerStages.pending_deposit]: {
+  [ServerStages.deposit_received]: {
     title: `Deposit detected on `,
     stepNumber: 1,
   },
@@ -31,7 +31,7 @@ const stages = {
     title: "Awaiting your signature to complete deposit",
     stepNumber: 3,
   },
-  [ServerStages.deposit_received]: {
+  [ServerStages.executing_deposit]: {
     title: "Depositing into Hyperliquid",
     stepNumber: 4,
   },
@@ -128,7 +128,7 @@ export const ProcessingView = ({
               ? IndicatorState.Processing
               : IndicatorState.Empty;
 
-            if (key === ServerStages.pending_deposit) {
+            if (key === ServerStages.deposit_received) {
               return (
                 <div key={key}>
                   <div className="flex flex-row gap-2 items-center text-main_white text-base font-semibold font-['Inter']">
@@ -191,7 +191,7 @@ export const ProcessingView = ({
                         }}
                         disabled={!depositAddress || signPermitLoading}
                       >
-                        {signPermitLoading ? (
+                        {!signPermitLoading ? (
                           <>Sign permit</>
                         ) : (
                           <LoadingIcon

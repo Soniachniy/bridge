@@ -1,5 +1,3 @@
-import { delay } from "@/lib/1clickHelper";
-
 import { wagmiAdapter } from "@/providers/evm-provider";
 import { execute, getPermitData, getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
