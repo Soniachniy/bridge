@@ -71,10 +71,11 @@ export const ProcessingView = ({
   signPermit,
   currentStage,
 }: {
-  signPermit: (depositAddress: string) => void;
+  signPermit: (depositAddress: string) => Promise<void>;
   currentStage: ServerStages;
 }) => {
   const { watch } = useFormContext<FormInterface>();
+  const [signPermitLoading, setSignPermitLoading] = useState(false);
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
   const amountOut = watch("amountOut");
   const amountIn = watch("amount");
@@ -183,12 +184,21 @@ export const ProcessingView = ({
                       <ActionButton
                         className="mt-8"
                         variant="tertiary"
-                        onClick={() =>
-                          depositAddress && signPermit(depositAddress)
-                        }
-                        disabled={!depositAddress}
+                        onClick={async () => {
+                          setSignPermitLoading(true);
+                          depositAddress && (await signPermit(depositAddress));
+                          setSignPermitLoading(false);
+                        }}
+                        disabled={!depositAddress || signPermitLoading}
                       >
-                        Sign permit //TODO loading
+                        {signPermitLoading ? (
+                          <>Sign permit</>
+                        ) : (
+                          <LoadingIcon
+                            className="animate-spin size-4"
+                            fill={"#0F1A20"}
+                          />
+                        )}
                       </ActionButton>
                       <div className=" mt-4 flex flex-row items-center text-center  w-full justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
                         Please confirm the message in your wallet

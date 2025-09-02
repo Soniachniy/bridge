@@ -25,7 +25,7 @@ export const SuccessScreen = () => {
         <div className="w-[490px] text-gray_text text-sm font-normal font-['Inter'] leading-tight text-center justify-center">
           Deposit of{" "}
           <span className="text-gray_text text-sm font-bold font-['Inter'] leading-tight">
-            {amountOut} {selectedToken?.symbol}
+            {amountOut} USDC
           </span>{" "}
           to Hyperliquid successfully completed
         </div>

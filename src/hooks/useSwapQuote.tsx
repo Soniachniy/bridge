@@ -77,6 +77,16 @@ const useSwapQuote = ({
           const isAmountError = response?.error?.includes("Amount");
           if (isAmountError) {
             const token = tokens[tokenIn.assetId];
+            if (response?.error?.includes("try at least")) {
+              const errorMessage = response?.error?.split(" ");
+              const minAmount = errorMessage[errorMessage.length - 1];
+              setError("amount", {
+                message: `Amount too small. Min amount is ${formatTokenAmount(
+                  minAmount,
+                  token.decimals
+                )} ${token.symbol}`,
+              });
+            }
             if (response?.error?.includes("Amount too low") && token?.price) {
               const minAmount = removeTrailingZeros(
                 Big(Math.round(MIN_AMOUNT / token.price)).toFixed(8)
