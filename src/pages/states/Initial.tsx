@@ -356,7 +356,6 @@ export const ConnectButton = ({
       <ActionButton
         variant="primary"
         onClick={async () => {
-          console.log("isValid", isValid, errors);
           if (!isValid) {
             return;
           }

@@ -406,7 +406,6 @@ const useNetwork = (
           );
           transactionSolana.recentBlockhash = latestBlockHash.blockhash;
 
-          console.log(solanaWallet?.adapter.name, "solanaWallet?.adapter.name");
           // if (solanaWallet?.adapter.name === "HOT Wallet") {
           //   // TEMP FIX UNTIL HOT WALLET SUPPORT
           //   try {

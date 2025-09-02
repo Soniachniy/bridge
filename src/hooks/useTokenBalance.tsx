@@ -17,11 +17,6 @@ export const useTokenBalance = () => {
     ],
     queryFn: async () => {
       try {
-        console.log(
-          selectedToken,
-          selectedToken?.balanceUpdatedAt,
-          refundAddress
-        );
         if (
           selectedToken &&
           selectedToken.balanceUpdatedAt === 0 &&
@@ -32,13 +27,7 @@ export const useTokenBalance = () => {
             selectedToken.contractAddress,
             selectedToken.blockchain
           );
-          console.log(
-            selectedToken.assetId,
-            selectedToken.contractAddress,
-            balance,
-            nearBalance,
-            selectedToken.blockchain
-          );
+
           if (balance) {
             setValue("selectedToken", {
               ...selectedToken,

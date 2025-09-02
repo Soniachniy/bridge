@@ -89,8 +89,6 @@ export const formValidationSchema = z
     txHash: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    console.log("val", data.strategy, data.refundAddress, data.selectedToken);
-
     if (
       data.strategy === "wallet" &&
       data.selectedToken &&
