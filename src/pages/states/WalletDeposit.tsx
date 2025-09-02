@@ -120,7 +120,7 @@ export const WalletDepositView = () => {
           </div>
         </div>
         <div className="self-stretch text-center justify-center text-gray_text text-sm font-normal font-['Inter'] leading-none">
-          You will receive at least 119.5 USDC or the transaction will be
+          You will receive at least {amountOut} USDC or the transaction will be
           refunded
         </div>
 

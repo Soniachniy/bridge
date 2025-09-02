@@ -30,8 +30,9 @@ const SelectTokenDialog: FC<Props> = ({
   selectedToken,
   getPublicKey,
 }) => {
-  const [selectedBlockchain, setSelectedBlockchain] =
-    useState<TokenResponse.blockchain>();
+  const [selectedBlockchain, setSelectedBlockchain] = useState<
+    TokenResponse.blockchain | undefined
+  >(selectedToken?.blockchain);
   const [search, setSearch] = useState("");
   const allTokens = useTokens();
   const { setValue } = useFormContext();
@@ -162,7 +163,7 @@ const SelectTokenDialog: FC<Props> = ({
             >
               Select Network
             </Label>
-            <div className="flex flex-row flex-wrap gap-2">
+            <div className="flex flex-row flex-wrap gap-2 items-center">
               {blockchains.map(({ blockchain, title, icon }) => (
                 <button
                   key={`${blockchain}-${title}`}
@@ -171,7 +172,7 @@ const SelectTokenDialog: FC<Props> = ({
                   className={cn(
                     "hover:bg-white/20 bg-white/10 rounded-3xl  px-2 py-1 text-sm",
                     selectedBlockchain === blockchain &&
-                      "bg-white p-2.5 !text-black"
+                      "bg-white px-2 py-2 !text-black"
                   )}
                 >
                   <div className="flex flex-row gap-2 ">
