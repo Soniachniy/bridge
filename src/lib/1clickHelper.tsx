@@ -1,24 +1,3 @@
-import ArbitrumIcon from "@/assets/networks/arbitrum.svg?react";
-import BaseIcon from "@/assets/networks/base.svg?react";
-import BscIcon from "@/assets/networks/bsc.svg?react";
-import AuroraIcon from "@/assets/networks/aurora.png";
-
-import EthereumIcon from "@/assets/networks/evm.svg?react";
-import NearIcon from "@/assets/networks/near.svg?react";
-import SolanaIcon from "@/assets/networks/solana.svg?react";
-import TonIcon from "@/assets/networks/ton.svg?react";
-import BeraIcon from "@/assets/networks/bera.png";
-import BitcoinIcon from "@/assets/networks/bitcoin.png";
-import DogeIcon from "@/assets/networks/doge.png";
-import XrpIcon from "@/assets/networks/xrp.png";
-import GnosisIcon from "@/assets/networks/gnosis.png";
-import PolygonIcon from "@/assets/networks/polygon.png";
-import TronIcon from "@/assets/networks/tron.png";
-import OpIcon from "@/assets/networks/op.png";
-import CardanoIcon from "@/assets/networks/cardano.png";
-import SuiIcon from "@/assets/networks/sui.png";
-import AvaxIcon from "@/assets/networks/avax.png";
-
 import { Network } from "@/config";
 
 import {
@@ -50,42 +29,15 @@ export type OneClickSwapTransaction = {
   status: GetExecutionStatusResponse.status;
 };
 
-export const NetworkIconMap = {
-  [Network.NEAR]: <NearIcon />,
-  [Network.BASE]: <BaseIcon />,
-  [Network.BNB]: <BscIcon />,
-  [Network.TON]: <TonIcon />,
-  [Network.SOLANA]: <SolanaIcon />,
-  [Network.ARBITRUM]: <ArbitrumIcon />,
-  [Network.ETHEREUM]: <EthereumIcon />,
-  [Network.AURORA]: <img src={AuroraIcon} alt="Aurora" className="w-6 h-6" />,
-  [Network.BERA]: <img src={BeraIcon} alt="Bera" className="w-6 h-6" />,
-  [Network.BITCOIN]: (
-    <img src={BitcoinIcon} alt="Bitcoin" className="w-6 h-6" />
-  ),
-  [Network.DOGE]: <img src={DogeIcon} alt="Doge" className="w-6 h-6" />,
-  [Network.XRP]: <img src={XrpIcon} alt="XRP" className="w-6 h-6" />,
-  [Network.GNOSIS]: <img src={GnosisIcon} alt="Gnosis" className="w-6 h-6" />,
-  [Network.POLYGON]: (
-    <img src={PolygonIcon} alt="Polygon" className="w-6 h-6" />
-  ),
-  [Network.TRON]: <img src={TronIcon} alt="Tron" className="w-6 h-6" />,
-  [Network.ZEC]: <img src={TronIcon} alt="ZEC" className="w-6 h-6" />,
-  [Network.SUI]: <img src={SuiIcon} alt="SUI" className="w-6 h-6" />,
-  [Network.CARDANO]: <img src={CardanoIcon} alt="SUI" className="w-6 h-6" />,
-  [Network.OP]: <img src={OpIcon} alt="OP" className="w-6 h-6" />,
-  [Network.AVAX]: <img src={AvaxIcon} alt="AVAX" className="w-6 h-6" />,
-};
-
 export const CHAIN_TITLE: Record<TokenResponse.blockchain | string, string> = {
   [TokenResponse.blockchain.NEAR]: "Near",
-  [TokenResponse.blockchain.ETH]: "Ethereum Mainnet",
+  [TokenResponse.blockchain.ETH]: "Ethereum",
   [TokenResponse.blockchain.BASE]: "Base",
-  [TokenResponse.blockchain.ARB]: "Arbitrum One",
+  [TokenResponse.blockchain.ARB]: "Arbitrum",
   [TokenResponse.blockchain.GNOSIS]: "Gnosis",
   [TokenResponse.blockchain.BERA]: "Berachain",
-  [TokenResponse.blockchain.BSC]: "BNB Smart Chain Mainnet",
-  [TokenResponse.blockchain.POL]: "Polygon Mainnet",
+  [TokenResponse.blockchain.BSC]: "BNB",
+  [TokenResponse.blockchain.POL]: "Polygon",
   [TokenResponse.blockchain.SOL]: "Solana",
   [TokenResponse.blockchain.BTC]: "Bitcoin",
   [TokenResponse.blockchain.TON]: "Ton",
@@ -372,6 +324,10 @@ export function translateNetwork(network?: string): Network {
       return Network.OP;
     case "avax":
       return Network.AVAX;
+    case "stellar":
+      return Network.STELLAR;
+    case "aptos":
+      return Network.APTOS;
   }
   return Network.ARBITRUM;
 }
@@ -383,8 +339,8 @@ export const NATIVE_TOKENS_BY_DEFUSE_ID: Record<Network, string | undefined> = {
   [Network.ARBITRUM]: "nep141:arb.omft.near",
   [Network.GNOSIS]: "nep141:gnosis.omft.near",
   [Network.BERA]: "nep141:bera.omft.near",
-  [Network.BNB]: "nep141:bsc.omft.near",
-  [Network.POLYGON]: "nep141:pol.omft.near",
+  [Network.BNB]: "nep245:v2_1.omni.hot.tg:56_11111111111111111111",
+  [Network.POLYGON]: "nep245:v2_1.omni.hot.tg:137_11111111111111111111",
   [Network.SOLANA]: "nep141:sol.omft.near",
   [Network.BITCOIN]: "nep141:btc.omft.near",
   [Network.TON]: "nep245:v2_1.omni.hot.tg:1117_",
@@ -395,19 +351,16 @@ export const NATIVE_TOKENS_BY_DEFUSE_ID: Record<Network, string | undefined> = {
   [Network.AURORA]: "nep141:aurora",
   [Network.SUI]: "nep141:sui.omft.near",
   [Network.CARDANO]: "nep141:cardano.omft.near",
-  [Network.OP]: "nep141:op.omft.near",
-  [Network.AVAX]: "nep141:avax.omft.near",
+  [Network.OP]: "nep245:v2_1.omni.hot.tg:10_11111111111111111111",
+  [Network.AVAX]: "nep245:v2_1.omni.hot.tg:43114_11111111111111111111",
+  [Network.STELLAR]:
+    "nep245:v2_1.omni.hot.tg:1100_111bzQBB5v7AhLyPMDwS8uJgQV24KaAPXtwyVWu2KXbbfQU6NXRCz",
+  [Network.APTOS]: "nep141:aptos.omft.near",
 };
 
 export const isNativeToken = (blockchain: Network, assetId: string) => {
   return NATIVE_TOKENS_BY_DEFUSE_ID[blockchain] === assetId;
 };
-
-export function getNetworkIcon(network: string): React.ReactNode | null {
-  const networkType = translateNetwork(network);
-  if (!networkType) return null;
-  return NetworkIconMap[networkType];
-}
 
 export const delay = async (time = 1000): Promise<void> => {
   return new Promise((res) => setTimeout(res, time));

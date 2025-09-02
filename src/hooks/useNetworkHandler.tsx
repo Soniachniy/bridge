@@ -207,7 +207,10 @@ const useNetwork = (
       balance: bigint;
       nearBalance: bigint;
     }> => {
-      switch (network) {
+      const currentNetwork = blockchain
+        ? translateTokenToNetwork(blockchain)
+        : network;
+      switch (currentNetwork) {
         case Network.BASE:
         case Network.AURORA:
         case Network.BNB:
@@ -221,7 +224,7 @@ const useNetwork = (
           if (!chainId) {
             return { balance: 0n, nearBalance: 0n };
           }
-          if (isNativeToken(network, assetId)) {
+          if (isNativeToken(currentNetwork, assetId)) {
             const { value: nativeBalanceEVM } = await getBalance(
               wagmiAdapter.wagmiConfig,
 
@@ -231,7 +234,7 @@ const useNetwork = (
               }
             );
             balanceEVM = nativeBalanceEVM;
-          } else {
+          } else if (contractAddress) {
             const { value: tokenBalanceEVM } = await getBalance(
               wagmiAdapter.wagmiConfig,
               {
@@ -253,11 +256,17 @@ const useNetwork = (
             });
             return { balance: balance ?? 0n, nearBalance: 0n };
           }
-          const balance = await getSplTokenBalance(
-            publicKey,
-            contractAddress as `0x${string}`
-          );
-          return { balance: BigInt(balance?.toString() ?? 0), nearBalance: 0n };
+          if (contractAddress) {
+            const balance = await getSplTokenBalance(
+              publicKey,
+              contractAddress as `0x${string}`
+            );
+            return {
+              balance: BigInt(balance?.toString() ?? 0),
+              nearBalance: 0n,
+            };
+          }
+          return { balance: 0n, nearBalance: 0n };
         case Network.NEAR:
           if (!contractAddress || !accountId) {
             return { balance: 0n, nearBalance: 0n };
@@ -288,7 +297,7 @@ const useNetwork = (
           if (!tonWallet?.account?.address) {
             return { balance: 0n, nearBalance: 0n };
           }
-          if (isNativeToken(network, assetId)) {
+          if (isNativeToken(currentNetwork, assetId)) {
             const { balance } = await tonClient.accounts.getAccount(
               Address.parse(tonWallet?.account?.address)
             );

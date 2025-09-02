@@ -1,6 +1,7 @@
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
+import { useRef } from "react";
 
 import { FormInterface, MIN_AMOUNT } from "@/lib/validation";
 import { getQuote } from "@/providers/proxy-provider";
@@ -12,6 +13,7 @@ import {
 import { USDC_DECIMALS } from "@/lib/constants";
 import { useTokens } from "@/providers/token-context";
 import Big from "big.js";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   tokenIn: TokenResponse | null;
@@ -37,6 +39,9 @@ const useSwapQuote = ({
   trigger,
 }: Props) => {
   const tokens = useTokens();
+  const navigate = useNavigate();
+  const latestRequestRef = useRef<string>("");
+
   return useQuery({
     queryKey: [
       "quote",
@@ -47,6 +52,11 @@ const useSwapQuote = ({
     ],
     queryFn: async () => {
       if (!tokenIn) return null;
+
+      // Store the current request's amount
+      const currentRequest = amountIn;
+      latestRequestRef.current = currentRequest;
+
       try {
         const response = await getQuote(
           !hyperliquidAddress || !refundAddress,
@@ -57,6 +67,12 @@ const useSwapQuote = ({
           parseTokenAmount(amountIn, tokenIn.decimals),
           refundAddress ?? ""
         );
+
+        // Only process the response if it's still the latest request
+        if (latestRequestRef.current !== currentRequest) {
+          return null; // Skip processing outdated responses
+        }
+
         if (!response?.success) {
           const isAmountError = response?.error?.includes("Amount");
           if (isAmountError) {
@@ -102,18 +118,24 @@ const useSwapQuote = ({
 
           if (response.data.depositAddress) {
             setFormValue("depositAddress", response.data.depositAddress);
+            navigate(`/${response.data.depositAddress}`);
           }
           if (Boolean(hyperliquidAddress)) {
             clearError(["amount", "hyperliquidAddress", "refundAddress"]);
+            // Only trigger validation for the latest request
             trigger();
           }
         }
         return response;
       } catch (error: unknown) {
-        if (isAxiosError(error)) {
-          throw new Error(error.response?.data.message || "Invalid request");
+        // Only process errors for the latest request
+        if (latestRequestRef.current === currentRequest) {
+          if (isAxiosError(error)) {
+            throw new Error(error.response?.data.message || "Invalid request");
+          }
+          throw error;
         }
-        throw error;
+        return null;
       }
     },
     staleTime: 0,

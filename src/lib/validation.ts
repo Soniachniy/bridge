@@ -86,10 +86,16 @@ export const formValidationSchema = z
     }),
     amountOut: z.string(),
     depositAddress: z.string().optional(),
+    txHash: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    // Balance validation
-    if (data.strategy === "wallet" && data.selectedToken) {
+    console.log("val", data.strategy, data.refundAddress, data.selectedToken);
+
+    if (
+      data.strategy === "wallet" &&
+      data.selectedToken &&
+      data.refundAddress
+    ) {
       const decimals = data.selectedToken.decimals ?? 1;
       const balanceNumber =
         Number(data.selectedToken.balance) / Math.pow(10, decimals);
@@ -230,4 +236,5 @@ export interface FormInterface {
   platformFee: string;
   gasFee: string;
   strategy: EStrategy;
+  txHash?: string;
 }

@@ -4,16 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 .loader {
   @apply w-[50px] p-[3px] aspect-square rounded-full bg-[#25b09b];
-  --_m: conic-gradient(#0000 10%, #000),
-        linear-gradient(#000 0 0) content-box;
+  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
   -webkit-mask: var(--_m);
-          mask: var(--_m);
+  mask: var(--_m);
   -webkit-mask-composite: source-out;
-          mask-composite: subtract;
+  mask-composite: subtract;
 }
 
 @layer utilities {
@@ -23,27 +20,40 @@
 }
 
 @theme {
-  --color-main_dark: #1B2429;
+  --color-main: #05251f;
+  --color-form: #0f3932;
+  --color-input-custom: rgb(42, 76, 68);
+  --color-main_dark: #1b2429;
   --color-main_light: #97fce4;
   --color-main_black: #000000;
   --color-element: #273035;
   --color-gray_text: #9db2bd;
   --color-main_white: #ffffff;
   --color-error: #ff6e6e;
-  --color-warning: #FFCC00;
+  --color-warning: #ffcc00;
   --color-btn_text: #1fa67d;
   --color-btn_hov: #50d2c1;
 }
 
 @layer base {
-
   html {
     font-family: Inter, system-ui, sans-serif;
   }
 
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+  }
 
   :root {
-    --background: #0F1A20;
+    --background: #0f1a20;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -78,7 +88,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: #0F1A20;
+    --background: #0f1a20;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -112,9 +122,9 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number'] {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
     -webkit-appearance: none;
     margin: 0;
     -moz-appearance: textfield !important;
@@ -158,14 +168,14 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-background: #0F1A20;
-  --color-panel-solid: #1B2429;
+  --color-background: #0f1a20;
+  --color-panel-solid: #1b2429;
   --main_dark: #1b2429;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #1B2429;
+  --background: #1b2429;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -199,7 +209,7 @@
 }
 
 .dark {
-  --background: #1B2429;
+  --background: #1b2429;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -240,4 +250,3 @@
     @apply bg-background text-foreground;
   }
 }
-

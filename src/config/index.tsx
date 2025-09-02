@@ -3,7 +3,22 @@ import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
+import { setupArepaWallet } from "@near-wallet-selector/arepa-wallet";
+import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
+import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
+import { setupIntearWallet } from "@near-wallet-selector/intear-wallet";
+import { setupLedger } from "@near-wallet-selector/ledger";
+import { setupMathWallet } from "@near-wallet-selector/math-wallet";
+import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
+import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
+import { setupNarwallets } from "@near-wallet-selector/narwallets";
 
+import { setupNightly } from "@near-wallet-selector/nightly";
+import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { setupRamperWallet } from "@near-wallet-selector/ramper-wallet";
+import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
+import { setupWelldoneWallet } from "@near-wallet-selector/welldone-wallet";
+import { setupXDEFI } from "@near-wallet-selector/xdefi";
 import { WalletModuleFactory } from "@near-wallet-selector/core";
 import { BrowserWallet } from "@near-wallet-selector/core";
 
@@ -27,6 +42,8 @@ import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 export enum Network {
   ARBITRUM = "arb",
   AURORA = "aur",
+  STELLAR = "stellar",
+  APTOS = "aptos",
   BASE = "base",
   BERA = "bera",
   BNB = "bnb",
@@ -68,6 +85,8 @@ export const supportedNetworks = {
   [Network.CARDANO]: false,
   [Network.OP]: true,
   [Network.AVAX]: true,
+  [Network.STELLAR]: false,
+  [Network.APTOS]: false,
 };
 
 export const networkChainId = {
@@ -91,6 +110,8 @@ export const networkChainId = {
   [Network.CARDANO]: null,
   [Network.OP]: optimism.id,
   [Network.AVAX]: avalanche.id,
+  [Network.STELLAR]: null,
+  [Network.APTOS]: null,
 };
 
 export const getNetworkChainId = (network: TokenResponse.blockchain) => {
@@ -105,8 +126,33 @@ export const basicConfig = {
     contractId: "",
     modules: [
       setupHotWallet() as WalletModuleFactory<BrowserWallet>,
-      setupMyNearWallet(),
-      setupSender(),
+      setupMyNearWallet() as WalletModuleFactory<BrowserWallet>,
+      setupSender() as WalletModuleFactory<BrowserWallet>,
+      setupArepaWallet() as WalletModuleFactory<BrowserWallet>,
+      setupBitteWallet() as WalletModuleFactory<BrowserWallet>,
+      setupCoin98Wallet() as WalletModuleFactory<BrowserWallet>,
+      setupIntearWallet() as WalletModuleFactory<BrowserWallet>,
+      setupLedger() as WalletModuleFactory<BrowserWallet>,
+      setupMathWallet() as WalletModuleFactory<BrowserWallet>,
+      setupMeteorWallet() as WalletModuleFactory<BrowserWallet>,
+      setupMeteorWalletApp({
+        contractId: "",
+      }) as WalletModuleFactory<BrowserWallet>,
+      setupNarwallets() as WalletModuleFactory<BrowserWallet>,
+      setupNightly() as WalletModuleFactory<BrowserWallet>,
+      setupOKXWallet() as WalletModuleFactory<BrowserWallet>,
+      setupRamperWallet() as WalletModuleFactory<BrowserWallet>,
+      setupWalletConnect({
+        projectId: "bde78605c842813c95fe91c9b4ed1f92",
+        metadata: {
+          name: "Hyperdep",
+          description: "Hyperdep",
+          url: "https://hyperdep.now",
+          icons: ["https://hyperdep.now/logo.png"],
+        },
+      }) as WalletModuleFactory<BrowserWallet>,
+      setupWelldoneWallet() as WalletModuleFactory<BrowserWallet>,
+      setupXDEFI() as WalletModuleFactory<BrowserWallet>,
     ],
   },
   evmConfig: {
