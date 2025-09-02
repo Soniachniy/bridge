@@ -21,6 +21,7 @@ import { formatTokenAmount } from "@/lib/utils";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import useProcessing from "@/hooks/useProcessing";
+import { SuccessScreen } from "./states/SuccessScreen";
 
 export enum EDepositMethod {
   WALLET = "wallet",
@@ -86,9 +87,7 @@ export default function Form() {
     [ProcessingStages.Processing]: (
       <ProcessingView signPermit={signPermit} currentStage={currentStage} />
     ),
-    [ProcessingStages.SuccessScreen]: (
-      <ProcessingView signPermit={signPermit} currentStage={currentStage} />
-    ),
+    [ProcessingStages.SuccessScreen]: <SuccessScreen />,
   };
 
   useEffect(() => {
