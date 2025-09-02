@@ -106,7 +106,7 @@ export const DepositView = () => {
             <div className="self-stretch text-center justify-start text-main_white text-base font-bold font-['Inter'] leading-normal">
               Your Deposit Address
             </div>
-            <div className="flex flex-row gap-2 flex-1 items-center">
+            <div className="flex md:flex-row flex-col gap-2 flex-1 items-center">
               <div className="flex flex-col flex-2 gap-4">
                 <div className="flex flex-row gap-2 items-center">
                   {selectedToken && (
