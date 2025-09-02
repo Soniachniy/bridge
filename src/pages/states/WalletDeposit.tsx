@@ -1,35 +1,34 @@
-import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
+import {
+  CHAIN_ICON,
+  CHAIN_TITLE,
+  getTokenIcon,
+  translateNetwork,
+} from "@/lib/1clickHelper";
 import { useFormContext } from "react-hook-form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { ActionButton } from "@/components/ActionButtons";
+import ArrowDown from "@/assets/arrow-down.svg?react";
 
-import {
-  cn,
-  formatTokenAmount,
-  getUriPrefix,
-  truncateAddress,
-} from "@/lib/utils";
+import { formatTokenAmount, truncateAddress } from "@/lib/utils";
 import { USDC_DECIMALS } from "@/lib/constants";
 
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
-import CopyIcon from "@/assets/copy-icon.svg?react";
 import LoadingIcon from "@/assets/loading-icon.svg?react";
-import ArrowDown from "@/assets/arrow-down.svg?react";
+import useNetwork from "@/hooks/useNetworkHandler";
+import { useTokens } from "@/providers/token-context";
 import { FormInterface } from "@/lib/validation";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 import { useState } from "react";
 
-import { Network } from "@/config";
-import { QrcodeSVG } from "react-qrcode-pretty";
-
-export const DepositView = () => {
+export const WalletDepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
   const [isLoading, setIsLoading] = useState(false);
-  const [depositViewVisible, setDepositViewVisible] = useState(false);
   const { watch } = useFormContext<FormInterface>();
-
+  const tokens = useTokens();
   const selectedToken = watch("selectedToken");
-
+  const { makeDeposit } = useNetwork(
+    translateNetwork(selectedToken?.blockchain)
+  );
   const amountOut = watch("amountOut");
   const amountIn: string = watch("amount");
   const depositAddress = watch("depositAddress");
@@ -37,20 +36,16 @@ export const DepositView = () => {
   const gasFee = watch("gasFee");
   const refundAddress = watch("refundAddress");
   const hyperliquidAddress: string = watch("hyperliquidAddress");
-  const uriPrefix = getUriPrefix(
-    selectedToken?.blockchain as unknown as Network
-  );
 
   return (
     <>
       <div className="flex flex-col gap-6 self-center inline-flex justify-between items-start bg-form rounded-4xl p-6 w-full md:w-[540px]">
         <div className="flex flex-col gap-2 w-full">
           <div className="self-stretch text-center justify-start text-main_white text-xl font-bold font-['Inter'] leading-normal">
-            Deposit to Hyperliquid Manually
+            Confirm Transaction Details
           </div>
           <div className="self-stretch text-center justify-center text-gray_text text-sm font-normal font-['Inter'] leading-tight">
-            Send the exact amount to the address below to complete your deposit.
-            Bridging and conversion will be handled automatically.
+            Double-check the details before proceeding.
           </div>
         </div>
         <div className="self-stretch text-center justify-center">
@@ -60,94 +55,6 @@ export const DepositView = () => {
           <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
             23h 59m
           </span>
-        </div>
-
-        <div
-          className={
-            "relative flex flex-col bg-[#1D4D44] rounded-3xl gap-2 w-full flex"
-          }
-        >
-          {!depositViewVisible && (
-            <div className="text-center justify-center items-center z-10 absolute top-0 left-0 w-full h-full flex flex-col gap-2">
-              <div className="px-4">
-                <span className="text-main_white text-sm font-bold font-['Inter'] leading-tight">
-                  Important:{" "}
-                </span>
-                <span className="text-main_white text-sm font-normal font-['Inter'] leading-tight">
-                  Please send exactly{" "}
-                </span>
-                <span className="text-main_white text-sm font-bold font-['Inter'] leading-tight">
-                  {amountIn} {selectedToken?.symbol}{" "}
-                </span>
-                <span className="text-main_white text-sm font-normal font-['Inter'] leading-tight">
-                  as shown. <br />
-                  Some exchanges may not support refunds if you send a different
-                  amount. If the amount doesn’t match, your transfer could fail
-                  or be delayed.
-                </span>
-              </div>
-              <ActionButton
-                variant="primary"
-                className="text-base font-semibold"
-                onClick={() => {
-                  setDepositViewVisible(true);
-                }}
-              >
-                I Understand, Show Deposit Address
-              </ActionButton>
-            </div>
-          )}
-          <div
-            className={cn(
-              "flex flex-col rounded-3xl p-4 gap-2 w-full flex",
-              depositViewVisible ? "backdrop-blur-none" : "bg-form blur-md"
-            )}
-          >
-            <div className="self-stretch text-center justify-start text-main_white text-base font-bold font-['Inter'] leading-normal">
-              Your Deposit Address
-            </div>
-            <div className="flex flex-row gap-2 flex-1 items-center">
-              <div className="flex flex-col flex-2 gap-4">
-                <div className="flex flex-row gap-2 items-center">
-                  {selectedToken && (
-                    <>
-                      <div className="justify-start text-gray_text text-sm font-normal font-['Inter'] leading-none">
-                        Network:
-                      </div>
-                      <div className="flex flex-row gap-2 items-center justify-start text-white text-sm font-semibold font-['Inter'] leading-none">
-                        <img
-                          src={CHAIN_ICON[selectedToken?.blockchain]}
-                          alt={selectedToken?.blockchain ?? "blockchain"}
-                          className="size-6 rounded-full"
-                        />
-                        {CHAIN_TITLE[selectedToken?.blockchain ?? "ethereum"]}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="h-12 px-4 py-3 rounded-xl outline outline-1 outline-offset-[-1px] outline-teal-200/40 inline-flex justify-between items-center">
-                  <div className="justify-center text-main_white text-base font-semibold font-['Inter'] leading-none">
-                    {truncateAddress(depositAddress, 24, 10, 10)}
-                  </div>
-                  <CopyIcon
-                    className="size-6 cursor-pointer relative"
-                    onClick={() => {
-                      navigator.clipboard.writeText(depositAddress ?? "");
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col justify-center items-center flex-1 gap-2">
-                <QrcodeSVG
-                  value={`${uriPrefix}:${depositAddress}?value=${amountIn}`}
-                  padding={10}
-                  size={116}
-                  bgColor="#fff"
-                  bgRounded
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="gap-2 flex flex-row justify-between items-center w-full">
@@ -264,23 +171,38 @@ export const DepositView = () => {
         </div>
 
         <div className="flex flex-row gap-2 px-4 w-full">
-          {!depositViewVisible && (
-            <ActionButton
-              variant="secondary"
-              className="flex-1"
-              onClick={() => {
-                actorRef.send({ type: "back_to_asset_selection" });
-              }}
-            >
-              Back
-            </ActionButton>
-          )}
+          <ActionButton
+            variant="secondary"
+            className="flex-1"
+            onClick={() => {
+              actorRef.send({ type: "back_to_asset_selection" });
+            }}
+          >
+            Back
+          </ActionButton>
           <ActionButton
             variant="primary"
             className="flex-5"
-            disabled={isLoading || !depositViewVisible}
+            disabled={isLoading}
             onClick={async () => {
+              if (!selectedToken || !depositAddress || !amountIn) {
+                return;
+              }
               setIsLoading(true);
+              const result = await makeDeposit(
+                selectedToken,
+                depositAddress,
+                amountIn,
+                tokens[selectedToken?.assetId].decimals,
+                {
+                  balance: selectedToken.balance,
+                  nearBalance: selectedToken.balanceNear,
+                }
+              );
+
+              if (!result) {
+                setIsLoading(false);
+              }
             }}
           >
             {isLoading ? (
@@ -288,7 +210,7 @@ export const DepositView = () => {
                 <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
               </div>
             ) : (
-              "Confirm deposit"
+              "Confirm & Create Transaction"
             )}
           </ActionButton>
         </div>

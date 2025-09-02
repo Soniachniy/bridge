@@ -16,11 +16,12 @@ export const ActionButton = memo(
   }) => {
     const buttonClasses = useMemo(() => {
       const baseClasses =
-        "flex-1 px-4 py-3 rounded-xl flex justify-center items-center cursor-pointer overflow-hidden w-full max-w-[480px] text-base font-normal font-inter text-center leading-normal";
+        "select-none px-4 py-3 rounded-xl flex justify-center items-center cursor-pointer overflow-hidden text-base font-normal font-inter text-center leading-normal";
       const variantClasses = {
         primary: "bg-main_light text-main",
-        secondary: "text-main_light hover:bg-element text-main",
-        tertiary: "font-semibold hover:bg-yellow-200 text-main bg-yellow-400",
+        secondary:
+          "text-main_light text-base font-semibold font-['Inter'] bg-teal-200/10 hover:bg-teal-200/20",
+        tertiary: "font-semibold hover:bg-yellow-200 bg-[#FFCC00] text-main",
         quaternary:
           "text-main_light text-base bg:transparent hover:bg-element text-main",
       };
@@ -30,14 +31,9 @@ export const ActionButton = memo(
       }`;
     }, [variant, className, disabled]);
 
-    const containerClasses =
-      "self-stretch inline-flex justify-center items-start w-full";
-
     return (
-      <div className={containerClasses}>
-        <div onClick={onClick} className={buttonClasses}>
-          {children}
-        </div>
+      <div onClick={disabled ? undefined : onClick} className={buttonClasses}>
+        {children}
       </div>
     );
   }

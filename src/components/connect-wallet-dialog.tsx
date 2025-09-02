@@ -151,7 +151,7 @@ const ConnectWalletDialog: FC = () => {
           )}
           {connectors.length > 0 && (
             <>
-              <div className="flex items-center flex-row justify-between h-fit w-full gap-2 shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
+              <div className="flex select-none items-center flex-row justify-between h-fit w-full gap-2 shrink-0 text-white text-base font-semibold font-['Inter'] leading-normal">
                 Connect wallets
               </div>
               <div className="flex flex-col">

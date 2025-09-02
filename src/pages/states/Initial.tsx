@@ -7,12 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import WalletIcon from "@/assets/wallet-icon.svg?react";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 import ErrorIcon from "@/assets/form-error-icon.svg?react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 
 import useSwapQuote from "@/hooks/useSwapQuote";
@@ -27,14 +22,16 @@ import {
   translateNetwork,
 } from "@/lib/1clickHelper";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { Network } from "@/config";
+import { Network, translateTokenToNetwork } from "@/config";
 import { EStrategy } from "../Form";
 import useNetwork from "@/hooks/useNetworkHandler";
 import SelectNetworkDialog from "@/components/select-network";
-import InfoIcon from "@/assets/warning-icon.svg?react";
 import LogoutIcon from "@/assets/logout-icon.svg?react";
-import SlippageDialog from "@/components/slippage-dialog";
+import ArrowDown from "@/assets/arrow-down.svg?react";
 import { Loader } from "lucide-react";
+import { Toggle } from "@/components/toggle";
+import { motion } from "framer-motion";
+import SlippageDialog from "@/components/slippage-dialog";
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -54,6 +51,7 @@ export const InitialView = () => {
   const slippageValue = watch("slippageValue");
   const hyperliquidAddress = watch("hyperliquidAddress");
   const refundAddress = watch("refundAddress");
+  const strategy = watch("strategy");
 
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 100 : 0, [
     amountIn,
@@ -72,44 +70,8 @@ export const InitialView = () => {
     trigger,
   });
 
-  const {
-    connectWallet,
-    isConnected,
-    getPublicKey,
-    disconnectWallet,
-    getBalance,
-  } = useNetwork(translateNetwork(selectedToken?.blockchain), setValue);
-
-  useEffect(() => {
-    const getSelectedTokenBalance = async () => {
-      try {
-        if (
-          selectedToken &&
-          selectedToken.balanceUpdatedAt === 0 &&
-          refundAddress
-        ) {
-          const { balance, nearBalance } = await getBalance(
-            selectedToken.assetId,
-            selectedToken.contractAddress,
-            selectedToken.blockchain
-          );
-          if (balance) {
-            setValue("selectedToken", {
-              ...selectedToken,
-              balance: balance,
-              balanceNear: nearBalance,
-              balanceUpdatedAt: Date.now(),
-            });
-            trigger("amount");
-          }
-        }
-      } catch (e) {
-        console.log(e, "error while getting balance");
-      }
-    };
-
-    getSelectedTokenBalance();
-  }, [selectedToken?.assetId]);
+  const { connectWallet, isConnected, getPublicKey, disconnectWallet } =
+    useNetwork(translateNetwork(selectedToken?.blockchain), setValue);
 
   const connectWalletHandler = useCallback(
     (network: Network) => {
@@ -118,163 +80,183 @@ export const InitialView = () => {
     [connectWallet, isConnected]
   );
 
-  return (
-    <div className="flex flex-col gap-6">
-      <SlippageDialog />
+  useEffect(() => {
+    if (selectedToken?.blockchain) {
+      setValue(
+        "refundAddress",
+        getPublicKey(translateTokenToNetwork(selectedToken.blockchain))
+      );
+    }
+  }, [
+    isConnected(translateTokenToNetwork(selectedToken.blockchain)),
+    selectedToken.blockchain,
+  ]);
 
-      <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px]">
-        <div className="flex flex-row gap-2 justify-between w-full">
-          <div className="self-stretch justify-start text-gray_text text-base font-semibold font-['Inter']">
-            Pick your asset and network
-          </div>
-          <SelectNetworkDialog
-            connectWallet={connectWalletHandler}
-            disconnectWallet={disconnectWallet}
-            getPublicKey={getPublicKey}
-          />
+  return (
+    <>
+      <div className="flex flex-col justify-center items-center mb-8">
+        <div className="mb-2 text-center justify-start text-main_white text-4xl font-bold font-['Inter']">
+          Deposit to Hyperliquid from Any Chain
         </div>
-        <div className="flex flex-row gap-2 justify-between w-full bg-[#1B2429] rounded-2xl px-4">
-          <input
-            {...register("amount", {
-              onChange: (e) => {
-                const enforcedValue = enforcer(e.target.value);
-                if (enforcedValue === null) return;
-                setValue("amount", enforcedValue, { shouldValidate: true });
-              },
-            })}
-            type="text"
-            pattern="^[0-9]*[.,]?[0-9]*$"
-            className={`${
-              errors.amount ? "text-error" : "text-white"
-            } grow-1 w-full border-none outline-none text-2xl font-light bg-transparent font-inter leading-none`}
-            value={amountIn ?? ""}
-            placeholder="0"
-            inputMode="decimal"
-            autoComplete="off"
-            minLength={1}
-            maxLength={79}
-            spellCheck="false"
-            autoCorrect="off"
-          />
-          <SelectTokenDialog
-            {...register("selectedToken")}
-            selectToken={(token) => {
-              setValue("selectedToken", {
-                ...token,
-                balance: BigInt(0),
-                balanceNear: BigInt(0),
-                balanceUpdatedAt: 0,
-              });
-            }}
-            selectedToken={selectedToken}
-            getPublicKey={getPublicKey}
-          />
-        </div>
-        {errors.amount && (
-          <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
-            <span>{errors.amount.message?.toString()}</span>
-          </div>
-        )}
+        <span className="mb-4 opacity-60 text-center justify-start text-main_white text-base font-normal font-['Inter'] leading-normal">
+          A fast and friendly way to top up your Hyperliquid account. We hide
+          the complexity
+          <br /> of bridges: just connect your wallet, pick an asset, and we do
+          the rest.
+        </span>
       </div>
-      <div className="flex flex-col gap-1 justify-center items-center w-full md:w-[480px] w-full">
-        <div className="flex flex-row gap-2 justify-between w-full">
-          <div className="self-stretch justify-start text-gray_text text-base font-semibold font-['Inter']">
-            To
+      <motion.div
+        layout="preserve-aspect"
+        transition={{
+          height: { duration: 4, ease: "easeInOut" },
+        }}
+        className="flex flex-col gap-6 bg-form rounded-4xl p-6 w-full md:w-[540px]"
+      >
+        <Toggle />
+        <div className="flex flex-col gap-4 justify-center items-center bg-input-custom rounded-3xl p-[16px] ">
+          {strategy === EStrategy.Wallet && (
+            <SelectNetworkDialog
+              connectWallet={connectWalletHandler}
+              disconnectWallet={disconnectWallet}
+              getPublicKey={getPublicKey}
+            />
+          )}
+          <div className="flex flex-row gap-2 justify-between w-full rounded-2xl">
+            <input
+              {...register("amount", {
+                onChange: (e) => {
+                  const enforcedValue = enforcer(e.target.value);
+                  if (enforcedValue === null) return;
+                  setValue("amount", enforcedValue, { shouldValidate: true });
+                },
+              })}
+              type="text"
+              pattern="^[0-9]*[.,]?[0-9]*$"
+              className={`${
+                errors.amount ? "text-error" : "text-main_white"
+              } grow-1 w-full border-none outline-none placeholder:text-main_white text-3xl font-semibold bg-transparent font-inter leading-none`}
+              value={amountIn ?? ""}
+              placeholder="0"
+              inputMode="decimal"
+              autoComplete="off"
+              minLength={1}
+              maxLength={79}
+              spellCheck="false"
+              autoCorrect="off"
+            />
+            <SelectTokenDialog
+              {...register("selectedToken")}
+              selectToken={(token) => {
+                setValue("selectedToken", {
+                  ...token,
+                  balance: BigInt(0),
+                  balanceNear: BigInt(0),
+                  balanceUpdatedAt: 0,
+                });
+              }}
+              selectedToken={selectedToken}
+              getPublicKey={getPublicKey}
+            />
           </div>
-          {!hyperliquidAddress ? (
-            <div
-              onClick={() => connectWallet(Network.ARBITRUM)}
-              className="flex cursor-pointer flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline "
-            >
-              Connect Hyperliquid Wallet
-            </div>
-          ) : (
-            <div className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] underline ">
-              <WalletIcon fill="#97fce4" className="self-center" />
-              {truncateAddress(getPublicKey(Network.ARBITRUM))}
-              <LogoutIcon
-                onClick={() => disconnectWallet(Network.ARBITRUM)}
-                className="w-4 h-4 self-center"
-              />
+          {errors.amount && (
+            <div className="text-error word-break text-xs w-full font-normal text-left  font-inter">
+              <span>{errors.amount.message?.toString()}</span>
             </div>
           )}
         </div>
-        <div className="flex flex-row gap-2 align-center justify-between w-full bg-[#1B2429] rounded-2xl px-4">
-          <span
-            className={`grow-1 relative border-none outline-none text-2xl font-light bg-transparent font-inter leading-none self-center ${
-              Number(amountOut) === 0 ? "text-gray_text" : "text-main_light"
-            }`}
-          >
-            {amountOut ?? "0"}
-            {isFetching && (
-              <span className="text-gray_text flex flex-row gap-1 items-center text-xs font-normal font-['Inter'] absolute bottom-[-16px]">
-                Loading <Loader className="size-4 animate-spin" />
-              </span>
-            )}
-          </span>
 
-          <div className="flex flex-row gap-2 px-2 py-2 items-center">
-            <div className="relative h-[55px] flex items-center">
-              <img
-                src={getTokenIcon({ symbol: "USDC" } as TokenResponse)}
-                alt={"USDC"}
-                className="size-12 rounded-full"
-              />
-              <HyperliquidIcon className="absolute size-4 -bottom-1 -right-1 border border-black rounded-full" />
-            </div>
-            <div className="flex flex-col gap-2 items-start">
-              <p className="justify-center text-white text-sm font-normal font-['Inter'] leading-none">
-                USDC
-              </p>
-              <p className="justify-center text-gray_text text-[10px] font-normal font-['Inter'] leading-none">
-                {CHAIN_TITLE[TokenResponse.blockchain.ARB]}
-              </p>
-            </div>
-          </div>
+        <div className="flex flex-row align-center justify-center relative">
+          <SlippageDialog />
+          <ArrowDown className="self-center" />
         </div>
-        {errors.amountOut && (
-          <div className="text-error word-break text-xs md:w-[480px] font-normal text-left  font-inter">
-            <span>{errors.amountOut.message?.toString()}</span>
+
+        <div className="flex flex-col gap-2 justify-center items-center w-full bg-input-custom rounded-3xl p-[16px]  w-full">
+          <div className="flex flex-row gap-2 justify-between w-full">
+            {!hyperliquidAddress && (
+              <div className="select-none text-center justify-center flex flex-row items-center gap-2 relative text-main_white text-base font-normal font-['Inter'] leading-normal">
+                <div className="size-3 left-[6px] top-[6px] bg-red-400 rounded-full" />
+                <span>Connect Hyperliquid Wallet</span>
+              </div>
+            )}
+
+            {!hyperliquidAddress ? (
+              <div
+                onClick={() => connectWallet(Network.ARBITRUM)}
+                className="text-main text-base font-semibold font-['Inter'] bg-main_light rounded-md px-2 py-1 cursor-pointer"
+              >
+                Connect
+              </div>
+            ) : (
+              <div className="flex w-full flex-row gap-2 justify-end align-center text-main_light text-sm font-normal font-['Inter'] underline ">
+                <WalletIcon fill="#97fce4" className="self-center" />
+                {truncateAddress(getPublicKey(Network.ARBITRUM))}
+                <LogoutIcon
+                  onClick={() => disconnectWallet(Network.ARBITRUM)}
+                  className="w-4 h-4 self-center"
+                />
+              </div>
+            )}
           </div>
-        )}
-        {selectedToken && !isConnected(selectedToken?.blockchain) && (
-          <div className="flex flex-col gap-2 mt-6 w-full md:w-[480px]">
-            <div className="flex flex-row justify-between w-full gap-2 items-center">
-              <label className="text-gray_text font-normal text-xs font-inter">
-                Refund address
-              </label>
-              <TooltipProvider>
-                <Tooltip delayDuration={150}>
-                  <TooltipTrigger asChild>
-                    <InfoIcon stroke="#97FCE4" className="w-4 h-4" />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    align="end"
-                    className="text-xs bg-black border-none px-4 py-4"
-                  >
-                    <div className="flex text-left text-white flex-col gap-1 text-main_white text-xs font-normal font-['Inter']">
-                      If the swap fails, we'll refund source asset to this
-                      address. If you connect Wallet on the Source chain, we
-                      will us it as Refund address. (Required)
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <div className="bg-[#1B2429] rounded-xl grow-1 p-3 flex flex-row justify-between items-center gap-7 md:w-[480px] h-12 sm:w-full">
-              <div className="flex flex-col grow-1 gap-1 w-[210px]">
-                <div className="flex flex-row grow-1 items-center">
-                  <input
-                    type="text"
-                    {...register("refundAddress")}
-                    className="text-white border-none outline-none text-xs font-normal bg-transparent font-inter leading-none w-full"
-                    placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
-                    autoComplete="off"
-                    spellCheck="false"
-                    autoCorrect="off"
+          <div className="flex flex-row gap-2 align-center justify-between w-full rounded-2xl">
+            <span
+              className={`grow-1 relative border-none outline-none text-main_white text-3xl font-semibold bg-transparent font-inter self-center`}
+            >
+              {amountOut ?? "0"}
+              {isFetching && (
+                <span className="text-gray_text flex flex-row gap-1 items-center text-xs font-normal font-['Inter'] absolute bottom-[-16px]">
+                  Loading <Loader className="size-4 animate-spin" />
+                </span>
+              )}
+            </span>
+
+            <div className="flex flex-row gap-2 px-2 py-2 items-center">
+              <div className="relative flex items-center">
+                <div className="size-10 flex items-center justify-center rounded-full bg-white">
+                  <img
+                    src={getTokenIcon({ symbol: "USDC" } as TokenResponse)}
+                    alt={"USDC"}
+                    className="size-8 rounded-full"
                   />
                 </div>
+                <HyperliquidIcon className="absolute size-4 bottom-0 right-0 border border-input-custom rounded-full" />
+              </div>
+              <div className="flex flex-col gap-2 items-start">
+                <p className="justify-center text-white text-base font-semibold font-['Inter'] leading-none">
+                  USDC
+                </p>
+                <p className="justify-center text-main_white text-xs font-normal opacity-60 font-['Inter'] leading-none">
+                  {CHAIN_TITLE[TokenResponse.blockchain.ARB]}
+                </p>
+              </div>
+            </div>
+          </div>
+          {errors.amountOut && (
+            <div className="text-error word-break text-xs w-full font-normal text-left  font-inter">
+              <span>{errors.amountOut.message?.toString()}</span>
+            </div>
+          )}
+        </div>
+        {strategy === EStrategy.Manual ? (
+          <div className="flex mt-6 px-4 flex-col gap-3 w-full">
+            <div className="flex flex-col gap-2">
+              <div className="justify-center text-main_white text-sm font-normal font-['Inter'] leading-none">
+                Refund Address
+              </div>
+              <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
+                If the swap fails, your assets will be refunded to this address.
+              </div>
+            </div>
+            <div className="rounded-xl grow-1 p-3 flex border-1 border-[#458779] active:border-main_light hover:border-main_light flex-row justify-between items-center w-full h-12">
+              <div className="flex flex-col grow-1 gap-1 w-full">
+                <input
+                  type="text"
+                  {...register("refundAddress")}
+                  className="text-white border-none outline-none text-xs font-normal grow-1  font-inter leading-none w-full"
+                  placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
+                  autoComplete="off"
+                  spellCheck="false"
+                  autoCorrect="off"
+                />
               </div>
 
               <div className="flex flex-row justify-end items-center gap-1">
@@ -291,23 +273,27 @@ export const InitialView = () => {
                       setValue("refundAddress", text);
                       trigger("refundAddress");
                     }}
-                    className="text-center cursor-pointer bg-main_light rounded-[5px] px-2 py-1 justify-center text-main text-xs font-normal font-['Inter'] leading-none"
+                    className="text-center cursor-pointer rounded-[5px] px-2 py-1 justify-center  text-main_light text-base font-semibold font-['Inter'] leading-none"
                   >
-                    paste
+                    Paste
                   </div>
                 </div>
               </div>
             </div>
             {errors.refundAddress && (
-              <div className="text-error word-break text-xs w-full md:w-[480px] font-normal text-left  font-inter">
+              <div className="text-error word-break text-xs w-full font-normal text-left  font-inter">
                 <span>{errors.refundAddress.message?.toString()}</span>
               </div>
             )}
           </div>
+        ) : (
+          <div className="flex justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
+            Refunds (if needed) will be sent to your Source Wallet
+          </div>
         )}
-      </div>
-      <ConnectButton isLoading={isFetching} evmAddress={hyperliquidAddress} />
-    </div>
+        <ConnectButton isLoading={isFetching} evmAddress={hyperliquidAddress} />
+      </motion.div>
+    </>
   );
 };
 
@@ -321,7 +307,7 @@ export const ConnectButton = ({
   const actorRef = BridgeFormMachineContext.useActorRef();
   const {
     watch,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = useFormContext();
   const refundAddress = watch("refundAddress");
   const selectedToken = watch("selectedToken");
@@ -330,7 +316,7 @@ export const ConnectButton = ({
 
   if (!evmAddress) {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <ActionButton variant="primary" disabled className="w-full">
           Continue
         </ActionButton>
@@ -342,7 +328,7 @@ export const ConnectButton = ({
   }
   if (Number(amountIn) === 0 || !selectedToken) {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <ActionButton variant="primary" disabled className="w-full">
           Continue
         </ActionButton>
@@ -354,7 +340,7 @@ export const ConnectButton = ({
   }
   if (strategy === EStrategy.Manual && !refundAddress) {
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <ActionButton variant="primary" disabled className="w-full">
           Continue
         </ActionButton>
@@ -366,10 +352,11 @@ export const ConnectButton = ({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       <ActionButton
         variant="primary"
         onClick={async () => {
+          console.log("isValid", isValid, errors);
           if (!isValid) {
             return;
           }

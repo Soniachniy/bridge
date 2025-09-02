@@ -17,6 +17,7 @@ const config: Config = {
       colors: {
         background: "#0F1A20",
         foreground: "#0F1A20",
+
         card: {
           DEFAULT: "#0F1A20",
           foreground: "#0F1A20",
@@ -46,7 +47,7 @@ const config: Config = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
+        custom: "rgba(151, 252, 228, 0.1)",
         ring: "hsl(var(--ring))",
         chart: {
           "1": "hsl(var(--chart-1))",

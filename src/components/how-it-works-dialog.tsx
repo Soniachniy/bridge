@@ -10,26 +10,25 @@ import {
 import { FC } from "react";
 
 import QuestionMarkIcon from "@/assets/question-icon.svg?react";
-import { XIcon } from "lucide-react";
+
+import XIcon from "@/assets/close-icon.svg?react";
 
 const HowItWorksDialog: FC = () => {
   return (
     <Dialog>
       <DialogTrigger>
-        <div className="flex flex-row gap-2 justify-center align-center text-main_light text-sm font-normal font-['Inter'] ">
-          <div className="flex flex-row gap-2 justify-center align-center">
-            <span className="hidden text-center justify-center text-main_white text-base font-normal font-['Inter'] sm:flex">
-              How it works
-            </span>
-            <QuestionMarkIcon className="w-4 h-4 self-center" />
-          </div>
+        <div className="flex flex-row gap-2 justify-center align-center cursor-pointer">
+          <span className="hidden text-center justify-center text-main_white text-base font-semibold font-['Inter'] sm:flex">
+            How it works
+          </span>
+          <QuestionMarkIcon className="w-5 h-5 self-center" />
         </div>
       </DialogTrigger>
       <DialogContent
         showCloseButton={false}
         className="flex  justify-center items-center md:w-[480px] w-full mt-1 md:mr-[48px] !border-none  max-w-xs outline-none outline-main_dark bg-main_dark flex rounded-2xl !px-0 !pb-0 !pt-0 "
       >
-        <DialogClose className=" top-6 right-6 absolute" asChild>
+        <DialogClose className=" top-6 right-6 absolute cursor-pointer" asChild>
           <button>
             <XIcon className="w-4 h-4 text-main_dark" stroke="#fff" />
           </button>

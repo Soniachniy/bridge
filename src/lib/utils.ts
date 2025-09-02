@@ -34,12 +34,17 @@ export const enforcer = (event: string) => {
   return null;
 };
 
-export function truncateAddress(address: string | undefined | null): string {
+export function truncateAddress(
+  address: string | undefined | null,
+  limit: number = 16,
+  prefix: number = 6,
+  suffix: number = 4
+): string {
   if (!address) return "";
-  if (address.length <= 16) return address;
+  if (address.length <= limit) return address;
 
-  return `${address.substring(0, 6)}...${address.substring(
-    address.length - 4
+  return `${address.substring(0, prefix)}...${address.substring(
+    address.length - suffix
   )}`;
 }
 
@@ -107,3 +112,35 @@ export const isEVMNetwork = (network: Network) => {
     network === Network.DOGE
   );
 };
+
+export function getUriPrefix(network: Network): string {
+  switch (network) {
+    case Network.BITCOIN:
+      return "bitcoin";
+    case Network.DOGE:
+      return "dogecoin";
+    case Network.ETHEREUM:
+    case Network.ARBITRUM:
+    case Network.AURORA:
+    case Network.BASE:
+    case Network.BERA:
+    case Network.BNB:
+    case Network.GNOSIS:
+    case Network.POLYGON:
+      return "ethereum";
+    case Network.NEAR:
+      return "near";
+    case Network.SOLANA:
+      return "solana";
+    case Network.TON:
+      return "ton";
+    case Network.TRON:
+      return "tron";
+    case Network.XRP:
+      return "xrpl";
+    case Network.ZEC:
+      return "zcash";
+    default:
+      return "";
+  }
+}

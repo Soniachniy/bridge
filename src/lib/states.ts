@@ -2,17 +2,14 @@ import { createMachine } from "xstate";
 
 export enum ProcessingStages {
   AssetSelection = "AssetSelection",
-  DetailsReview = "DetailsReview",
+  WalletDeposit = "WalletDeposit",
   ManualDeposit = "ManualDeposit",
   AwaitingDeposit = "AwaitingDeposit",
+  AwaitingManualDeposit = "AwaitingManualDeposit",
   Processing = "Processing",
-  UserPermit = "UserPermit",
   ErrorScreen = "ErrorScreen",
-  ExecutingDeposit = "ExecutingDeposit",
-  SignErrorScreen = "SignErrorScreen",
   SuccessScreen = "SuccessScreen",
   SwapErrorScreen = "SwapErrorScreen",
-  ManualDepositErrorScreen = "ManualDepositErrorScreen",
 }
 
 export const machine = createMachine({
@@ -23,7 +20,7 @@ export const machine = createMachine({
     [ProcessingStages.AssetSelection]: {
       on: {
         create_transaction: {
-          target: "DetailsReview",
+          target: "WalletDeposit",
         },
         manual_deposit: {
           target: "ManualDeposit",
@@ -32,34 +29,8 @@ export const machine = createMachine({
           target: "Processing",
         },
       },
-      description:
-        "The user selects the asset and blockchain, and fills in the desired amount of tokens. Validation occurs to determine if the form is completely filled out.",
     },
-    [ProcessingStages.DetailsReview]: {
-      on: {
-        awaiting_deposit: {
-          target: "AwaitingDeposit",
-        },
-        back_to_asset_selection: {
-          target: "AssetSelection",
-        },
-      },
-      description:
-        "The user reviews all previously filled data. They may change the refund address if desired. The deposit address is shown if manual deposit was selected.",
-    },
-    [ProcessingStages.ManualDeposit]: {
-      on: {
-        awaiting_deposit: {
-          target: "AwaitingDeposit",
-        },
-        back_to_asset_selection: {
-          target: "AssetSelection",
-        },
-      },
-      description:
-        "The user reviews all previously filled data. They may change the refund address if desired. The deposit address is shown if manual deposit was selected.",
-    },
-    [ProcessingStages.AwaitingDeposit]: {
+    [ProcessingStages.WalletDeposit]: {
       on: {
         start_processing: {
           target: "Processing",
@@ -67,15 +38,23 @@ export const machine = createMachine({
         back_to_asset_selection: {
           target: "AssetSelection",
         },
-        sign_permit: {
-          target: "UserPermit",
+      },
+    },
+    [ProcessingStages.ManualDeposit]: {
+      on: {
+        start_processing: {
+          target: "Processing",
+        },
+        back_to_asset_selection: {
+          target: "AssetSelection",
         },
       },
     },
+
     [ProcessingStages.Processing]: {
       on: {
-        sign_permit: {
-          target: "UserPermit",
+        success: {
+          target: "SuccessScreen",
         },
         error: {
           target: "ErrorScreen",
@@ -84,24 +63,8 @@ export const machine = createMachine({
           target: "AssetSelection",
         },
       },
-      description:
-        "An idle screen is displayed while an asynchronous request is made to process the transaction. Different titles are shown based on the backend status response.",
     },
-    [ProcessingStages.UserPermit]: {
-      on: {
-        signed: {
-          target: "ExecutingDeposit",
-        },
-        sign_error: {
-          target: "SignErrorScreen",
-        },
-        back_to_asset_selection: {
-          target: "AssetSelection",
-        },
-      },
-      description:
-        "Data from the server is presented that requires signing with the user's EVM wallet. The machine waits until the user performs the signing.",
-    },
+
     [ProcessingStages.ErrorScreen]: {
       on: {
         retry: {
@@ -111,43 +74,13 @@ export const machine = createMachine({
           target: "AssetSelection",
         },
       },
-      description:
-        "An error screen is displayed if there was an issue while swapping the assets.",
-    },
-    [ProcessingStages.ExecutingDeposit]: {
-      on: {
-        success: {
-          target: "SuccessScreen",
-        },
-        swap_error: {
-          target: "SwapErrorScreen",
-        },
-        manual_deposit_error: {
-          target: "ManualDepositErrorScreen",
-        },
-        back_to_asset_selection: {
-          target: "AssetSelection",
-        },
-      },
-      description:
-        "The deposit is executed. Upon completion, the success screen is displayed.",
-    },
-    [ProcessingStages.SignErrorScreen]: {
-      on: {
-        retry_sign: {
-          target: "UserPermit",
-        },
-        back_to_asset_selection: {
-          target: "AssetSelection",
-        },
-      },
-      description:
-        "The user is asked to sign again if there was an error while signing the permit.",
     },
     [ProcessingStages.SuccessScreen]: {
-      type: "final",
-      description:
-        "The success screen is displayed after a successful deposit.",
+      on: {
+        back_to_asset_selection: {
+          target: "AssetSelection",
+        },
+      },
     },
     [ProcessingStages.SwapErrorScreen]: {
       on: {
@@ -160,10 +93,6 @@ export const machine = createMachine({
       },
       description:
         "A refund screen is shown if the swap failed, displaying refund information.",
-    },
-    [ProcessingStages.ManualDepositErrorScreen]: {
-      description:
-        "An additional screen is shown if the user took the manual deposit option and deposited less than needed.",
     },
   },
 });

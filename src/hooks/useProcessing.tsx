@@ -11,47 +11,55 @@ import { signTypedData, switchChain } from "@wagmi/core";
 import { ProcessingStages } from "@/lib/states";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 
-export const translateStatus = (status: string) => {
+export enum ServerStages {
+  idle = "idle",
+  pending_deposit = "pending_deposit",
+  deposit_received = "deposit_received",
+  ready_for_permit = "ready_for_permit",
+  executing_deposit = "executing_deposit",
+  processing = "processing",
+  completed = "completed",
+  failed = "failed",
+  deposit_failed = "deposit_failed",
+}
+
+export const stageToStep = (stage: ServerStages) => {
+  switch (stage) {
+    case ServerStages.pending_deposit:
+      return 0;
+    case ServerStages.deposit_received:
+      return 1;
+    case ServerStages.processing:
+      return 2;
+    case ServerStages.ready_for_permit:
+      return 3;
+    case ServerStages.executing_deposit:
+      return 4;
+    case ServerStages.completed:
+      return 5;
+    case ServerStages.failed:
+      return 5;
+    case ServerStages.deposit_failed:
+      return 5;
+    default:
+      return 0;
+  }
+};
+
+export const getNextView = (status: ServerStages) => {
   switch (status) {
     case "pending_deposit":
-      return ProcessingStages.AwaitingDeposit;
+      return ProcessingStages.Processing;
     case "deposit_received":
       return ProcessingStages.Processing;
     case "processing":
       return ProcessingStages.Processing;
-    case "ready_for_permit":
-      return ProcessingStages.UserPermit;
-    case "executing_deposit":
-      return ProcessingStages.ExecutingDeposit;
     case "completed":
       return ProcessingStages.SuccessScreen;
-    case "incomplete_deposit":
-      return ProcessingStages.ManualDepositErrorScreen;
     case "failed":
       return ProcessingStages.ErrorScreen;
     case "deposit_failed":
       return ProcessingStages.ErrorScreen;
-    default:
-      return ProcessingStages.ErrorScreen;
-  }
-};
-
-const redirectToStage = (stage: ProcessingStages) => {
-  switch (stage) {
-    case ProcessingStages.AwaitingDeposit:
-      return "awaiting_deposit";
-    case ProcessingStages.Processing:
-      return "start_processing";
-    case ProcessingStages.UserPermit:
-      return "sign_permit";
-    case ProcessingStages.ExecutingDeposit:
-      return "signed";
-    case ProcessingStages.SuccessScreen:
-      return "success";
-    case ProcessingStages.ErrorScreen:
-      return "swap_error";
-    case ProcessingStages.ManualDepositErrorScreen:
-      return "manual_deposit_error";
     default:
       return;
   }
@@ -59,12 +67,16 @@ const redirectToStage = (stage: ProcessingStages) => {
 
 export default function useProcessing(depositAddressParam?: string | null) {
   const actorRef = BridgeFormMachineContext.useActorRef();
+
+  const [currentStage, setCurrentStage] = useState<ServerStages>(
+    depositAddressParam ? ServerStages.pending_deposit : ServerStages.idle
+  );
+
   const tokens = useTokens();
   const { id: depositAddressFromParams } = useParams();
   const depositAddress = depositAddressParam || depositAddressFromParams;
 
   const [isPermitAsked, setIsPermitAsked] = useState(false);
-  const view = BridgeFormMachineContext.useSelector((s) => s.value);
 
   const signPermit = async (depositAddress: string) => {
     const permitData = await getPermitData(depositAddress);
@@ -116,7 +128,8 @@ export default function useProcessing(depositAddressParam?: string | null) {
         actorRef.send({ type: "error" });
       }
     };
-    const getDepositStatus = async (depositAddress: string, retries = 80) => {
+
+    const getDepositStatus = async (depositAddress: string, retries = 800) => {
       const timeInterval = 7000;
       const maxRetries = retries;
       let attempt = 0;
@@ -125,16 +138,15 @@ export default function useProcessing(depositAddressParam?: string | null) {
         try {
           await delay(timeInterval);
           const statusResponse = await getStatus(depositAddress);
+          setCurrentStage(statusResponse.data.status);
 
-          const stage = translateStatus(statusResponse.data.status);
-          if (stage !== view) {
-            const newView = redirectToStage(stage);
-            if (newView) {
-              actorRef.send({ type: newView });
-            }
+          if (statusResponse.data.status === "processing") {
+            actorRef.send({ type: "start_processing" });
           }
 
           if (statusResponse.data.status === "completed") {
+            actorRef.send({ type: "success" });
+
             return;
           }
         } catch (error) {
@@ -144,13 +156,19 @@ export default function useProcessing(depositAddressParam?: string | null) {
         attempt++;
       }
     };
-    startPolling();
-  }, [depositAddress, tokens]);
+    if (currentStage !== ServerStages.idle) {
+      startPolling();
+    }
+  }, [depositAddress, tokens, currentStage]);
 
   useEffect(() => {
+    if (depositAddress && currentStage === ServerStages.idle) {
+      setCurrentStage(ServerStages.pending_deposit);
+    }
+
     const processPermit = async () => {
       if (depositAddress) {
-        if (view === ProcessingStages.UserPermit) {
+        if (currentStage === ServerStages.ready_for_permit) {
           if (!isPermitAsked) {
             setIsPermitAsked(true);
             await signPermit(depositAddress);
@@ -159,9 +177,10 @@ export default function useProcessing(depositAddressParam?: string | null) {
       }
     };
     processPermit();
-  }, [view, depositAddress]);
+  }, [depositAddress, currentStage]);
 
   return {
+    currentStage,
     signPermit,
   };
 }
