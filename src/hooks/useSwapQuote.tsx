@@ -86,8 +86,10 @@ const useSwapQuote = ({
                   token.decimals
                 )} ${token.symbol}`,
               });
-            }
-            if (response?.error?.includes("Amount too low") && token?.price) {
+            } else if (
+              response?.error?.includes("Amount too low") &&
+              token?.price
+            ) {
               const minAmount = removeTrailingZeros(
                 Big(Math.round(MIN_AMOUNT / token.price)).toFixed(8)
               );
