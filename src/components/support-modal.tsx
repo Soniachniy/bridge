@@ -57,7 +57,7 @@ export const SupportModal = () => {
           </div>
         </DialogTrigger>
         <DialogContent
-          className="border-none  outline-none bg-main_dark rounded-4xl flex flex-col gap-6 justify-center items-center"
+          className="border-none !w-full sm:!max-w-100px outline-none bg-main_dark rounded-4xl flex flex-col gap-6 justify-center items-center"
           showCloseButton={false}
         >
           <DialogHeader>
@@ -80,8 +80,8 @@ export const SupportModal = () => {
                 <span className="font-bold">{addressToShow?.type}</span> address
                 with the support team.
               </DialogDescription>
-              <div className="h-12 px-4 py-3 rounded-xl outline outline-1 outline-offset-[-1px] outline-teal-200/40 inline-flex justify-between items-center">
-                <div className="justify-center text-main_white text-base font-semibold font-['Inter'] leading-none">
+              <div className="h-12 px-4 py-3 rounded-xl w-full outline outline-1 outline-offset-[-1px] outline-teal-200/40 inline-flex justify-between items-center">
+                <div className="justify-center w-full overflow-hidden whitespace-nowrap text-ellipsis text-main_white text-base font-semibold font-['Inter'] leading-none">
                   {addressToShow?.address}
                 </div>
                 <CopyIcon

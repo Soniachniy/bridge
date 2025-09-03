@@ -9,6 +9,7 @@ export const API_ROUTES = {
   STATUS: basicConfig.proxyApiPoint + "/api/status/",
   GET_PERMIT: basicConfig.proxyApiPoint + "/api/permit-data/",
   EXECUTE: basicConfig.proxyApiPoint + "/api/permit",
+  HISTORY: basicConfig.proxyApiPoint + "/api/transactions",
 };
 
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
@@ -65,6 +66,52 @@ export interface PermitDataResponse {
     };
     depositAddress: string;
     finalAmount: string;
+  };
+}
+
+export const getHistory = async (
+  hyperliquidAddress: string
+): Promise<HistoryResponse> => {
+  const response = await fetch(
+    API_ROUTES.HISTORY + "?hyperliquidAddress=" + hyperliquidAddress
+  );
+  return response.json();
+};
+
+export interface HistoryTransaction {
+  depositAddress: string;
+  assetFrom: string;
+  amountIn: string;
+  status: string;
+  oneClickStatus: string;
+  finalAmount: string;
+  finalTxHash: string;
+  errorMessage: string | null;
+  fees: {
+    expectedPlatformFee: string;
+    finalPlatformFee: string;
+    gasFee: string;
+    platformFeePercentage: number;
+    platformFeeMin: string;
+    platformFeeMax: string;
+  };
+  timestamps: {
+    createdAt: string;
+    updatedAt: string;
+    quoteExpiresAt: string;
+  };
+  needsPermit: boolean;
+  canRetry: boolean;
+  isCompleted: boolean;
+  isFailed: boolean;
+}
+
+export interface HistoryResponse {
+  success: boolean;
+  data: {
+    hyperliquidAddress: string;
+    totalTransactions: number;
+    transactions: HistoryTransaction[];
   };
 }
 

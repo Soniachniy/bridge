@@ -233,6 +233,7 @@ export const ProcessingView = ({
           </div>
           <ArrowDown
             className={cn("size-3", isDetailsVisible ? "rotate-180" : "")}
+            fill="#97FCE4"
           />
         </div>
         {isDetailsVisible && (
@@ -270,7 +271,7 @@ export const ProcessingView = ({
                   </div>
                 </div>
               )}
-              <ArrowDown className="rotate-270" />
+              <ArrowDown className="rotate-270" fill="#97FCE4" />
 
               <div className="relative flex flex-col flex-1 rounded-3xl justify-center items-center outline outline-1 outline-offset-[-1px] outline-teal-200/10 p-6 gap-3">
                 <div className="flex flex-row gap-2 items-start">

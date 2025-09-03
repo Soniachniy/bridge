@@ -130,7 +130,7 @@ const SelectTokenDialog: FC<Props> = ({
             </div>
           )}
 
-          <ChevronIcon color="#97fce4" className="size-3" />
+          <ChevronIcon color="#97fce4" fill="#97FCE4" className="size-3" />
         </Button>
       </Dialog.Trigger>
       <Dialog.Content

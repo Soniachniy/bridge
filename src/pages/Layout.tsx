@@ -9,6 +9,7 @@ import { formValidationSchema } from "@/lib/validation";
 import { EStrategy } from "@/pages/Form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { SLIPPAGE } from "@/lib/constants";
+import { useNavigate } from "react-router-dom";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const actorRef = BridgeFormMachineContext.useActorRef();
@@ -41,15 +42,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       txHash: "",
     },
   });
+  const navigate = useNavigate();
+
   return (
     <FormProvider {...methods}>
-      <div className="flex flex-col min-h-screen bg-main justify-between">
+      <div className="flex flex-col min-h-screen bg-main w-full justify-between">
         <header>
           <div className="flex justify-between items-center mx-5 md:mx-20 my-6">
             <div
               className="flex items-center gap-2"
               onClick={() => {
                 actorRef.send({ type: "back_to_asset_selection" });
+                navigate("/");
               }}
             >
               <img
@@ -61,7 +65,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <div className="flex flex-row items-center gap-4">
               <SupportModal />
-              <div className="flex flex-row gap-2 justify-center align-center cursor-pointer">
+              <div
+                className="flex flex-row gap-2 justify-center align-center cursor-pointer"
+                onClick={() => {
+                  navigate("/history");
+                }}
+              >
                 <span className="hidden text-center justify-center text-main_white text-base font-semibold font-['Inter'] sm:flex">
                   History
                 </span>

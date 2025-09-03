@@ -29,11 +29,6 @@ export const TokenContextProvider = ({
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
-  console.table(
-    Object.values(tokensData ?? {})
-      .filter((token) => !token.contractAddress)
-      .map((token) => [token.assetId, token.blockchain])
-  );
 
   return (
     <TokenContext.Provider value={{ tokens: tokensData }}>

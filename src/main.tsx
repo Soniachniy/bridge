@@ -7,6 +7,7 @@ import { WalletSelector } from "@near-wallet-selector/core";
 import { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import Layout from "./pages/Layout";
 import Form from "./pages/Form";
+import { History } from "./pages/History";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TokenContextProvider } from "./providers/token-context";
 
@@ -26,6 +27,7 @@ createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<Form />} />
               <Route path="/:id" element={<Form />} />
+              <Route path="/history" element={<History />} />
             </Routes>
           </Layout>
         </BrowserRouter>

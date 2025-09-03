@@ -64,6 +64,46 @@ export const getNextView = (status: ServerStages) => {
   }
 };
 
+export const signPermit = async (depositAddress: string, actorRef?: any) => {
+  const permitData = await getPermitData(depositAddress);
+  const { message, types, domain } = permitData.data;
+
+  await switchChain(wagmiAdapter.wagmiConfig, {
+    chainId: Number(domain.chainId),
+  });
+  const signature = await signTypedData(wagmiAdapter.wagmiConfig, {
+    account: message.owner as `0x${string}`,
+    types,
+    primaryType: "Permit",
+    domain: {
+      name: domain.name,
+      version: domain.version,
+      chainId: BigInt(domain.chainId),
+      verifyingContract: domain.verifyingContract as `0x${string}`,
+    },
+    message: {
+      owner: message.owner as `0x${string}`,
+      spender: message.spender as `0x${string}`,
+      value: BigInt(message.value),
+      nonce: BigInt(message.nonce),
+      deadline: BigInt(message.deadline),
+    },
+  });
+  actorRef?.send({ type: "signed" });
+  if (signature) {
+    const r = sliceHex(signature, 0, 32);
+    const s = sliceHex(signature, 32, 64);
+    const vByte = sliceHex(signature, 64, 65);
+    const v = parseInt(vByte, 16);
+
+    await execute(depositAddress, {
+      v: v,
+      r: r,
+      s: s,
+    });
+  }
+};
+
 export default function useProcessing(depositAddressParam?: string | null) {
   const actorRef = BridgeFormMachineContext.useActorRef();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,46 +116,6 @@ export default function useProcessing(depositAddressParam?: string | null) {
   const depositAddress = depositAddressParam || depositAddressFromParams;
 
   const [isPermitAsked, setIsPermitAsked] = useState(false);
-
-  const signPermit = async (depositAddress: string) => {
-    const permitData = await getPermitData(depositAddress);
-    const { message, types, domain } = permitData.data;
-
-    await switchChain(wagmiAdapter.wagmiConfig, {
-      chainId: Number(domain.chainId),
-    });
-    const signature = await signTypedData(wagmiAdapter.wagmiConfig, {
-      account: message.owner as `0x${string}`,
-      types,
-      primaryType: "Permit",
-      domain: {
-        name: domain.name,
-        version: domain.version,
-        chainId: BigInt(domain.chainId),
-        verifyingContract: domain.verifyingContract as `0x${string}`,
-      },
-      message: {
-        owner: message.owner as `0x${string}`,
-        spender: message.spender as `0x${string}`,
-        value: BigInt(message.value),
-        nonce: BigInt(message.nonce),
-        deadline: BigInt(message.deadline),
-      },
-    });
-    actorRef.send({ type: "signed" });
-    if (signature) {
-      const r = sliceHex(signature, 0, 32);
-      const s = sliceHex(signature, 32, 64);
-      const vByte = sliceHex(signature, 64, 65);
-      const v = parseInt(vByte, 16);
-
-      await execute(depositAddress, {
-        v: v,
-        r: r,
-        s: s,
-      });
-    }
-  };
 
   const { clearTimer } = useLocalStoreTimer();
 
