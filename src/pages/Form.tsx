@@ -1,9 +1,8 @@
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormContext } from "react-hook-form";
 
-import { FormInterface, formValidationSchema } from "@/lib/validation";
+import { FormInterface } from "@/lib/validation";
 
-import { SLIPPAGE, USDC_DECIMALS } from "@/lib/constants";
+import { USDC_DECIMALS } from "@/lib/constants";
 
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
 import { InitialView } from "./states/Initial";
@@ -18,7 +17,6 @@ import { useEffect } from "react";
 import { getStatus } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
 import { formatTokenAmount } from "@/lib/utils";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 
 import useProcessing from "@/hooks/useProcessing";
 import { SuccessScreen } from "./states/SuccessScreen";
