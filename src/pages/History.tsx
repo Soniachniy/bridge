@@ -26,7 +26,11 @@ const Status = ({ status }: { status: string }) => {
       </div>
     );
   }
-  if (status === ServerStages.failed) {
+  if (
+    status === "swap_failed" ||
+    status === "deposit_failed" ||
+    status === "failed"
+  ) {
     return (
       <div className="size- px-2 py-1 bg-red-500/10 rounded-2xl inline-flex justify-start items-center gap-2">
         <div className="justify-start text-red-500 text-xs font-semibold font-['Inter'] leading-none">
@@ -54,6 +58,7 @@ const HistoryCard = ({
   tokens: { [key: string]: TokenResponse };
   publicKey: string;
 }) => {
+  console.log(transaction);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const date = new Date(transaction.timestamps.createdAt);
@@ -272,7 +277,7 @@ export const History = () => {
       if (!address) {
         return null;
       }
-      return getHistory(address);
+      return getHistory("0x717771645d2cF6a84C72F7a39C907979f82692D4");
     },
   });
 
