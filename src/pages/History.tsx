@@ -237,32 +237,33 @@ const HistoryCard = ({
           </div>
         </div>
       )}
-      {transaction.status === ServerStages.ready_for_permit && (
-        <>
-          <ActionButton
-            variant="tertiary"
-            className="w-full"
-            disabled={loading}
-            onClick={async () => {
-              setLoading(true);
-              await signPermit(transaction.depositAddress);
-              await queryClient.invalidateQueries({
-                queryKey: ["history", publicKey ?? ""],
-              });
-              setLoading(false);
-            }}
-          >
-            {loading ? (
-              <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
-            ) : (
-              "Sign Permit"
-            )}
-          </ActionButton>
-          <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
-            Please confirm the message in your wallet
-          </div>
-        </>
-      )}
+      {transaction.status === ServerStages.ready_for_permit ||
+        (transaction.status === "deposit_failed" && (
+          <>
+            <ActionButton
+              variant="tertiary"
+              className="w-full"
+              disabled={loading}
+              onClick={async () => {
+                setLoading(true);
+                await signPermit(transaction.depositAddress);
+                await queryClient.invalidateQueries({
+                  queryKey: ["history", publicKey ?? ""],
+                });
+                setLoading(false);
+              }}
+            >
+              {loading ? (
+                <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
+              ) : (
+                "Sign Permit"
+              )}
+            </ActionButton>
+            <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
+              Please confirm the message in your wallet
+            </div>
+          </>
+        ))}
     </div>
   );
 };
@@ -277,7 +278,7 @@ export const History = () => {
       if (!address) {
         return null;
       }
-      return getHistory("0x717771645d2cF6a84C72F7a39C907979f82692D4");
+      return getHistory(address);
     },
   });
 
