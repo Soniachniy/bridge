@@ -106,7 +106,7 @@ const HistoryCard = ({
             </div>
             <div className="text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
               {formatTokenAmount(
-                transaction.amountIn,
+                transaction.amountIn ?? 0,
                 tokens[transaction.assetFrom]?.decimals
               )}
             </div>
@@ -128,7 +128,7 @@ const HistoryCard = ({
               </div>
             </div>
             <div className="text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
-              {formatTokenAmount(transaction.finalAmount, USDC_DECIMALS)}
+              {formatTokenAmount(transaction.finalAmount ?? 0, USDC_DECIMALS)}
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ const HistoryCard = ({
             </div>
             <div className="text-main_white text-xs font-semibold font-['Inter']">
               {formatTokenAmount(
-                transaction.amountIn,
+                transaction.amountIn ?? 0,
                 tokens[transaction.assetFrom]?.decimals
               )}{" "}
               {tokens[transaction.assetFrom]?.symbol}
@@ -210,7 +210,8 @@ const HistoryCard = ({
               Amount to receive:
             </div>
             <div className=" text-main_white text-xs font-semibold font-['Inter']">
-              {formatTokenAmount(transaction.finalAmount, USDC_DECIMALS)} USDC
+              {formatTokenAmount(transaction.finalAmount ?? 0, USDC_DECIMALS)}{" "}
+              USDC
             </div>
           </div>
           <div className="flex flex-row items-center w-full justify-between">
@@ -271,7 +272,7 @@ export const History = () => {
       if (!address) {
         return null;
       }
-      return getHistory(address);
+      return getHistory("0x717771645d2cF6a84C72F7a39C907979f82692D4");
     },
   });
 
@@ -285,7 +286,7 @@ export const History = () => {
         <div className="flex flex-col flex-1 items-center gap-4 w-full">
           <ActionButton
             variant="secondary"
-            className="w-full"
+            className="w-[480px] md:w-full"
             onClick={() => connectWallet(Network.ETHEREUM)}
           >
             Connect Wallet
