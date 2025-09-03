@@ -1,7 +1,7 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { formValidationSchema } from "@/lib/validation";
+import { FormInterface, formValidationSchema } from "@/lib/validation";
 
 import { SLIPPAGE, USDC_DECIMALS } from "@/lib/constants";
 
@@ -37,37 +37,8 @@ export default function Form() {
   const { id: depositAddressFromParams } = useParams();
   const navigate = useNavigate();
   const tokens = useTokens();
-
+  const methods = useFormContext<FormInterface>();
   const actorRef = BridgeFormMachineContext.useActorRef();
-  const methods = useForm({
-    resolver: zodResolver(formValidationSchema),
-    mode: "onChange",
-    reValidateMode: "onChange",
-    defaultValues: {
-      amount: "",
-      strategy: EStrategy.Wallet,
-      amountOut: "0",
-      selectedToken: {
-        assetId:
-          "nep141:eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near",
-        blockchain: TokenResponse.blockchain.ETH,
-        decimals: 6,
-        price: 0,
-        priceUpdatedAt: "0",
-        symbol: "USDT",
-        balance: 0n,
-        balanceNear: 0n,
-        balanceUpdatedAt: 0,
-      },
-      hyperliquidAddress: "",
-      refundAddress: "",
-      depositAddress: "",
-      slippageValue: SLIPPAGE,
-      platformFee: "0",
-      gasFee: "0",
-      txHash: "",
-    },
-  });
 
   const onSubmit = async () => {
     // TODO: Implement onSubmit
@@ -154,14 +125,12 @@ export default function Form() {
 
   return (
     <div className="p-4 w-full min-h-96">
-      <FormProvider {...methods}>
-        <form
-          className="flex flex-col justify-center items-center"
-          onSubmit={methods.handleSubmit(onSubmit)}
-        >
-          {ViewByState[String(view)] ?? null}
-        </form>
-      </FormProvider>
+      <form
+        className="flex flex-col justify-center items-center"
+        onSubmit={methods.handleSubmit(onSubmit)}
+      >
+        {ViewByState[String(view)] ?? null}
+      </form>
     </div>
   );
 }

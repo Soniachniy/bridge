@@ -21,6 +21,7 @@ import { useState } from "react";
 
 import { Network } from "@/config";
 import { QrcodeSVG } from "react-qrcode-pretty";
+import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 export const DepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
@@ -41,6 +42,8 @@ export const DepositView = () => {
     selectedToken?.blockchain as unknown as Network
   );
 
+  const { timeLeftFormatted, setTimer, timeLeft } = useLocalStoreTimer();
+
   return (
     <>
       <div className="flex flex-col gap-6 self-center inline-flex justify-between items-start bg-form rounded-4xl p-6 w-full md:w-[540px]">
@@ -54,12 +57,16 @@ export const DepositView = () => {
           </div>
         </div>
         <div className="self-stretch text-center justify-center">
-          <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
-            Complete within:{" "}
-          </span>
-          <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
-            23h 59m
-          </span>
+          {timeLeft > 0 && (
+            <>
+              <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
+                Complete within:{" "}
+              </span>
+              <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
+                {timeLeftFormatted}
+              </span>
+            </>
+          )}
         </div>
 
         <div
@@ -91,6 +98,7 @@ export const DepositView = () => {
                 className="text-base font-semibold"
                 onClick={() => {
                   setDepositViewVisible(true);
+                  setTimer();
                 }}
               >
                 I Understand, Show Deposit Address

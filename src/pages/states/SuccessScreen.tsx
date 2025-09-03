@@ -6,12 +6,21 @@ import LinkIcon from "@/assets/link-icon.svg?react";
 import SuccessIcon from "@/assets/success-icon.svg?react";
 
 export const SuccessScreen = () => {
-  const { watch } = useFormContext<FormInterface>();
+  const { watch, setValue } = useFormContext<FormInterface>();
   const amountOut = watch("amountOut");
+  const selectedToken = watch("selectedToken");
 
   const actorRef = BridgeFormMachineContext.useActorRef();
 
   const goToMainPage = () => {
+    selectedToken &&
+      setValue("selectedToken", {
+        ...selectedToken,
+        balance: 0n,
+        balanceNear: 0n,
+        balanceUpdatedAt: 0,
+      });
+
     actorRef.send({ type: "back_to_asset_selection" });
   };
 

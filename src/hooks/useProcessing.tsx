@@ -8,6 +8,7 @@ import { sliceHex } from "viem";
 import { signTypedData, switchChain } from "@wagmi/core";
 import { ProcessingStages } from "@/lib/states";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
+import { useLocalStoreTimer } from "./useLocalStoreTimer";
 
 export enum ServerStages {
   idle = "idle",
@@ -116,6 +117,8 @@ export default function useProcessing(depositAddressParam?: string | null) {
     }
   };
 
+  const { clearTimer } = useLocalStoreTimer();
+
   useEffect(() => {
     const startPolling = async () => {
       try {
@@ -138,7 +141,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
 
         if (statusResponse.data.status === "completed") {
           actorRef.send({ type: "success" });
-
+          clearTimer();
           return;
         }
       } catch (error) {

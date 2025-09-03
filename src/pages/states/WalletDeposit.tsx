@@ -18,7 +18,8 @@ import useNetwork from "@/hooks/useNetworkHandler";
 import { useTokens } from "@/providers/token-context";
 import { FormInterface } from "@/lib/validation";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 export const WalletDepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
@@ -36,6 +37,11 @@ export const WalletDepositView = () => {
   const gasFee = watch("gasFee");
   const refundAddress = watch("refundAddress");
   const hyperliquidAddress: string = watch("hyperliquidAddress");
+  const { timeLeftFormatted, setTimer, timeLeft } = useLocalStoreTimer();
+
+  useEffect(() => {
+    setTimer();
+  }, []);
 
   return (
     <>
@@ -49,12 +55,16 @@ export const WalletDepositView = () => {
           </div>
         </div>
         <div className="self-stretch text-center justify-center">
-          <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
-            Complete within:{" "}
-          </span>
-          <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
-            23h 59m
-          </span>
+          {timeLeft > 0 && (
+            <>
+              <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
+                Complete within:{" "}
+              </span>
+              <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
+                {timeLeftFormatted}
+              </span>
+            </>
+          )}
         </div>
 
         <div className="gap-2 flex flex-row justify-between items-center w-full">

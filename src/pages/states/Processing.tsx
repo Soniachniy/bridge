@@ -17,6 +17,7 @@ import { ActionButton } from "@/components/ActionButtons";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ServerStages, stageToStep } from "@/hooks/useProcessing";
+import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 const stages = {
   [ServerStages.deposit_received]: {
@@ -87,6 +88,7 @@ export const ProcessingView = ({
   const txHash = watch("txHash");
 
   const depositAddress = watch("depositAddress");
+  const { timeLeftFormatted, timeLeft } = useLocalStoreTimer();
 
   return (
     <>
@@ -103,12 +105,16 @@ export const ProcessingView = ({
           </div>
         </div>
         <div className="self-stretch text-center justify-center">
-          <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
-            Complete within:{" "}
-          </span>
-          <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
-            23h 59m
-          </span>
+          {timeLeft > 0 && (
+            <>
+              <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
+                Complete within:{" "}
+              </span>
+              <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
+                {timeLeftFormatted}
+              </span>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col gap-8 px-10 w-full">
