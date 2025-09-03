@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 const LOCAL_STORAGE_KEY = "timer";
 
 const formatTimeLeft = (timeLeft: number) => {
-  console.log(timeLeft);
-  console.log(timeLeft / (60 * 60 * 1000));
   const hours = Math.floor(timeLeft / (60 * 60 * 1000));
   const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
   return `${hours}h ${minutes}m`;
@@ -33,12 +31,7 @@ export const useLocalStoreTimer = () => {
     const interval = setInterval(() => {
       const deadline = getTimer();
       if (!deadline) return;
-      console.log("deadline", deadline);
-      console.log("Date.now()", Date.now());
-      console.log(
-        "Number(deadline) - Date.now()",
-        Number(deadline) - Date.now()
-      );
+
       const timeLeft = Number(deadline) - Date.now();
       if (timeLeft <= 0) {
         clearTimer();
