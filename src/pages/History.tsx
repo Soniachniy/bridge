@@ -286,7 +286,7 @@ export const History = () => {
         <div className="flex flex-col flex-1 items-center gap-4 w-full">
           <ActionButton
             variant="secondary"
-            className="w-[480px] md:w-full"
+            className="w-full md:w-[480px]"
             onClick={() => connectWallet(Network.ETHEREUM)}
           >
             Connect Wallet
