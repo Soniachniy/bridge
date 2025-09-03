@@ -272,7 +272,7 @@ export const History = () => {
       if (!address) {
         return null;
       }
-      return getHistory("0x717771645d2cF6a84C72F7a39C907979f82692D4");
+      return getHistory(address);
     },
   });
 
