@@ -83,10 +83,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <footer>
           <div className="flex justify-between items-center mx-4 md:mx-26 my-10">
-            <span className="text-white text-sm underline font-light">
+            <span
+              className="text-white text-sm underline font-light cursor-pointer"
+              onClick={() => navigate("/privacy")}
+            >
               Privacy Policy
             </span>
-            <span className="text-white text-sm underline font-light">
+            <span
+              className="text-white text-sm underline font-light cursor-pointer"
+              onClick={() => navigate("/terms")}
+            >
               Terms of Service
             </span>
           </div>

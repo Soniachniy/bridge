@@ -295,14 +295,11 @@ export const History = () => {
     queryKey: ["history", getPublicKey(Network.ETHEREUM) ?? "", page],
     queryFn: async () => {
       const address = getPublicKey(Network.ETHEREUM);
-      console.log(address);
       if (!address) {
         return null;
       }
-      console.log(page);
       const response = await getHistory(address, page);
       setMaxPage(response.data.pagination.totalPages);
-      console.log(response);
       return response;
     },
     placeholderData: keepPreviousData,

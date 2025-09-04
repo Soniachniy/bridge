@@ -10,6 +10,8 @@ import Form from "./pages/Form";
 import { History } from "./pages/History";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TokenContextProvider } from "./providers/token-context";
+import { TermsPage } from "./pages/TermsPage";
+import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 
 declare global {
   interface Window {
@@ -28,6 +30,8 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<Form />} />
               <Route path="/:id" element={<Form />} />
               <Route path="/history" element={<History />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
             </Routes>
           </Layout>
         </BrowserRouter>
