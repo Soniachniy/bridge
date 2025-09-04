@@ -42,7 +42,7 @@ export const DepositView = () => {
     selectedToken?.blockchain as unknown as Network
   );
 
-  const { timeLeftFormatted, setTimer, timeLeft } = useLocalStoreTimer();
+  const { timeLeftFormatted, timeLeft } = useLocalStoreTimer();
 
   return (
     <>
@@ -98,7 +98,6 @@ export const DepositView = () => {
                 className="text-base font-semibold"
                 onClick={() => {
                   setDepositViewVisible(true);
-                  setTimer();
                 }}
               >
                 I Understand, Show Deposit Address

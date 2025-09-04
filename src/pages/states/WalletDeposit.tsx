@@ -37,11 +37,7 @@ export const WalletDepositView = () => {
   const gasFee = watch("gasFee");
   const refundAddress = watch("refundAddress");
   const hyperliquidAddress: string = watch("hyperliquidAddress");
-  const { timeLeftFormatted, setTimer, timeLeft } = useLocalStoreTimer();
-
-  useEffect(() => {
-    setTimer();
-  }, []);
+  const { timeLeftFormatted, timeLeft } = useLocalStoreTimer();
 
   return (
     <>

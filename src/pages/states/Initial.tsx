@@ -32,6 +32,7 @@ import { Loader } from "lucide-react";
 import { Toggle } from "@/components/toggle";
 import { motion } from "framer-motion";
 import SlippageDialog from "@/components/slippage-dialog";
+import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -353,7 +354,7 @@ export const ConnectButton = ({
       </div>
     );
   }
-
+  const { setTimer } = useLocalStoreTimer();
   return (
     <div className="flex flex-col w-full">
       <ActionButton
@@ -369,6 +370,7 @@ export const ConnectButton = ({
           if (isValid) {
             actorRef.send({ type: screen });
           }
+          setTimer();
         }}
         className="w-full"
         disabled={isLoading || !isValid}
