@@ -20,7 +20,7 @@ export const LegalPage = ({
 }: LegalPageProps) => {
   return (
     <div className="flex flex-col items-center w-full gap-2 flex-1 relative">
-      <div className="w-full md:w-[644px] py-6 inline-flex flex-col justify-start  gap-12">
+      <div className="w-full md:w-[644px] px-6 py-6 inline-flex flex-col justify-start  gap-12">
         <div className="size- flex flex-col justify-start items-center gap-4">
           <div className="w-full text-center justify-start text-main_white text-4xl font-bold font-['Inter']">
             {title}
