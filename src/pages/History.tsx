@@ -5,7 +5,7 @@ import { formatTokenAmount, truncateAddress } from "@/lib/utils";
 import { getHistory, HistoryTransaction } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
 import { USDC_DECIMALS } from "@/lib/constants";
@@ -287,16 +287,25 @@ const HistoryCard = ({
 
 export const History = () => {
   const { isConnected, getPublicKey, connectWallet } = useNetwork(null);
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(0);
+
   const tokens = useTokens();
-  const { data } = useQuery({
-    queryKey: ["history", getPublicKey(Network.ETHEREUM) ?? ""],
-    queryFn: () => {
+  const { data, isPlaceholderData } = useQuery({
+    queryKey: ["history", getPublicKey(Network.ETHEREUM) ?? "", page],
+    queryFn: async () => {
       const address = getPublicKey(Network.ETHEREUM);
+      console.log(address);
       if (!address) {
         return null;
       }
-      return getHistory(address);
+      console.log(page);
+      const response = await getHistory(address, page);
+      setMaxPage(response.data.pagination.totalPages);
+      console.log(response);
+      return response;
     },
+    placeholderData: keepPreviousData,
   });
 
   return (
@@ -319,10 +328,9 @@ export const History = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-4 w-full md:w-[480px]">
-          {data?.data.transactions
-            .filter((item) => item.status !== ServerStages.pending_deposit)
-            .map((item) => (
+        <>
+          <div className="flex flex-col items-center gap-4 w-full md:w-[480px]">
+            {data?.data.transactions.map((item) => (
               <HistoryCard
                 key={item.depositAddress}
                 transaction={item}
@@ -330,7 +338,41 @@ export const History = () => {
                 tokens={tokens}
               />
             ))}
-        </div>
+          </div>
+          <div className="flex flex-row mt-8 items-center gap-2">
+            <button
+              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              disabled={page === 1}
+            >
+              <ChevronDown
+                className="size-4 rotate-90"
+                fill={page === 1 ? "gray" : "white"}
+              />
+            </button>
+            <div className="w-16 h-8 rounded-xl border border-gray-400/40 flex items-center justify-center">
+              <div className="flex items-center text-center justify-center text-white text-xs font-semibold font-['Inter'] leading-none">
+                {page}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                if (!isPlaceholderData && data?.data.pagination.hasNextPage) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              disabled={isPlaceholderData || !data?.data.pagination.hasNextPage}
+            >
+              <ChevronDown
+                className="size-4 rotate-270"
+                fill={page === maxPage ? "gray" : "white"}
+              />
+            </button>
+            <div className="justify-center text-white text-xs font-normal font-['Inter'] leading-none">
+              of {maxPage}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

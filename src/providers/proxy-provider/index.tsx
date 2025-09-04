@@ -70,13 +70,18 @@ export interface PermitDataResponse {
 }
 
 export const getHistory = async (
-  hyperliquidAddress: string
+  hyperliquidAddress: string,
+  page: number
 ): Promise<HistoryResponse> => {
   const response = await fetch(
     API_ROUTES.HISTORY +
       "?hyperliquidAddress=" +
       hyperliquidAddress +
-      "&hide=pending_deposit"
+      "&hide=pending_deposit" +
+      "&page=" +
+      page +
+      "&limit=" +
+      10
   );
   return response.json();
 };
@@ -115,6 +120,14 @@ export interface HistoryTransaction {
 export interface HistoryResponse {
   success: boolean;
   data: {
+    pagination: {
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+      limit: number;
+      page: number;
+      totalPages: number;
+      totalTransactions: number;
+    };
     hyperliquidAddress: string;
     totalTransactions: number;
     transactions: HistoryTransaction[];
