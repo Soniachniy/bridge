@@ -9,7 +9,8 @@ import { formValidationSchema } from "@/lib/validation";
 import { EStrategy } from "@/pages/Form";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import { SLIPPAGE } from "@/lib/constants";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const actorRef = BridgeFormMachineContext.useActorRef();
@@ -43,6 +44,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     },
   });
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, [pathname]);
 
   return (
     <FormProvider {...methods}>
