@@ -12,7 +12,6 @@ import {
 import { USDC_DECIMALS } from "@/lib/constants";
 
 import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
-import CopyIcon from "@/assets/copy-icon.svg?react";
 import LoadingIcon from "@/assets/loading-icon.svg?react";
 import ArrowDown from "@/assets/arrow-down.svg?react";
 import { FormInterface } from "@/lib/validation";
@@ -22,6 +21,7 @@ import { useState } from "react";
 import { Network } from "@/config";
 import { QrcodeSVG } from "react-qrcode-pretty";
 import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
+import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
 
 export const DepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
@@ -136,11 +136,11 @@ export const DepositView = () => {
                   <div className="justify-center text-main_white text-base font-semibold font-['Inter'] leading-none">
                     {truncateAddress(depositAddress, 24, 10, 10)}
                   </div>
-                  <CopyIcon
+                  <CopyButton
+                    variant="ghost"
+                    size="md"
+                    content={depositAddress ?? ""}
                     className="size-6 cursor-pointer relative"
-                    onClick={() => {
-                      navigator.clipboard.writeText(depositAddress ?? "");
-                    }}
                   />
                 </div>
               </div>

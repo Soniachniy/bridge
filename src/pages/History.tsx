@@ -240,7 +240,7 @@ const HistoryCard = ({
                 Refund address:
               </div>
               <div className="text-main_white text-xs font-semibold font-['Inter']">
-                {transaction.refundTo}
+                {truncateAddress(transaction.refundTo)}
               </div>
             </div>
           )}

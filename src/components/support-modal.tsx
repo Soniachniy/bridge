@@ -11,10 +11,10 @@ import SupportIcon from "@/assets/support.svg?react";
 import X from "@/assets/close-icon.svg?react";
 import LinkIcon from "@/assets/link-icon.svg?react";
 
-import CopyIcon from "@/assets/copy-icon.svg?react";
 import { FormInterface } from "@/lib/validation";
 import { useFormContext } from "react-hook-form";
 import { ActionButton } from "./ActionButtons";
+import { CopyButton } from "./ui/shadcn-io/copy-button";
 
 const getAddressToShow = (
   depositAddress?: string,
@@ -84,11 +84,11 @@ export const SupportModal = () => {
                 <div className="justify-center w-full overflow-hidden whitespace-nowrap text-ellipsis text-main_white text-base font-semibold font-['Inter'] leading-none">
                   {addressToShow?.address}
                 </div>
-                <CopyIcon
+                <CopyButton
+                  variant="ghost"
+                  size="md"
+                  content={addressToShow?.address ?? ""}
                   className="size-6 cursor-pointer relative"
-                  onClick={() => {
-                    navigator.clipboard.writeText(addressToShow?.address ?? "");
-                  }}
                 />
               </div>
             </>
