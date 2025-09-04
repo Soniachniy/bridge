@@ -71,12 +71,17 @@ export const formatTokenAmount = (
   decimals = 18,
   precision?: number
 ): string => {
-  if (typeof value === "bigint") {
-    return Big(value.toString())
-      .div(Big(BASE).pow(decimals))
-      .toFixed(precision);
+  try {
+    if (typeof value === "bigint") {
+      return Big(value.toString())
+        .div(Big(BASE).pow(decimals))
+        .toFixed(precision);
+    }
+    return Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);
+  } catch (error) {
+    console.error(error);
+    return "0";
   }
-  return Big(value).div(Big(BASE).pow(decimals)).toFixed(precision);
 };
 
 export const parseTokenAmount = (value: ValueType, decimals: number) => {

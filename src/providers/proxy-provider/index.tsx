@@ -73,7 +73,10 @@ export const getHistory = async (
   hyperliquidAddress: string
 ): Promise<HistoryResponse> => {
   const response = await fetch(
-    API_ROUTES.HISTORY + "?hyperliquidAddress=" + hyperliquidAddress
+    API_ROUTES.HISTORY +
+      "?hyperliquidAddress=" +
+      hyperliquidAddress +
+      "&hide=pending_deposit"
   );
   return response.json();
 };
@@ -82,6 +85,7 @@ export interface HistoryTransaction {
   depositAddress: string;
   assetFrom: string;
   amountIn: string;
+  amountOut: string;
   status: string;
   oneClickStatus: string;
   finalAmount: string;
@@ -102,6 +106,8 @@ export interface HistoryTransaction {
   };
   needsPermit: boolean;
   canRetry: boolean;
+  hyperliquidAddress: string;
+  refundTo: string | null;
   isCompleted: boolean;
   isFailed: boolean;
 }

@@ -1,7 +1,7 @@
 import { Network } from "@/config";
 import useNetwork from "@/hooks/useNetworkHandler";
 import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
-import { formatTokenAmount } from "@/lib/utils";
+import { formatTokenAmount, truncateAddress } from "@/lib/utils";
 import { getHistory, HistoryTransaction } from "@/providers/proxy-provider";
 import { useTokens } from "@/providers/token-context";
 import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
@@ -35,6 +35,15 @@ const Status = ({ status }: { status: string }) => {
       <div className="size- px-2 py-1 bg-red-500/10 rounded-2xl inline-flex justify-start items-center gap-2">
         <div className="justify-start text-red-500 text-xs font-semibold font-['Inter'] leading-none">
           Failed
+        </div>
+      </div>
+    );
+  }
+  if (status === "refunded") {
+    return (
+      <div className="size- px-2 py-1 bg-orange-400/10 rounded-2xl inline-flex justify-start items-center gap-2">
+        <div className="justify-start text-orange-400 text-xs font-semibold font-['Inter'] leading-none">
+          Refunded
         </div>
       </div>
     );
@@ -133,7 +142,10 @@ const HistoryCard = ({
               </div>
             </div>
             <div className="text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
-              {formatTokenAmount(transaction.finalAmount ?? 0, USDC_DECIMALS)}
+              {formatTokenAmount(
+                transaction.finalAmount ?? transaction.amountOut,
+                USDC_DECIMALS
+              )}
             </div>
           </div>
         </div>
@@ -215,55 +227,60 @@ const HistoryCard = ({
               Amount to receive:
             </div>
             <div className=" text-main_white text-xs font-semibold font-['Inter']">
-              {formatTokenAmount(transaction.finalAmount ?? 0, USDC_DECIMALS)}{" "}
+              {formatTokenAmount(
+                transaction.finalAmount ?? transaction.amountOut,
+                USDC_DECIMALS
+              )}{" "}
               USDC
             </div>
           </div>
-          <div className="flex flex-row items-center w-full justify-between">
-            <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
-              Refund address:
+          {transaction.refundTo && (
+            <div className="flex flex-row items-center w-full justify-between">
+              <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
+                Refund address:
+              </div>
+              <div className="text-main_white text-xs font-semibold font-['Inter']">
+                {transaction.refundTo}
+              </div>
             </div>
-            <div className="text-main_white text-xs font-semibold font-['Inter']">
-              Refund address
-            </div>
-          </div>
+          )}
           <div className="flex flex-row items-center w-full justify-between">
             <div className="justify-start text-gray_text text-xs font-normal font-['Inter'] leading-none">
               Hyperliquid address:
             </div>
             <div className="text-main_white text-xs font-semibold font-['Inter']">
-              Hyperliquid address
+              {truncateAddress(transaction.hyperliquidAddress)}
             </div>
           </div>
         </div>
       )}
-      {transaction.status === ServerStages.ready_for_permit ||
-        (transaction.status === "deposit_failed" && (
-          <>
-            <ActionButton
-              variant="tertiary"
-              className="w-full"
-              disabled={loading}
-              onClick={async () => {
-                setLoading(true);
-                await signPermit(transaction.depositAddress);
-                await queryClient.invalidateQueries({
-                  queryKey: ["history", publicKey ?? ""],
-                });
-                setLoading(false);
-              }}
-            >
-              {loading ? (
-                <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
-              ) : (
-                "Sign Permit"
-              )}
-            </ActionButton>
-            <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
-              Please confirm the message in your wallet
-            </div>
-          </>
-        ))}
+      {(transaction.status === ServerStages.ready_for_permit ||
+        transaction.status === "deposit_failed") && (
+        <>
+          <ActionButton
+            variant="tertiary"
+            className="w-full"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              await signPermit(transaction.depositAddress);
+              await queryClient.invalidateQueries({
+                queryKey: ["history", publicKey ?? ""],
+              });
+              setLoading(false);
+            }}
+          >
+            {loading ? (
+              <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
+            ) : (
+              "Sign Permit"
+            )}
+          </ActionButton>
+          <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
+            Please confirm the message in your wallet
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -284,7 +301,7 @@ export const History = () => {
 
   return (
     <div className="flex flex-col items-center w-full gap-2 flex-1 relative">
-      <div className="text-center justify-start text-main_white text-4xl font-bold font-['Inter']">
+      <div className="text-center justify-start text-main_white mb-8 text-4xl font-bold font-['Inter']">
         History
       </div>
 
