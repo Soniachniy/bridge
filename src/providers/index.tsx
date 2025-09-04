@@ -9,6 +9,7 @@ import { TonProvider } from "./ton-provider";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import { BridgeFormMachineProvider } from "@/providers/machine-provider";
+import { TronProvider } from "./tron-provider";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -18,9 +19,11 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           <WagmiProvider config={wagmiAdapter.wagmiConfig}>
             <QueryClientProvider client={queryClient}>
               <SolanaProvider>
-                <BridgeFormMachineProvider>
-                  <Theme>{children}</Theme>
-                </BridgeFormMachineProvider>
+                <TronProvider>
+                  <BridgeFormMachineProvider>
+                    <Theme>{children}</Theme>
+                  </BridgeFormMachineProvider>
+                </TronProvider>
               </SolanaProvider>
             </QueryClientProvider>
           </WagmiProvider>

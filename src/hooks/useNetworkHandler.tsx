@@ -57,6 +57,9 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
 
 import { useConnection } from "@solana/wallet-adapter-react";
+import { useWallet as useWalletTron } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { tronWeb } from "@/providers/tron-provider";
+import Big from "big.js";
 
 const useNetwork = (
   network: Network | null,
@@ -102,6 +105,16 @@ const useNetwork = (
   const { openModal, signOut, selector, RPCProvider } = useWalletSelector();
   const { accountId } = useWalletSelector();
 
+  /* TRON */
+  const {
+    wallet: walletTron,
+    address: addressTron,
+    connected: connectedTron,
+    connect: connectTron,
+    disconnect: disconnectTron,
+    signTransaction: signTransactionTron,
+  } = useWalletTron();
+
   return {
     isConnected: (localNetwork?: Network) => {
       const currentNetwork = localNetwork ?? network;
@@ -120,6 +133,8 @@ const useNetwork = (
           return Boolean(publicKey);
         case Network.TON:
           return Boolean(tonWallet);
+        case Network.TRON:
+          return connectedTron;
         default:
           return false;
       }
@@ -148,6 +163,9 @@ const useNetwork = (
           return openModal();
         case Network.TON:
           return tonConnectUI.openModal();
+
+        case Network.TRON:
+          return connectTron();
         default:
           return null;
       }
@@ -168,6 +186,9 @@ const useNetwork = (
           return signOut();
         case Network.TON:
           return tonConnectUI.disconnect();
+
+        case Network.TRON:
+          return disconnectTron();
         default:
           return null;
       }
@@ -190,6 +211,8 @@ const useNetwork = (
           return tonWallet?.account?.address
             ? toUserFriendlyAddress(tonWallet?.account?.address)
             : null;
+        case Network.TRON:
+          return addressTron;
         default:
           return null;
       }
@@ -313,6 +336,22 @@ const useNetwork = (
             balance: BigInt(tonTokenBalance.balance.toString()),
             nearBalance: 0n,
           };
+        case Network.TRON:
+          if (!addressTron) {
+            return { balance: 0n, nearBalance: 0n };
+          }
+          if (isNativeToken(currentNetwork, assetId) && addressTron) {
+            const balance = await tronWeb.trx.getBalance(addressTron);
+            return { balance: BigInt(balance), nearBalance: 0n };
+          }
+          if (contractAddress) {
+            const contract = await tronWeb.contract().at(contractAddress);
+
+            const balance = await contract.balanceOf(addressTron).call();
+
+            return { balance: BigInt(balance), nearBalance: 0n };
+          }
+          return { balance: 0n, nearBalance: 0n };
 
         default:
           return { balance: 0n, nearBalance: 0n };
@@ -526,6 +565,40 @@ const useNetwork = (
             alert("Transaction failed.");
           }
           return true;
+        case Network.TRON:
+          if (!addressTron) {
+            return false;
+          }
+          if (isNativeToken(network, selectedToken.assetId)) {
+            const amountNumber = Big(
+              parseTokenAmount(amount, decimals)
+            ).toNumber();
+
+            const transaction = await tronWeb.transactionBuilder.sendTrx(
+              depositAddress,
+              Big(tronWeb.toSun(amountNumber).toString()).toNumber(),
+              addressTron
+            );
+            console.log(transaction);
+
+            const signedTransaction = await signTransactionTron(transaction);
+
+            const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
+            return res.result;
+          } else {
+            const transaction = await tronWeb.transactionBuilder.sendToken(
+              depositAddress,
+              Big(parseTokenAmount(amount, decimals)).toNumber(),
+              addressTron,
+              depositAddress as `0x${string}`
+            );
+            console.log(transaction);
+
+            const signedTransaction = await signTransactionTron(transaction);
+
+            const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
+            return res.result;
+          }
       }
     },
     signData: async (data: PermitDataResponse) => {
