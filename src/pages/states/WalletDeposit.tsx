@@ -18,7 +18,7 @@ import useNetwork from "@/hooks/useNetworkHandler";
 import { useTokens } from "@/providers/token-context";
 import { FormInterface } from "@/lib/validation";
 import { BridgeFormMachineContext } from "@/providers/machine-provider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 export const WalletDepositView = () => {

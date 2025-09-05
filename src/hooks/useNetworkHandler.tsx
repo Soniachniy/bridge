@@ -106,7 +106,6 @@ const useNetwork = (
 
   /* TRON */
   const {
-    wallet: walletTron,
     address: addressTron,
     connected: connectedTron,
     connect: connectTron,
