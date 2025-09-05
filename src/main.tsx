@@ -12,6 +12,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TokenContextProvider } from "./providers/token-context";
 import { TermsPage } from "./pages/TermsPage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
+import ReactGA from "react-ga4";
+
+ReactGA.initialize("G-NBNSX5TW8C");
 
 declare global {
   interface Window {

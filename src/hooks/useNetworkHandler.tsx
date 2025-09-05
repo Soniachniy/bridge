@@ -60,7 +60,6 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { useWallet as useWalletTron } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { tronWeb } from "@/providers/tron-provider";
 import Big from "big.js";
-
 const useNetwork = (
   network: Network | null,
   setValue?: (key: keyof FormInterface, value: any) => void

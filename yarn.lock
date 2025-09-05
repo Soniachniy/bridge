@@ -19127,6 +19127,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-ga4@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "react-ga4@npm:2.1.0"
+  checksum: 10c0/314aa86dd7cb868535f26bfb8b537d3b3c20649c66b2b942fba72e081295441446932a4ae96499231c8a4836ab0a222a97b1bd03633b8cc1477991efe93444cd
+  languageName: node
+  linkType: hard
+
 "react-hook-form@npm:^7.60.0":
   version: 7.60.0
   resolution: "react-hook-form@npm:7.60.0"
@@ -21623,6 +21630,7 @@ __metadata:
     near-api-js: "npm:^6.2.3"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
+    react-ga4: "npm:^2.1.0"
     react-hook-form: "npm:^7.60.0"
     react-qrcode-pretty: "npm:^3.3.1"
     react-router-dom: "npm:^7.7.1"
