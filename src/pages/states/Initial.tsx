@@ -34,8 +34,6 @@ import { motion } from "framer-motion";
 import SlippageDialog from "@/components/slippage-dialog";
 import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
-import { WalletActionButton } from "@tronweb3/tronwallet-adapter-react-ui";
-
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
   const {
@@ -115,7 +113,6 @@ export const InitialView = () => {
         }}
         className="flex flex-col gap-6 bg-form rounded-4xl p-6 w-full md:w-[540px]"
       >
-        <WalletActionButton />
         <Toggle />
         <div className="flex flex-col gap-4 justify-center items-center bg-input-custom rounded-3xl p-[16px] ">
           {strategy === EStrategy.Wallet && (
