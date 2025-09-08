@@ -27,7 +27,7 @@ export const wagmiAdapter = new WagmiAdapter({
   networks: basicConfig.evmConfig.networks,
   projectId: basicConfig.evmConfig.projectId,
   connectors: [metaMask()],
-  ssr: true,
+  ssr: false,
 });
 
 export const modal = createAppKit({

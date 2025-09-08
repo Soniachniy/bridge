@@ -83,10 +83,10 @@ export const InitialView = () => {
 
   useEffect(() => {
     if (selectedToken?.blockchain) {
-      setValue(
-        "refundAddress",
-        getPublicKey(translateTokenToNetwork(selectedToken.blockchain))
+      const refundAddress = getPublicKey(
+        translateTokenToNetwork(selectedToken.blockchain)
       );
+      setValue("refundAddress", refundAddress);
     }
   }, [
     isConnected(translateTokenToNetwork(selectedToken.blockchain)),

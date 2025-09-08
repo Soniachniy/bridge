@@ -111,7 +111,7 @@ export default function useProcessing(depositAddressParam?: string | null) {
     depositAddressParam ? ServerStages.pending_deposit : ServerStages.idle
   );
 
-  const tokens = useTokens();
+  const { tokens } = useTokens();
   const { id: depositAddressFromParams } = useParams();
   const depositAddress = depositAddressParam || depositAddressFromParams;
 

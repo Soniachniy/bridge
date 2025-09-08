@@ -1,20 +1,20 @@
-import { Network } from '@/config';
-import useNetwork from '@/hooks/useNetworkHandler';
-import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from '@/lib/1clickHelper';
-import { formatTokenAmount, truncateAddress } from '@/lib/utils';
-import { getHistory, HistoryTransaction } from '@/providers/proxy-provider';
-import { useTokens } from '@/providers/token-context';
-import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import HyperliquidIcon from '@/assets/hyperliquid-icon.svg?react';
-import { USDC_DECIMALS } from '@/lib/constants';
-import ArrowDown from '@/assets/arrow-down.svg?react';
-import ChevronDown from '@/assets/chevron.svg?react';
-import { ServerStages, signPermit } from '@/hooks/useProcessing';
-import { ActionButton } from '@/components/ActionButtons';
-import LoadingIcon from '@/assets/loading-icon.svg?react';
-import { queryClient } from '@/providers/evm-provider';
+import { Network } from "@/config";
+import useNetwork from "@/hooks/useNetworkHandler";
+import { CHAIN_ICON, CHAIN_TITLE, getTokenIcon } from "@/lib/1clickHelper";
+import { formatTokenAmount, truncateAddress } from "@/lib/utils";
+import { getHistory, HistoryTransaction } from "@/providers/proxy-provider";
+import { useTokens } from "@/providers/token-context";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
+import { USDC_DECIMALS } from "@/lib/constants";
+import ArrowDown from "@/assets/arrow-down.svg?react";
+import ChevronDown from "@/assets/chevron.svg?react";
+import { ServerStages, signPermit } from "@/hooks/useProcessing";
+import { ActionButton } from "@/components/ActionButtons";
+import LoadingIcon from "@/assets/loading-icon.svg?react";
+import { queryClient } from "@/providers/evm-provider";
 
 const Status = ({ status }: { status: string }) => {
   if (status === ServerStages.completed) {
@@ -27,9 +27,9 @@ const Status = ({ status }: { status: string }) => {
     );
   }
   if (
-    status === 'swap_failed' ||
-    status === 'deposit_failed' ||
-    status === 'failed'
+    status === "swap_failed" ||
+    status === "deposit_failed" ||
+    status === "failed"
   ) {
     return (
       <div className="size- px-2 py-1 bg-red-500/10 rounded-2xl inline-flex justify-start items-center gap-2">
@@ -39,7 +39,7 @@ const Status = ({ status }: { status: string }) => {
       </div>
     );
   }
-  if (status === 'refunded') {
+  if (status === "refunded") {
     return (
       <div className="size- px-2 py-1 bg-orange-400/10 rounded-2xl inline-flex justify-start items-center gap-2">
         <div className="justify-start text-orange-400 text-xs font-semibold font-['Inter'] leading-none">
@@ -87,7 +87,7 @@ const HistoryCard = ({
         <div className="flex flex-row items-center gap-4">
           <Status status={transaction.status} />
           <ChevronDown
-            className={`size-3 cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
+            className={`size-3 cursor-pointer ${isOpen ? "rotate-180" : ""}`}
             onClick={() => setIsOpen(!isOpen)}
             fill="white"
           />
@@ -103,7 +103,7 @@ const HistoryCard = ({
                     src={getTokenIcon({
                       assetId: transaction.assetFrom,
                     } as TokenResponse)}
-                    alt={transaction.assetFrom ?? 'token'}
+                    alt={transaction.assetFrom ?? "token"}
                     className="size-[24px] rounded-full"
                   />
                 </div>
@@ -111,7 +111,7 @@ const HistoryCard = ({
                 <img
                   src={CHAIN_ICON[tokens[transaction.assetFrom]?.blockchain]}
                   alt={
-                    tokens[transaction.assetFrom]?.blockchain ?? 'blockchain'
+                    tokens[transaction.assetFrom]?.blockchain ?? "blockchain"
                   }
                   className="absolute size-[10px] bottom-0 right-0 border border-input-custom rounded-full"
                 />
@@ -120,7 +120,7 @@ const HistoryCard = ({
             <div className="text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
               {formatTokenAmount(
                 transaction.amountIn ?? 0,
-                tokens[transaction.assetFrom]?.decimals,
+                tokens[transaction.assetFrom]?.decimals
               )}
             </div>
           </div>
@@ -131,9 +131,9 @@ const HistoryCard = ({
                 <div className="size-[24px] flex items-center justify-center rounded-full bg-white">
                   <img
                     src={getTokenIcon({
-                      symbol: 'USDC',
+                      symbol: "USDC",
                     } as TokenResponse)}
-                    alt={'USDC'}
+                    alt={"USDC"}
                     className="size-[24px] rounded-full"
                   />
                 </div>
@@ -143,7 +143,7 @@ const HistoryCard = ({
             <div className="text-center justify-center text-main_white text-xs font-semibold font-['Inter'] leading-none">
               {formatTokenAmount(
                 transaction.finalAmount ?? transaction.amountOut,
-                USDC_DECIMALS,
+                USDC_DECIMALS
               )}
             </div>
           </div>
@@ -161,7 +161,7 @@ const HistoryCard = ({
                     src={getTokenIcon({
                       assetId: transaction.assetFrom,
                     } as TokenResponse)}
-                    alt={transaction.assetFrom ?? 'token'}
+                    alt={transaction.assetFrom ?? "token"}
                     className="size-[24px] rounded-full"
                   />
                 </div>
@@ -169,7 +169,7 @@ const HistoryCard = ({
                 <img
                   src={CHAIN_ICON[tokens[transaction.assetFrom]?.blockchain]}
                   alt={
-                    tokens[transaction.assetFrom]?.blockchain ?? 'blockchain'
+                    tokens[transaction.assetFrom]?.blockchain ?? "blockchain"
                   }
                   className="absolute size-[10px] bottom-0 right-0 border border-input-custom rounded-full"
                 />
@@ -189,8 +189,8 @@ const HistoryCard = ({
             <div className="text-main_white text-xs font-semibold font-['Inter']">
               {formatTokenAmount(
                 transaction.amountIn ?? 0,
-                tokens[transaction.assetFrom]?.decimals,
-              )}{' '}
+                tokens[transaction.assetFrom]?.decimals
+              )}{" "}
               {tokens[transaction.assetFrom]?.symbol}
             </div>
           </div>
@@ -204,9 +204,9 @@ const HistoryCard = ({
                   <div className="size-[24px] flex items-center justify-center rounded-full bg-white">
                     <img
                       src={getTokenIcon({
-                        symbol: 'USDC',
+                        symbol: "USDC",
                       } as TokenResponse)}
-                      alt={'USDC'}
+                      alt={"USDC"}
                       className="size-[24px] rounded-full"
                     />
                   </div>
@@ -228,8 +228,8 @@ const HistoryCard = ({
             <div className=" text-main_white text-xs font-semibold font-['Inter']">
               {formatTokenAmount(
                 transaction.finalAmount ?? transaction.amountOut,
-                USDC_DECIMALS,
-              )}{' '}
+                USDC_DECIMALS
+              )}{" "}
               USDC
             </div>
           </div>
@@ -254,7 +254,7 @@ const HistoryCard = ({
         </div>
       )}
       {(transaction.status === ServerStages.ready_for_permit ||
-        transaction.status === 'deposit_failed') && (
+        transaction.status === "deposit_failed") && (
         <>
           <ActionButton
             variant="tertiary"
@@ -264,15 +264,15 @@ const HistoryCard = ({
               setLoading(true);
               await signPermit(transaction.depositAddress);
               await queryClient.invalidateQueries({
-                queryKey: ['history', publicKey ?? ''],
+                queryKey: ["history", publicKey ?? ""],
               });
               setLoading(false);
             }}
           >
             {loading ? (
-              <LoadingIcon className="animate-spin" fill={'#0F1A20'} />
+              <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
             ) : (
-              'Sign Permit'
+              "Sign Permit"
             )}
           </ActionButton>
           <div className="justify-center text-gray_text text-xs font-normal font-['Inter'] leading-none">
@@ -288,7 +288,7 @@ export const History = () => {
   const { isConnected, getPublicKey, connectWallet } = useNetwork(null);
   const [page, setPage] = useState(1);
   const { data, isPlaceholderData } = useQuery({
-    queryKey: ['history', getPublicKey(Network.ETHEREUM) ?? '', page],
+    queryKey: ["history", getPublicKey(Network.ETHEREUM) ?? "", page],
     queryFn: async () => {
       const address = getPublicKey(Network.ETHEREUM);
       if (!address) {
@@ -302,7 +302,7 @@ export const History = () => {
   });
   const [maxPage, setMaxPage] = useState(data?.data.pagination.totalPages ?? 0);
 
-  const tokens = useTokens();
+  const { tokens } = useTokens();
   return (
     <div className="flex flex-col items-center w-full gap-2 flex-1 relative">
       <div className="text-center justify-start text-main_white mb-8 text-4xl font-bold font-['Inter']">
@@ -329,8 +329,8 @@ export const History = () => {
               <HistoryCard
                 key={item.depositAddress}
                 transaction={item}
-                publicKey={getPublicKey(Network.ETHEREUM) ?? ''}
-                tokens={tokens}
+                publicKey={getPublicKey(Network.ETHEREUM) ?? ""}
+                tokens={tokens ?? {}}
               />
             ))}
           </div>
@@ -341,7 +341,7 @@ export const History = () => {
             >
               <ChevronDown
                 className="size-4 rotate-90"
-                fill={page === 1 ? 'gray' : 'white'}
+                fill={page === 1 ? "gray" : "white"}
               />
             </button>
             <div className="w-16 h-8 rounded-xl border border-gray-400/40 flex items-center justify-center">
@@ -360,7 +360,7 @@ export const History = () => {
             >
               <ChevronDown
                 className="size-4 rotate-270"
-                fill={page === maxPage ? 'gray' : 'white'}
+                fill={page === maxPage ? "gray" : "white"}
               />
             </button>
             <div className="justify-center text-white text-xs font-normal font-['Inter'] leading-none">

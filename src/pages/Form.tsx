@@ -34,13 +34,9 @@ export enum EStrategy {
 export default function Form() {
   const { id: depositAddressFromParams } = useParams();
   const navigate = useNavigate();
-  const tokens = useTokens();
+  const { tokens } = useTokens();
   const methods = useFormContext<FormInterface>();
   const actorRef = BridgeFormMachineContext.useActorRef();
-
-  const onSubmit = async () => {
-    // TODO: Implement onSubmit
-  };
 
   const view = BridgeFormMachineContext.useSelector(
     (s) => s.value
@@ -71,7 +67,7 @@ export default function Form() {
           navigate("/");
         }
         if (
-          Object.keys(tokens).length !== 0 &&
+          Object.keys(tokens ?? {}).length !== 0 &&
           (statusResponse.data.status === "deposit_received" ||
             statusResponse.data.status === "processing" ||
             statusResponse.data.status === "ready_for_permit")
@@ -123,10 +119,7 @@ export default function Form() {
 
   return (
     <div className="p-4 w-full min-h-96">
-      <form
-        className="flex flex-col justify-center items-center"
-        onSubmit={methods.handleSubmit(onSubmit)}
-      >
+      <form className="flex flex-col justify-center items-center">
         {ViewByState[String(view)] ?? null}
       </form>
     </div>

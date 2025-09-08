@@ -17,7 +17,6 @@ export default function SlippageDialog() {
   const [open, setOpen] = useState(false);
   const { watch: internalWatch, setValue: internalSetValue } = useFormContext();
   const selectedToken = internalWatch("selectedToken");
-  const refundAddress = internalWatch("refundAddress");
   const slippageValue = internalWatch("slippageValue");
 
   const { register, setValue, trigger, formState, handleSubmit, watch } =
@@ -29,14 +28,12 @@ export default function SlippageDialog() {
       reValidateMode: "onChange",
       defaultValues: {
         slippageValue: slippageValue,
-        refundAddress: refundAddress,
       },
     });
   const slippageValueInternal = watch("slippageValue");
 
   const onSubmit = (data: any) => {
     internalSetValue("slippageValue", data.slippageValue);
-    internalSetValue("refundAddress", data.refundAddress);
     setOpen(false);
   };
 

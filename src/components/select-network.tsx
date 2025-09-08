@@ -45,11 +45,13 @@ const SelectNetworkDialog: FC<{
   const selectedToken = watch("selectedToken");
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
-  const allTokens = useTokens();
+  const { tokens: allTokens } = useTokens();
 
   const { blockchains, mainTokens } = useMemo(() => {
     const uniqueBlockchains = [
-      ...new Set(Object.values(allTokens).map(({ blockchain }) => blockchain)),
+      ...new Set(
+        Object.values(allTokens ?? {}).map(({ blockchain }) => blockchain)
+      ),
     ];
 
     const blockchains: {
@@ -66,7 +68,7 @@ const SelectNetworkDialog: FC<{
       })
       .filter((item) => isSupportedNetwork(translateNetwork(item.blockchain)));
 
-    const mainTokens = Object.values(allTokens).reduce((acc, token) => {
+    const mainTokens = Object.values(allTokens ?? {}).reduce((acc, token) => {
       if (!acc[token.blockchain]) {
         acc[token.blockchain] = token;
       }
@@ -296,6 +298,14 @@ const SelectNetworkDialog: FC<{
                   onClick={() => {
                     setIsSecondDialogOpen(false);
                     connectWallet(translateNetwork(blockchain));
+                    setValue("selectedToken", {
+                      ...mainTokens[
+                        blockchain as unknown as TokenResponse.blockchain
+                      ],
+                      balance: 0n,
+                      balanceNear: 0n,
+                      balanceUpdatedAt: 0,
+                    });
                   }}
                 >
                   <div className="text-white flex items-center flex-row gap-2 text-sm font-normal font-['Inter']">

@@ -38,7 +38,7 @@ const useSwapQuote = ({
   slippageValue,
   trigger,
 }: Props) => {
-  const tokens = useTokens();
+  const { tokens } = useTokens();
   const navigate = useNavigate();
   const latestRequestRef = useRef<string>("");
 
@@ -78,8 +78,8 @@ const useSwapQuote = ({
             return null;
           }
           const isAmountError = response?.error?.includes("Amount");
-          if (isAmountError) {
-            const token = tokens[tokenIn.assetId];
+          const token = tokens?.[tokenIn.assetId];
+          if (isAmountError && token) {
             if (response?.error?.includes("try at least")) {
               const errorMessage = response?.error?.split(" ");
               const minAmount = errorMessage[errorMessage.length - 1];

@@ -16,7 +16,19 @@ export const TokenContextProvider = ({
 }) => {
   const { data: tokensData } = useQuery({
     queryKey: ["tokens"],
-    queryFn: () => fetchTokens(),
+    queryFn: async () => {
+      const tokens = await fetchTokens();
+      return tokens.map((token) => {
+        if (!token.contractAddress) {
+          return {
+            ...token,
+            contractAddress: token.blockchain,
+          };
+        } else {
+          return token;
+        }
+      });
+    },
     select: (data) => {
       return data.reduce((acc, token) => {
         acc[token.assetId] = token;
@@ -39,5 +51,5 @@ export const TokenContextProvider = ({
 
 export const useTokens = () => {
   const { tokens } = useContext(TokenContext);
-  return tokens ?? {};
+  return { tokens };
 };

@@ -25,7 +25,7 @@ export const WalletDepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
   const [isLoading, setIsLoading] = useState(false);
   const { watch } = useFormContext<FormInterface>();
-  const tokens = useTokens();
+  const { tokens } = useTokens();
   const selectedToken = watch("selectedToken");
   const { makeDeposit } = useNetwork(
     translateNetwork(selectedToken?.blockchain)
@@ -191,7 +191,7 @@ export const WalletDepositView = () => {
             className="flex-5"
             disabled={isLoading}
             onClick={async () => {
-              if (!selectedToken || !depositAddress || !amountIn) {
+              if (!selectedToken || !depositAddress || !amountIn || !tokens) {
                 return;
               }
               setIsLoading(true);
