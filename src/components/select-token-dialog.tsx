@@ -1,23 +1,23 @@
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { Dialog } from "@radix-ui/themes";
-import { SearchIcon } from "lucide-react";
-import X from "@/assets/close-icon.svg?react";
-import { FC, useMemo, useState } from "react";
-import ChevronIcon from "@/assets/chevron.svg?react";
+import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
+import { Dialog } from '@radix-ui/themes';
+import { SearchIcon } from 'lucide-react';
+import X from '@/assets/close-icon.svg?react';
+import { FC, useMemo, useState } from 'react';
+import ChevronIcon from '@/assets/chevron.svg?react';
 import {
   CHAIN_TITLE,
   CHAIN_ICON,
   getTokenIcon,
   translateNetwork,
-} from "@/lib/1clickHelper";
+} from '@/lib/1clickHelper';
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 
-import { cn, truncateAddress } from "@/lib/utils";
-import { useTokens } from "@/providers/token-context";
-import { useFormContext } from "react-hook-form";
-import { Network } from "@/config";
+import { cn, truncateAddress } from '@/lib/utils';
+import { useTokens } from '@/providers/token-context';
+import { useFormContext } from 'react-hook-form';
+import { Network } from '@/config';
 
 type Props = {
   selectedToken: TokenResponse | null;
@@ -33,7 +33,7 @@ const SelectTokenDialog: FC<Props> = ({
   const [selectedBlockchain, setSelectedBlockchain] = useState<
     TokenResponse.blockchain | undefined
   >(selectedToken?.blockchain);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const allTokens = useTokens();
   const { setValue } = useFormContext();
 
@@ -81,7 +81,8 @@ const SelectTokenDialog: FC<Props> = ({
     <Dialog.Root
       onOpenChange={(open) => {
         if (open) return;
-        setSearch("");
+        setSearch('');
+        setSelectedBlockchain(selectedToken?.blockchain);
       }}
     >
       <Dialog.Trigger>
@@ -95,14 +96,14 @@ const SelectTokenDialog: FC<Props> = ({
               <div className="size-10 flex items-center justify-center rounded-full bg-white">
                 <img
                   src={getTokenIcon(selectedToken)}
-                  alt={selectedToken?.assetId ?? "token"}
+                  alt={selectedToken?.assetId ?? 'token'}
                   className="size-8 rounded-full"
                 />
               </div>
 
               <img
                 src={CHAIN_ICON[selectedToken?.blockchain]}
-                alt={selectedToken?.blockchain ?? "blockchain"}
+                alt={selectedToken?.blockchain ?? 'blockchain'}
                 className="absolute size-4 bottom-0 right-0 border border-input-custom rounded-full"
               />
             </div>
@@ -134,8 +135,8 @@ const SelectTokenDialog: FC<Props> = ({
         </Button>
       </Dialog.Trigger>
       <Dialog.Content
-        minWidth={{ initial: "300px", xs: "330px" }}
-        minHeight={{ initial: "500px" }}
+        minWidth={{ initial: '300px', xs: '330px' }}
+        minHeight={{ initial: '500px' }}
         className="mt-1 flex justify-center items-center max-w-xs !border-none !outline-none !bg-main_dark flex  !ring-0 !rounded-4xl !px-0 !pb-0 !pt-0"
       >
         <div className="flex  min-h-[500px] flex-col grow p-6  gap-5">
@@ -169,9 +170,9 @@ const SelectTokenDialog: FC<Props> = ({
                   value={blockchain}
                   onClick={() => setSelectedBlockchain(blockchain)}
                   className={cn(
-                    "hover:bg-white/20 bg-white/10 rounded-3xl  px-2 py-1 text-sm",
+                    'hover:bg-white/20 bg-white/10 rounded-3xl  px-2 py-1 text-sm',
                     selectedBlockchain === blockchain &&
-                      "bg-white px-2 py-2 !text-black"
+                      'bg-white px-2 py-2 !text-black',
                   )}
                 >
                   <div className="flex flex-row gap-2 ">
@@ -205,7 +206,7 @@ const SelectTokenDialog: FC<Props> = ({
               {!!search && (
                 <X
                   className="size-4 cursor-pointer"
-                  onClick={() => setSearch("")}
+                  onClick={() => setSearch('')}
                 />
               )}
             </div>
@@ -221,25 +222,25 @@ const SelectTokenDialog: FC<Props> = ({
                   className="justify-start  py-2 rounded-md gap-4 hover:bg-element"
                   onClick={() => {
                     const address = getPublicKey(
-                      translateNetwork(token.blockchain)
+                      translateNetwork(token.blockchain),
                     );
                     if (address) {
-                      setValue("refundAddress", address);
+                      setValue('refundAddress', address);
                     } else {
-                      setValue("refundAddress", "");
+                      setValue('refundAddress', '');
                     }
                     selectToken(token);
                   }}
                 >
                   <div className="relative shrink-0 mx-2  ">
                     <img
-                      src={getTokenIcon(token) ?? "/static/icons/empty.svg"}
-                      alt={token?.assetId ?? "token"}
+                      src={getTokenIcon(token) ?? '/static/icons/empty.svg'}
+                      alt={token?.assetId ?? 'token'}
                       className="size-10 rounded-full"
                     />
                     <img
                       src={CHAIN_ICON[token?.blockchain]}
-                      alt={token?.blockchain ?? "blockchain"}
+                      alt={token?.blockchain ?? 'blockchain'}
                       className="absolute size-4 -bottom-0.5 -right-0.5 shrink-0 border border-white rounded-full"
                     />
                   </div>
