@@ -58,6 +58,7 @@ import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
 
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useWallet as useWalletTron } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { useWalletModal as useWalletModalTron } from "@tronweb3/tronwallet-adapter-react-ui";
 import { tronWeb } from "@/providers/tron-provider";
 import Big from "big.js";
 
@@ -109,10 +110,10 @@ const useNetwork = (
   const {
     address: addressTron,
     connected: connectedTron,
-    connect: connectTron,
     disconnect: disconnectTron,
     signTransaction: signTransactionTron,
   } = useWalletTron();
+  const { setVisible: setVisibleTron } = useWalletModalTron();
 
   return {
     isConnected: (localNetwork?: Network) => {
@@ -164,7 +165,7 @@ const useNetwork = (
           return tonConnectUI.openModal();
 
         case Network.TRON:
-          return connectTron();
+          return setVisibleTron(true);
         default:
           return null;
       }
@@ -569,13 +570,9 @@ const useNetwork = (
             return false;
           }
           if (isNativeToken(network, selectedToken.assetId)) {
-            const amountNumber = Big(
-              parseTokenAmount(amount, decimals)
-            ).toNumber();
-
             const transaction = await tronWeb.transactionBuilder.sendTrx(
               depositAddress,
-              Big(tronWeb.toSun(amountNumber).toString()).toNumber(),
+              Big(tronWeb.toSun(Number(amount)).toString()).toNumber(),
               addressTron
             );
             console.log(transaction);

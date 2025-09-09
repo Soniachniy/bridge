@@ -44,11 +44,6 @@ const SelectTokenDialog: FC<Props> = ({
     getPublicKey(translateNetwork(selectedBlockchain)) ?? "",
     selectedBlockchain
   );
-  console.log(
-    "fetching balance1",
-    selectedBlockchain,
-    getPublicKey(translateNetwork(selectedBlockchain)) ?? ""
-  );
 
   const { blockchains } = useMemo(() => {
     const uniqueBlockchains = [
@@ -112,8 +107,6 @@ const SelectTokenDialog: FC<Props> = ({
       return Number(b.balance) - Number(a.balance);
     });
   }, [allTokens, search, currentSelectedBlockchains, balances]);
-
-  console.log("filteredTokens", balances, filteredTokens);
 
   return (
     <Dialog.Root

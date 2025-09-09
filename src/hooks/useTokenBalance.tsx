@@ -75,7 +75,7 @@ const fetchBalance = async (
         } = await fetch(`https://api.fastnear.com/v1/account/${address}/full`, {
           method: "GET",
         }).then((res) => res.json());
-        console.log(res);
+
         return {
           ...res.tokens.reduce((acc, token) => {
             if (token.contract_id === "wrap.near") {

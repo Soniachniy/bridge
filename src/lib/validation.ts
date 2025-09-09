@@ -19,6 +19,10 @@ const tonAddressSchema = z
       "Invalid TON address format. Must be a valid Base64 or hex address.",
   });
 
+export const tronHexAddress = z
+  .string()
+  .regex(/^T[1-9A-HJ-NP-Za-km-z]{33}$/, "Invalid TRON hex address");
+
 const nearAddressSchema = z.string().refine(
   (val) => {
     // Implicit account: exactly 64 characters, containing a-Z and 0-9
@@ -141,6 +145,14 @@ export const formValidationSchema = z
             path: ["refundAddress"],
           });
         }
+      } else if (data.selectedToken.blockchain === "tron") {
+        if (!tronHexAddress.safeParse(data.refundAddress).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid TRON address",
+          });
+        }
       } else {
         const evmAddressParse = evmAddressValidation.safeParse(
           data.refundAddress
@@ -193,6 +205,14 @@ export const createSlippageDialogValidationSchema = (
             code: z.ZodIssueCode.custom,
             path: ["refundAddress"],
             message: "Address is not a valid TON address",
+          });
+        }
+      } else if (blockchain === "tron") {
+        if (!tronHexAddress.safeParse(address).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["refundAddress"],
+            message: "Address is not a valid TRON address",
           });
         }
       } else {

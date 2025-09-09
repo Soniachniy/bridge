@@ -20,11 +20,12 @@ import {
 } from "@tronweb3/tronwallet-adapters";
 
 export const tronWeb = new TronWeb({
-  fullHost: "https://api.nileex.io",
+  fullHost: "https://api.trongrid.io",
 });
 
 export function TronProvider({ children }: { children: React.ReactNode }) {
   function onError(e: WalletError) {
+    console.error(e.message);
     if (e instanceof WalletNotFoundError) {
       // some alert for wallet not found
     } else if (e instanceof WalletDisconnectedError) {
