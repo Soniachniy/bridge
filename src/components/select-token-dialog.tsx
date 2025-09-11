@@ -111,9 +111,9 @@ const SelectTokenDialog: FC<Props> = ({
   return (
     <Dialog.Root
       onOpenChange={(open) => {
+        setSelectedBlockchain(selectedToken?.blockchain);
         if (open) return;
         setSearch("");
-        setSelectedBlockchain(selectedToken?.blockchain);
       }}
     >
       <Dialog.Trigger>
