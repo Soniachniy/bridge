@@ -140,6 +140,52 @@ const fetchBalance = async (
           [Network.TON]: tonBalance.balance.toString(),
         };
       }
+      case Network.ARBITRUM:
+      case Network.AURORA:
+      case Network.BASE:
+      case Network.BNB:
+      case Network.POLYGON:
+      case Network.OP:
+      case Network.AVAX:
+      case Network.ETHEREUM: {
+        const balance = await fetch(
+          `${basicConfig.balancesApiPoint}/balances?address=${address}`,
+          { method: "GET" }
+        );
+        const data = await balance.json();
+
+        return data.networks.reduce((acc: any, item: any) => {
+          return {
+            ...acc,
+            ...item.assets.reduce((acc: any, asset: any) => {
+              const contractId = asset.contractId ?? item.network;
+              acc[contractId] = asset.amount;
+              return acc;
+            }, {} as { [key: string]: string }),
+          };
+        }, {} as { [key: string]: string });
+      }
+      case Network.TRON: {
+        const url = `https://apilist.tronscanapi.com/api/account/tokens?address=${address}&start=0&limit=20&hidden=0&show=0&sortType=0&sortBy=0`;
+        const balance = await fetch(url, {
+          method: "GET",
+          headers: {
+            "TRON-PRO-API-KEY": basicConfig.tronConfig.key,
+          },
+        });
+        const data = await balance.json();
+
+        return {
+          ...data.data.reduce((acc: any, item: any) => {
+            const contractId =
+              item.tokenId === "_" ? Network.TRON : item.tokenId;
+            return {
+              ...acc,
+              [contractId]: item.balance,
+            };
+          }, {} as { [key: string]: string }),
+        };
+      }
       default:
         return {};
     }

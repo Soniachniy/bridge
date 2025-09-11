@@ -347,7 +347,9 @@ const useNetwork = (
           if (contractAddress) {
             const contract = await tronWeb.contract().at(contractAddress);
 
-            const balance = await contract.balanceOf(addressTron).call();
+            const balance = await contract
+              .balanceOf(addressTron)
+              .call({ from: addressTron });
 
             return { balance: BigInt(balance), nearBalance: 0n };
           }
@@ -575,7 +577,6 @@ const useNetwork = (
               Big(tronWeb.toSun(Number(amount)).toString()).toNumber(),
               addressTron
             );
-            console.log(transaction);
 
             const signedTransaction = await signTransactionTron(transaction);
 
@@ -588,7 +589,6 @@ const useNetwork = (
               addressTron,
               depositAddress as `0x${string}`
             );
-            console.log(transaction);
 
             const signedTransaction = await signTransactionTron(transaction);
 

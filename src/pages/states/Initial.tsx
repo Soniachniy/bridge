@@ -312,7 +312,7 @@ export const ConnectButton = ({
   const actorRef = BridgeFormMachineContext.useActorRef();
   const {
     watch,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = useFormContext();
   const refundAddress = watch("refundAddress");
   const selectedToken = watch("selectedToken");
@@ -356,21 +356,12 @@ export const ConnectButton = ({
     );
   }
   const { setTimer } = useLocalStoreTimer();
-  console.log(
-    "isValid",
-    isValid,
-    refundAddress,
-    selectedToken,
-    amountIn,
-    evmAddress,
-    errors
-  );
+
   return (
     <div className="flex flex-col w-full">
       <ActionButton
         variant="primary"
         onClick={async () => {
-          console.log("isValid", isValid);
           if (!isValid) {
             return;
           }

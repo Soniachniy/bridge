@@ -121,6 +121,7 @@ export const getNetworkChainId = (network: TokenResponse.blockchain) => {
 export const basicConfig = {
   arbitrumProxyAddress: "0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a",
   proxyApiPoint: "https://api.hyperdep.now",
+  balancesApiPoint: "https://balances.hyperdep.now",
   nearConfig: {
     network: "mainnet" as const,
     contractId: "",
@@ -181,6 +182,10 @@ export const basicConfig = {
       "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
     autoConnect: true,
     wallets: [new HotWalletAdapter(), new PhantomWalletAdapter()],
+  },
+  tronConfig: {
+    key: "4a1aebe1-bed8-46bd-9026-9f9408aa8f3f",
+    endpoint: "https://apilist.tronscan.org/api",
   },
 };
 
