@@ -15,7 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import LoadingIcon from "@/assets/loading-icon.svg?react";
 
-import { cn, formatTokenAmount, truncateAddress } from "@/lib/utils";
+import {
+  cn,
+  formatBalance,
+  formatTokenAmount,
+  truncateAddress,
+} from "@/lib/utils";
 import { useTokens } from "@/providers/token-context";
 import { useFormContext } from "react-hook-form";
 import { Network } from "@/config";
@@ -292,7 +297,7 @@ const SelectTokenDialog: FC<Props> = ({
                       {token.balance && (
                         <>
                           <div className="text-white text-base font-semibold font-['Inter'] leading-none">
-                            {token.balance}
+                            {formatBalance(token.balance, token.price)}
                           </div>
                           <div className="opacity-60 text-right justify-center text-main_white text-xs font-normal font-['Inter'] leading-none">
                             ${token.balanceValue}

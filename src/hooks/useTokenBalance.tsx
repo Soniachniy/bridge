@@ -62,6 +62,9 @@ const fetchBalance = async (
   }
   const currentNetwork = translateTokenToNetwork(network);
   try {
+    if (!address) {
+      return {};
+    }
     switch (currentNetwork) {
       case Network.NEAR: {
         const res: {

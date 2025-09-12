@@ -95,6 +95,21 @@ export const parseTokenAmount = (value: ValueType, decimals: number) => {
     .toFixed(0);
 };
 
+export const formatBalance = (value: string, price: number): string => {
+  const formattedValue = new Big(value);
+  if (!value || formattedValue.eq(0)) return value;
+
+  if (formattedValue.lte("0.00001")) {
+    if (formattedValue.mul(price).gt("1")) {
+      return formattedValue.toFixed(6);
+    }
+    return ">0.00001";
+  }
+  if (formattedValue.lt("1000")) return formattedValue.toFixed(5);
+  if (formattedValue.gt("100000")) return formattedValue.toFixed(1);
+  return formattedValue.toFixed(0);
+};
+
 export const isSupportedNetwork = (network: Network) => {
   return supportedNetworks[network] ?? false;
 };

@@ -582,12 +582,12 @@ const useNetwork = (
 
             const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
             return res.result;
-          } else {
+          } else if (selectedToken.contractAddress) {
             const transaction = await tronWeb.transactionBuilder.sendToken(
               depositAddress,
               Big(parseTokenAmount(amount, decimals)).toNumber(),
-              addressTron,
-              depositAddress as `0x${string}`
+              selectedToken.contractAddress as string,
+              addressTron
             );
 
             const signedTransaction = await signTransactionTron(transaction);
@@ -595,6 +595,7 @@ const useNetwork = (
             const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
             return res.result;
           }
+          return false;
       }
     },
     signData: async (data: PermitDataResponse) => {
