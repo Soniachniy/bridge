@@ -1,38 +1,38 @@
-import SelectTokenDialog from "@/components/select-token-dialog";
+import SelectTokenDialog from '@/components/select-token-dialog';
 
-import { enforcer, truncateAddress } from "@/lib/utils";
-import { useFormContext } from "react-hook-form";
+import { enforcer, truncateAddress } from '@/lib/utils';
+import { useFormContext } from 'react-hook-form';
 
-import { useCallback, useEffect, useState } from "react";
-import WalletIcon from "@/assets/wallet-icon.svg?react";
-import SuccessIcon from "@/assets/success-icon.svg?react";
-import ErrorIcon from "@/assets/form-error-icon.svg?react";
+import { useCallback, useEffect, useState } from 'react';
+import WalletIcon from '@/assets/wallet-icon.svg?react';
+import SuccessIcon from '@/assets/success-icon.svg?react';
+import ErrorIcon from '@/assets/form-error-icon.svg?react';
 
-import { BridgeFormMachineContext } from "@/providers/machine-provider";
+import { BridgeFormMachineContext } from '@/providers/machine-provider';
 
-import useSwapQuote from "@/hooks/useSwapQuote";
-import { FormInterface } from "@/lib/validation";
-import { useDebounce } from "@/hooks/useDebounce";
-import { ActionButton } from "@/components/ActionButtons";
+import useSwapQuote from '@/hooks/useSwapQuote';
+import { FormInterface } from '@/lib/validation';
+import { useDebounce } from '@/hooks/useDebounce';
+import { ActionButton } from '@/components/ActionButtons';
 
-import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
+import HyperliquidIcon from '@/assets/hyperliquid-icon.svg?react';
 import {
   CHAIN_TITLE,
   getTokenIcon,
   translateNetwork,
-} from "@/lib/1clickHelper";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { Network, translateTokenToNetwork } from "@/config";
-import { EStrategy } from "../Form";
-import useNetwork from "@/hooks/useNetworkHandler";
-import SelectNetworkDialog from "@/components/select-network";
-import LogoutIcon from "@/assets/logout-icon.svg?react";
-import ArrowDown from "@/assets/arrow-down.svg?react";
-import { Loader } from "lucide-react";
-import { Toggle } from "@/components/toggle";
-import { motion } from "framer-motion";
-import SlippageDialog from "@/components/slippage-dialog";
-import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
+} from '@/lib/1clickHelper';
+import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
+import { Network, translateTokenToNetwork } from '@/config';
+import { EStrategy } from '../Form';
+import useNetwork from '@/hooks/useNetworkHandler';
+import SelectNetworkDialog from '@/components/select-network';
+import LogoutIcon from '@/assets/logout-icon.svg?react';
+import ArrowDown from '@/assets/arrow-down.svg?react';
+import { Loader } from 'lucide-react';
+import { Toggle } from '@/components/toggle';
+import { motion } from 'framer-motion';
+import SlippageDialog from '@/components/slippage-dialog';
+import { useLocalStoreTimer } from '@/hooks/useLocalStoreTimer';
 
 export const InitialView = () => {
   const [debouncedAmountIn, setDebouncedValue] = useState<string | null>(null);
@@ -46,13 +46,13 @@ export const InitialView = () => {
     formState: { errors, dirtyFields },
   } = useFormContext();
 
-  const selectedToken = watch("selectedToken");
-  const amountIn = watch("amount");
-  const amountOut = watch("amountOut");
-  const slippageValue = watch("slippageValue");
-  const hyperliquidAddress = watch("hyperliquidAddress");
-  const refundAddress = watch("refundAddress");
-  const strategy = watch("strategy");
+  const selectedToken = watch('selectedToken');
+  const amountIn = watch('amount');
+  const amountOut = watch('amountOut');
+  const slippageValue = watch('slippageValue');
+  const hyperliquidAddress = watch('hyperliquidAddress');
+  const refundAddress = watch('refundAddress');
+  const strategy = watch('strategy');
 
   useDebounce(() => setDebouncedValue(amountIn), amountIn ? 100 : 0, [
     amountIn,
@@ -60,7 +60,7 @@ export const InitialView = () => {
 
   const { isFetching } = useSwapQuote({
     tokenIn: selectedToken,
-    amountIn: debouncedAmountIn ?? "",
+    amountIn: debouncedAmountIn ?? '',
     setFormValue: (key: keyof FormInterface, value: string) =>
       setValue(key, value),
     hyperliquidAddress,
@@ -78,15 +78,15 @@ export const InitialView = () => {
     (network: Network) => {
       if (!isConnected(network)) connectWallet(network);
     },
-    [connectWallet, isConnected]
+    [connectWallet, isConnected],
   );
 
   useEffect(() => {
     if (selectedToken?.blockchain) {
       const refundAddress = getPublicKey(
-        translateTokenToNetwork(selectedToken.blockchain)
+        translateTokenToNetwork(selectedToken.blockchain),
       );
-      setValue("refundAddress", refundAddress);
+      setValue('refundAddress', refundAddress);
     }
   }, [
     isConnected(translateTokenToNetwork(selectedToken.blockchain)),
@@ -109,7 +109,7 @@ export const InitialView = () => {
       <motion.div
         layout="preserve-aspect"
         transition={{
-          height: { duration: 4, ease: "easeInOut" },
+          height: { duration: 4, ease: 'easeInOut' },
         }}
         className="flex flex-col gap-6 bg-form rounded-4xl p-6 w-full md:w-[540px]"
       >
@@ -125,19 +125,19 @@ export const InitialView = () => {
 
           <div className="flex flex-row gap-2 justify-between w-full rounded-2xl">
             <input
-              {...register("amount", {
+              {...register('amount', {
                 onChange: (e) => {
                   const enforcedValue = enforcer(e.target.value);
                   if (enforcedValue === null) return;
-                  setValue("amount", enforcedValue, { shouldValidate: true });
+                  setValue('amount', enforcedValue, { shouldValidate: true });
                 },
               })}
               type="text"
               pattern="^[0-9]*[.,]?[0-9]*$"
               className={`${
-                errors.amount ? "text-error" : "text-main_white"
+                errors.amount ? 'text-error' : 'text-main_white'
               } grow-1 w-full border-none outline-none placeholder:text-main_white text-3xl font-semibold bg-transparent font-inter leading-none`}
-              value={amountIn ?? ""}
+              value={amountIn ?? ''}
               placeholder="0"
               inputMode="decimal"
               autoComplete="off"
@@ -147,16 +147,16 @@ export const InitialView = () => {
               autoCorrect="off"
             />
             <SelectTokenDialog
-              {...register("selectedToken")}
+              {...register('selectedToken')}
               selectToken={(token) => {
-                setValue("selectedToken", {
+                setValue('selectedToken', {
                   ...token,
                   balance: BigInt(0),
                   balanceNear: BigInt(0),
                   balanceUpdatedAt: 0,
                 });
                 if (selectedToken.assetId !== token.assetId) {
-                  setValue("amount", "0", { shouldValidate: false });
+                  setValue('amount', '0', { shouldValidate: false });
                 }
               }}
               selectedToken={selectedToken}
@@ -206,7 +206,7 @@ export const InitialView = () => {
             <span
               className={`grow-1 relative border-none outline-none text-main_white text-3xl font-semibold bg-transparent font-inter self-center`}
             >
-              {amountOut ?? "0"}
+              {amountOut ?? '0'}
               {isFetching && (
                 <span className="text-gray_text flex flex-row gap-1 items-center text-xs font-normal font-['Inter'] absolute bottom-[-16px]">
                   Loading <Loader className="size-4 animate-spin" />
@@ -218,14 +218,14 @@ export const InitialView = () => {
               <div className="relative flex items-center">
                 <div className="size-10 flex items-center justify-center rounded-full bg-white">
                   <img
-                    src={getTokenIcon({ symbol: "USDC" } as TokenResponse)}
-                    alt={"USDC"}
+                    src={getTokenIcon({ symbol: 'USDC' } as TokenResponse)}
+                    alt={'USDC'}
                     className="size-8 rounded-full"
                   />
                 </div>
                 <HyperliquidIcon className="absolute size-4 bottom-0 right-0 border border-input-custom rounded-full" />
               </div>
-              <div className="flex flex-col gap-2 items-start">
+              <div className="flex flex-col gap-2 items-start min-w-[70px]">
                 <p className="justify-center text-white text-base font-semibold font-['Inter'] leading-none">
                   USDC
                 </p>
@@ -255,7 +255,7 @@ export const InitialView = () => {
               <div className="flex flex-col grow-1 gap-1 w-full">
                 <input
                   type="text"
-                  {...register("refundAddress")}
+                  {...register('refundAddress')}
                   className="text-white border-none outline-none text-xs font-normal grow-1  font-inter leading-none w-full"
                   placeholder="0x32Be343B94f860124dC4fEe278FDCBD38C102D88"
                   autoComplete="off"
@@ -275,8 +275,8 @@ export const InitialView = () => {
                   <div
                     onClick={async () => {
                       const text = await window.navigator.clipboard.readText();
-                      setValue("refundAddress", text);
-                      trigger("refundAddress");
+                      setValue('refundAddress', text);
+                      trigger('refundAddress');
                     }}
                     className="text-center cursor-pointer rounded-[5px] px-2 py-1 justify-center  text-main_light text-base font-semibold font-['Inter'] leading-none"
                   >
@@ -314,10 +314,10 @@ export const ConnectButton = ({
     watch,
     formState: { isValid },
   } = useFormContext();
-  const refundAddress = watch("refundAddress");
-  const selectedToken = watch("selectedToken");
-  const amountIn = watch("amount");
-  const strategy = watch("strategy");
+  const refundAddress = watch('refundAddress');
+  const selectedToken = watch('selectedToken');
+  const amountIn = watch('amount');
+  const strategy = watch('strategy');
 
   if (!evmAddress) {
     return (
@@ -367,8 +367,8 @@ export const ConnectButton = ({
           }
           const screen =
             strategy === EStrategy.Manual
-              ? "manual_deposit"
-              : "create_transaction";
+              ? 'manual_deposit'
+              : 'create_transaction';
           if (isValid) {
             actorRef.send({ type: screen });
           }
