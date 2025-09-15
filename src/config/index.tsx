@@ -1,28 +1,28 @@
-import { setupHotWallet } from "@hot-wallet/sdk/adapter/near";
-import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
-import { setupSender } from "@near-wallet-selector/sender";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import { HotWalletAdapter } from "@hot-wallet/sdk/adapter/solana";
-import { setupArepaWallet } from "@near-wallet-selector/arepa-wallet";
-import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
-import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
-import { setupIntearWallet } from "@near-wallet-selector/intear-wallet";
-import { setupLedger } from "@near-wallet-selector/ledger";
-import { setupMathWallet } from "@near-wallet-selector/math-wallet";
-import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
-import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
-import { setupNarwallets } from "@near-wallet-selector/narwallets";
+import { setupHotWallet } from '@hot-wallet/sdk/adapter/near';
+import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
+import { setupSender } from '@near-wallet-selector/sender';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { HotWalletAdapter } from '@hot-wallet/sdk/adapter/solana';
+import { setupArepaWallet } from '@near-wallet-selector/arepa-wallet';
+import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
+import { setupCoin98Wallet } from '@near-wallet-selector/coin98-wallet';
+import { setupIntearWallet } from '@near-wallet-selector/intear-wallet';
+import { setupLedger } from '@near-wallet-selector/ledger';
+import { setupMathWallet } from '@near-wallet-selector/math-wallet';
+import { setupMeteorWallet } from '@near-wallet-selector/meteor-wallet';
+import { setupMeteorWalletApp } from '@near-wallet-selector/meteor-wallet-app';
+import { setupNarwallets } from '@near-wallet-selector/narwallets';
 
-import { setupNightly } from "@near-wallet-selector/nightly";
-import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
-import { setupRamperWallet } from "@near-wallet-selector/ramper-wallet";
-import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
-import { setupWelldoneWallet } from "@near-wallet-selector/welldone-wallet";
-import { setupXDEFI } from "@near-wallet-selector/xdefi";
-import { WalletModuleFactory } from "@near-wallet-selector/core";
-import { BrowserWallet } from "@near-wallet-selector/core";
+import { setupNightly } from '@near-wallet-selector/nightly';
+import { setupOKXWallet } from '@near-wallet-selector/okx-wallet';
+import { setupRamperWallet } from '@near-wallet-selector/ramper-wallet';
+import { setupWalletConnect } from '@near-wallet-selector/wallet-connect';
+import { setupWelldoneWallet } from '@near-wallet-selector/welldone-wallet';
+import { setupXDEFI } from '@near-wallet-selector/xdefi';
+import { WalletModuleFactory } from '@near-wallet-selector/core';
+import { BrowserWallet } from '@near-wallet-selector/core';
 
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import {
   mainnet,
   arbitrum,
@@ -36,32 +36,32 @@ import {
   avalanche,
   tron,
   gnosis,
-} from "@reown/appkit/networks";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+} from '@reown/appkit/networks';
+import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
 
 export enum Network {
-  ARBITRUM = "arb",
-  AURORA = "aur",
-  STELLAR = "stellar",
-  APTOS = "aptos",
-  BASE = "base",
-  BERA = "bera",
-  BNB = "bnb",
-  BITCOIN = "btc",
-  DOGE = "doge",
-  ETHEREUM = "eth",
-  GNOSIS = "gnosis",
-  NEAR = "near",
-  POLYGON = "polygon",
-  SOLANA = "sol",
-  TON = "ton",
-  TRON = "tron",
-  XRP = "xrp",
-  ZEC = "zec",
-  SUI = "sui",
-  CARDANO = "cardano",
-  OP = "op",
-  AVAX = "avax",
+  ARBITRUM = 'arb',
+  AURORA = 'aur',
+  STELLAR = 'stellar',
+  APTOS = 'aptos',
+  BASE = 'base',
+  BERA = 'bera',
+  BNB = 'bnb',
+  BITCOIN = 'btc',
+  DOGE = 'doge',
+  ETHEREUM = 'eth',
+  GNOSIS = 'gnosis',
+  NEAR = 'near',
+  POLYGON = 'polygon',
+  SOLANA = 'sol',
+  TON = 'ton',
+  TRON = 'tron',
+  XRP = 'xrp',
+  ZEC = 'zec',
+  SUI = 'sui',
+  CARDANO = 'cardano',
+  OP = 'op',
+  AVAX = 'avax',
 }
 
 export const supportedNetworks = {
@@ -85,7 +85,7 @@ export const supportedNetworks = {
   [Network.CARDANO]: false,
   [Network.OP]: true,
   [Network.AVAX]: true,
-  [Network.STELLAR]: false,
+  [Network.STELLAR]: true,
   [Network.APTOS]: false,
 };
 
@@ -119,12 +119,12 @@ export const getNetworkChainId = (network: TokenResponse.blockchain) => {
 };
 
 export const basicConfig = {
-  arbitrumProxyAddress: "0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a",
-  proxyApiPoint: "https://api.hyperdep.now",
-  balancesApiPoint: "https://balances.hyperdep.now",
+  arbitrumProxyAddress: '0xbafa6bb00cc1bdf9e8ecd549f0261bafbdfb1c2a',
+  proxyApiPoint: 'https://api.hyperdep.now',
+  balancesApiPoint: 'https://balances.hyperdep.now',
   nearConfig: {
-    network: "mainnet" as const,
-    contractId: "",
+    network: 'mainnet' as const,
+    contractId: '',
     modules: [
       setupHotWallet() as WalletModuleFactory<BrowserWallet>,
       setupMyNearWallet() as WalletModuleFactory<BrowserWallet>,
@@ -137,19 +137,19 @@ export const basicConfig = {
       setupMathWallet() as WalletModuleFactory<BrowserWallet>,
       setupMeteorWallet() as WalletModuleFactory<BrowserWallet>,
       setupMeteorWalletApp({
-        contractId: "",
+        contractId: '',
       }) as WalletModuleFactory<BrowserWallet>,
       setupNarwallets() as WalletModuleFactory<BrowserWallet>,
       setupNightly() as WalletModuleFactory<BrowserWallet>,
       setupOKXWallet() as WalletModuleFactory<BrowserWallet>,
       setupRamperWallet() as WalletModuleFactory<BrowserWallet>,
       setupWalletConnect({
-        projectId: "bde78605c842813c95fe91c9b4ed1f92",
+        projectId: 'bde78605c842813c95fe91c9b4ed1f92',
         metadata: {
-          name: "Hyperdep",
-          description: "Hyperdep",
-          url: "https://hyperdep.now",
-          icons: ["https://hyperdep.now/logo.png"],
+          name: 'Hyperdep',
+          description: 'Hyperdep',
+          url: 'https://hyperdep.now',
+          icons: ['https://hyperdep.now/logo.png'],
         },
       }) as WalletModuleFactory<BrowserWallet>,
       setupWelldoneWallet() as WalletModuleFactory<BrowserWallet>,
@@ -157,7 +157,7 @@ export const basicConfig = {
     ],
   },
   evmConfig: {
-    projectId: "bde78605c842813c95fe91c9b4ed1f92",
+    projectId: 'bde78605c842813c95fe91c9b4ed1f92',
     adapters: [WagmiAdapter],
     networks: [
       mainnet,
@@ -174,24 +174,27 @@ export const basicConfig = {
     ] as [AppKitNetwork, ...AppKitNetwork[]],
   },
   tonConfig: {
-    manifestUrl: "https://hyperdep.now/tonconnect-manifest.json",
-    endpoint: "https://toncenter.com/api/v2/jsonRPC",
+    manifestUrl: 'https://hyperdep.now/tonconnect-manifest.json',
+    endpoint: 'https://toncenter.com/api/v2/jsonRPC',
   },
   solanaConfig: {
     endpoint:
-      "https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc",
+      'https://mainnet.helius-rpc.com/?api-key=e5134d0c-9f20-48b6-ada5-33583b7f78fc',
     autoConnect: true,
     wallets: [new HotWalletAdapter(), new PhantomWalletAdapter()],
   },
   tronConfig: {
-    key: "4a1aebe1-bed8-46bd-9026-9f9408aa8f3f",
-    endpoint: "https://apilist.tronscan.org/api",
+    key: '4a1aebe1-bed8-46bd-9026-9f9408aa8f3f',
+    endpoint: 'https://apilist.tronscan.org/api',
+  },
+  stellarConfig: {
+    horizonUrl: 'https://horizon.stellar.org',
   },
 };
 
 // Local translation to avoid circular import with `@/lib/1clickHelper`
 export const translateTokenToNetwork = (
-  blockchain: TokenResponse.blockchain
+  blockchain: TokenResponse.blockchain,
 ): Network => {
   switch (blockchain) {
     case TokenResponse.blockchain.ARB:

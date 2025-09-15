@@ -5,6 +5,7 @@ import { queryClient, wagmiAdapter } from "./evm-provider";
 
 import { WalletSelectorContextProvider } from "./near-provider";
 import { SolanaProvider } from "./solana-provider";
+import { StellarProvider } from "./stellar-provider";
 import { TonProvider } from "./ton-provider";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
@@ -19,11 +20,13 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           <WagmiProvider config={wagmiAdapter.wagmiConfig}>
             <QueryClientProvider client={queryClient}>
               <SolanaProvider>
-                <TronProvider>
-                  <BridgeFormMachineProvider>
-                    <Theme>{children}</Theme>
-                  </BridgeFormMachineProvider>
-                </TronProvider>
+                <StellarProvider>
+                  <TronProvider>
+                    <BridgeFormMachineProvider>
+                      <Theme>{children}</Theme>
+                    </BridgeFormMachineProvider>
+                  </TronProvider>
+                </StellarProvider>
               </SolanaProvider>
             </QueryClientProvider>
           </WagmiProvider>

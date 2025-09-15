@@ -60,6 +60,7 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { useWallet as useWalletTron } from '@tronweb3/tronwallet-adapter-react-hooks';
 import { useWalletModal as useWalletModalTron } from '@tronweb3/tronwallet-adapter-react-ui';
 import { tronWeb } from '@/providers/tron-provider';
+import { useStellar, stellarUtils } from '@/providers/stellar-provider';
 import Big from 'big.js';
 
 const useNetwork = (
@@ -115,6 +116,15 @@ const useNetwork = (
   } = useWalletTron();
   const { setVisible: setVisibleTron } = useWalletModalTron();
 
+  /* STELLAR */
+  const {
+    isConnected: stellarConnected,
+    publicKey: stellarPublicKey,
+    connect: connectStellar,
+    disconnect: disconnectStellar,
+    signTransaction: signTransactionStellar,
+  } = useStellar();
+
   return {
     isConnected: (localNetwork?: Network) => {
       const currentNetwork = localNetwork ?? network;
@@ -135,6 +145,8 @@ const useNetwork = (
           return Boolean(tonWallet);
         case Network.TRON:
           return connectedTron;
+        case Network.STELLAR:
+          return stellarConnected;
         default:
           return false;
       }
@@ -166,6 +178,8 @@ const useNetwork = (
 
         case Network.TRON:
           return setVisibleTron(true);
+        case Network.STELLAR:
+          return connectStellar();
         default:
           return null;
       }
@@ -189,6 +203,8 @@ const useNetwork = (
 
         case Network.TRON:
           return disconnectTron();
+        case Network.STELLAR:
+          return disconnectStellar();
         default:
           return null;
       }
@@ -213,6 +229,8 @@ const useNetwork = (
             : null;
         case Network.TRON:
           return addressTron;
+        case Network.STELLAR:
+          return stellarPublicKey;
         default:
           return null;
       }
@@ -352,6 +370,19 @@ const useNetwork = (
               .call({ from: addressTron });
 
             return { balance: BigInt(balance), nearBalance: 0n };
+          }
+          return { balance: 0n, nearBalance: 0n };
+        case Network.STELLAR:
+          if (!stellarPublicKey) {
+            return { balance: 0n, nearBalance: 0n };
+          }
+          if (isNativeToken(currentNetwork, assetId)) {
+            const balance = await stellarUtils.getAccountBalance(stellarPublicKey, "XLM");
+            return { balance: BigInt(Math.floor(parseFloat(balance) * 10000000)), nearBalance: 0n };
+          }
+          if (contractAddress) {
+            const balance = await stellarUtils.getAccountBalance(stellarPublicKey, assetId);
+            return { balance: BigInt(Math.floor(parseFloat(balance) * 10000000)), nearBalance: 0n };
           }
           return { balance: 0n, nearBalance: 0n };
 
@@ -610,6 +641,34 @@ const useNetwork = (
             return res.result;
           }
           return false;
+        case Network.STELLAR:
+          if (!stellarPublicKey) {
+            return false;
+          }
+
+          const stellarAsset = isNativeToken(network, selectedToken.assetId)
+            ? { code: "XLM", type: "native" as const }
+            : {
+                code: selectedToken.assetId,
+                issuer: selectedToken.contractAddress,
+                type: "credit_alphanum4" as const
+              };
+
+          const transactionXdr = await stellarUtils.buildPaymentTransaction({
+            sourceAccount: stellarPublicKey,
+            destinationAccount: depositAddress,
+            asset: stellarAsset,
+            amount: amount,
+          });
+
+          try {
+            const signedXdr = await signTransactionStellar(transactionXdr);
+            const result = await stellarUtils.submitTransaction(signedXdr);
+            return result.successful;
+          } catch (error) {
+            console.error('Stellar transaction failed:', error);
+            return false;
+          }
       }
     },
     signData: async (data: PermitDataResponse) => {
