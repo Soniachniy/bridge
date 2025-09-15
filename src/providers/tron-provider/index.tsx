@@ -1,13 +1,13 @@
-import React, { useMemo } from "react";
-import { WalletProvider } from "@tronweb3/tronwallet-adapter-react-hooks";
-import { WalletModalProvider } from "@tronweb3/tronwallet-adapter-react-ui";
+import React, { useMemo } from 'react';
+import { WalletProvider } from '@tronweb3/tronwallet-adapter-react-hooks';
+import { WalletModalProvider } from '@tronweb3/tronwallet-adapter-react-ui';
 import {
   WalletDisconnectedError,
   WalletError,
   WalletNotFoundError,
-} from "@tronweb3/tronwallet-abstract-adapter";
-import "@tronweb3/tronwallet-adapter-react-ui/style.css";
-import { TronWeb } from "tronweb";
+} from '@tronweb3/tronwallet-abstract-adapter';
+import '@tronweb3/tronwallet-adapter-react-ui/style.css';
+import { TronWeb } from 'tronweb';
 import {
   TronLinkAdapter,
   TokenPocketAdapter,
@@ -17,10 +17,10 @@ import {
   BybitWalletAdapter,
   LedgerAdapter,
   WalletConnectAdapter,
-} from "@tronweb3/tronwallet-adapters";
+} from '@tronweb3/tronwallet-adapters';
 
 export const tronWeb = new TronWeb({
-  fullHost: "https://api.trongrid.io",
+  fullHost: 'https://api.trongrid.io',
 });
 
 export function TronProvider({ children }: { children: React.ReactNode }) {
@@ -45,14 +45,14 @@ export function TronProvider({ children }: { children: React.ReactNode }) {
       new BybitWalletAdapter(),
       new LedgerAdapter(),
       new WalletConnectAdapter({
-        network: "mainnet",
+        network: 'mainnet',
         options: {
-          projectId: "bde78605c842813c95fe91c9b4ed1f92",
+          projectId: 'bde78605c842813c95fe91c9b4ed1f92',
         },
         web3ModalConfig: {},
       }),
     ],
-    []
+    [],
   );
 
   return (

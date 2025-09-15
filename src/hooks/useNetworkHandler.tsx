@@ -1,32 +1,32 @@
-import { getNetworkChainId, Network } from "@/config";
+import { getNetworkChainId, Network } from '@/config';
 
-import { convertGas, useWalletSelector } from "@/providers/near-provider";
-import { useAccount, useAccountEffect } from "wagmi";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useEffect } from "react";
+import { convertGas, useWalletSelector } from '@/providers/near-provider';
+import { useAccount, useAccountEffect } from 'wagmi';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useEffect } from 'react';
 
-import { useAppKit } from "@reown/appkit/react";
-import { Transaction } from "@near-wallet-selector/core";
+import { useAppKit } from '@reown/appkit/react';
+import { Transaction } from '@near-wallet-selector/core';
 
 import {
   useTonWallet,
   useTonConnectUI,
   toUserFriendlyAddress,
-} from "@tonconnect/ui-react";
-import { getBalance } from "wagmi/actions";
-import { wagmiAdapter } from "@/providers/evm-provider";
+} from '@tonconnect/ui-react';
+import { getBalance } from 'wagmi/actions';
+import { wagmiAdapter } from '@/providers/evm-provider';
 import {
   createDepositTonTransaction,
   tonClient,
-} from "@/providers/ton-provider/ton-utils";
-import { Address } from "@ton/core";
+} from '@/providers/ton-provider/ton-utils';
+import { Address } from '@ton/core';
 import {
   createSPLTransferSolanaTransaction,
   checkSolanaATARequired,
   getSplTokenBalance,
   createTransferSolanaTransaction,
   getSolanaNativeBalance,
-} from "@/providers/solana-provider/solana-utils";
+} from '@/providers/solana-provider/solana-utils';
 
 import {
   prepareTransactionRequest,
@@ -36,35 +36,35 @@ import {
   waitForTransactionReceipt,
   disconnect,
   getAccount,
-} from "@wagmi/core";
-import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from "viem";
+} from '@wagmi/core';
+import { encodeFunctionData, erc20Abi, parseEther, parseUnits } from 'viem';
 
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
 
-import { formatTokenAmount, parseTokenAmount } from "@/lib/utils";
+import { formatTokenAmount, parseTokenAmount } from '@/lib/utils';
 
-import { PermitDataResponse } from "@/providers/proxy-provider";
+import { PermitDataResponse } from '@/providers/proxy-provider';
 import {
   checkSwapStorageBalance,
   ITransaction,
-} from "@/providers/near-provider/nearHelper";
-import { getAmount, getGas } from "@/providers/near-provider/nearHelper";
-import { FormInterface } from "@/lib/validation";
+} from '@/providers/near-provider/nearHelper';
+import { getAmount, getGas } from '@/providers/near-provider/nearHelper';
+import { FormInterface } from '@/lib/validation';
 
-import { isNativeToken } from "@/lib/1clickHelper";
-import { translateTokenToNetwork } from "@/config";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from "@/lib/constants";
+import { isNativeToken } from '@/lib/1clickHelper';
+import { translateTokenToNetwork } from '@/config';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { ONE_YOCTO_NEAR, RESERVED_NEAR_BALANCE } from '@/lib/constants';
 
-import { useConnection } from "@solana/wallet-adapter-react";
-import { useWallet as useWalletTron } from "@tronweb3/tronwallet-adapter-react-hooks";
-import { useWalletModal as useWalletModalTron } from "@tronweb3/tronwallet-adapter-react-ui";
-import { tronWeb } from "@/providers/tron-provider";
-import Big from "big.js";
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useWallet as useWalletTron } from '@tronweb3/tronwallet-adapter-react-hooks';
+import { useWalletModal as useWalletModalTron } from '@tronweb3/tronwallet-adapter-react-ui';
+import { tronWeb } from '@/providers/tron-provider';
+import Big from 'big.js';
 
 const useNetwork = (
   network: Network | null,
-  setValue?: (key: keyof FormInterface, value: any) => void
+  setValue?: (key: keyof FormInterface, value: any) => void,
 ) => {
   /* SOLANA */
   const { publicKey, disconnect: disconnectSolana } = useWallet();
@@ -80,7 +80,7 @@ const useNetwork = (
 
   useEffect(() => {
     if (isConnected && address && setValue) {
-      setValue("hyperliquidAddress", address);
+      setValue('hyperliquidAddress', address);
     }
   }, [isConnected, address, setValue]);
 
@@ -88,12 +88,12 @@ const useNetwork = (
     config: wagmiAdapter.wagmiConfig,
     onConnect: (account) => {
       if (account && setValue) {
-        setValue("hyperliquidAddress", account.address);
+        setValue('hyperliquidAddress', account.address);
       }
     },
     onDisconnect: () => {
       if (setValue) {
-        setValue("hyperliquidAddress", null);
+        setValue('hyperliquidAddress', null);
       }
     },
   });
@@ -149,14 +149,14 @@ const useNetwork = (
         case Network.POLYGON:
         case Network.ETHEREUM:
           return open({
-            view: "Connect",
-            namespace: "eip155",
+            view: 'Connect',
+            namespace: 'eip155',
           });
         case Network.SOLANA:
           try {
             return setVisible(true);
           } catch (e) {
-            console.log("SOLANA", e);
+            console.log('SOLANA', e);
             return null;
           }
         case Network.NEAR:
@@ -221,7 +221,7 @@ const useNetwork = (
     getBalance: async (
       assetId: string,
       contractAddress?: string,
-      blockchain?: TokenResponse.blockchain
+      blockchain?: TokenResponse.blockchain,
     ): Promise<{
       balance: bigint;
       nearBalance: bigint;
@@ -238,7 +238,7 @@ const useNetwork = (
         case Network.ETHEREUM:
           let balanceEVM = 0n;
           const chainId = getNetworkChainId(
-            blockchain ?? (network as unknown as TokenResponse.blockchain)
+            blockchain ?? (network as unknown as TokenResponse.blockchain),
           );
           if (!chainId) {
             return { balance: 0n, nearBalance: 0n };
@@ -250,7 +250,7 @@ const useNetwork = (
               {
                 address: address as `0x${string}`,
                 chainId: chainId,
-              }
+              },
             );
             balanceEVM = nativeBalanceEVM;
           } else if (contractAddress) {
@@ -260,7 +260,7 @@ const useNetwork = (
                 address: address as `0x${string}`,
                 token: contractAddress as `0x${string}`,
                 chainId: chainId,
-              }
+              },
             );
             balanceEVM = tokenBalanceEVM;
           }
@@ -278,7 +278,7 @@ const useNetwork = (
           if (contractAddress) {
             const balance = await getSplTokenBalance(
               publicKey,
-              contractAddress as `0x${string}`
+              contractAddress as `0x${string}`,
             );
             return {
               balance: BigInt(balance?.toString() ?? 0),
@@ -292,13 +292,13 @@ const useNetwork = (
           }
           let nearBalance = 0n;
           const tokenBalance = await RPCProvider.viewFunction(
-            "ft_balance_of",
+            'ft_balance_of',
             contractAddress,
             {
               account_id: accountId,
-            }
+            },
           );
-          if (contractAddress === "wrap.near") {
+          if (contractAddress === 'wrap.near') {
             const nativeNearBalance = await RPCProvider.viewAccount(accountId);
 
             const balance = BigInt(nativeNearBalance);
@@ -318,7 +318,7 @@ const useNetwork = (
           }
           if (isNativeToken(currentNetwork, assetId)) {
             const { balance } = await tonClient.accounts.getAccount(
-              Address.parse(tonWallet?.account?.address)
+              Address.parse(tonWallet?.account?.address),
             );
             return { balance: balance, nearBalance: 0n };
           }
@@ -329,7 +329,7 @@ const useNetwork = (
           const tonTokenBalance =
             await tonClient.accounts.getAccountJettonBalance(
               Address.parse(tonWallet?.account?.address),
-              Address.parse(contractAddress)
+              Address.parse(contractAddress),
             );
 
           return {
@@ -364,7 +364,7 @@ const useNetwork = (
       depositAddress: string,
       amount: string,
       decimals: number,
-      balance: { balance: bigint; nearBalance?: bigint }
+      balance: { balance: bigint; nearBalance?: bigint },
     ) => {
       switch (network) {
         case Network.BASE:
@@ -388,38 +388,38 @@ const useNetwork = (
               ? {
                   to: depositAddress as `0x${string}`,
                   value: parseEther(amount),
-                  data: "0x",
+                  data: '0x',
                 }
               : {
                   to: selectedToken.contractAddress as `0x${string}`,
                   data: encodeFunctionData({
                     abi: erc20Abi,
-                    functionName: "transfer",
+                    functionName: 'transfer',
                     args: [
                       depositAddress as `0x${string}`,
                       parseUnits(amount, decimals),
                     ],
                   }),
-                }
+                },
           );
 
           const hash = await sendTransaction(wagmiAdapter.wagmiConfig, request);
           const status = await waitForTransactionReceipt(
             wagmiAdapter.wagmiConfig,
-            { hash }
+            { hash },
           );
-          return status.status === "success";
+          return status.status === 'success';
         case Network.SOLANA:
           const solanaNative = isNativeToken(
             translateTokenToNetwork(selectedToken.blockchain),
-            selectedToken.assetId
+            selectedToken.assetId,
           );
           const solanaATACreationRequired = await checkSolanaATARequired(
             depositAddress,
             solanaNative,
-            selectedToken.contractAddress
+            selectedToken.contractAddress,
           );
-          console.log(solanaATACreationRequired, "solanaATACreationRequired");
+          console.log(solanaATACreationRequired, 'solanaATACreationRequired');
           if (!publicKey) {
             return false;
           }
@@ -428,18 +428,18 @@ const useNetwork = (
             ? createTransferSolanaTransaction(
                 publicKey.toBase58(),
                 depositAddress,
-                BigInt(parseTokenAmount(amount, decimals))
+                BigInt(parseTokenAmount(amount, decimals)),
               )
             : createSPLTransferSolanaTransaction(
                 publicKey.toBase58(),
                 depositAddress,
                 BigInt(parseTokenAmount(amount, decimals)),
                 selectedToken.contractAddress as `0x${string}`,
-                !solanaATACreationRequired
+                !solanaATACreationRequired,
               );
 
           const latestBlockHash = await solanaConnection.getLatestBlockhash(
-            "confirmed"
+            'confirmed',
           );
           transactionSolana.recentBlockhash = latestBlockHash.blockhash;
 
@@ -459,9 +459,9 @@ const useNetwork = (
           // } else {
           const txHash = await sendTransactionSolana(
             transactionSolana,
-            solanaConnection
+            solanaConnection,
           );
-          console.log(txHash, "txHash");
+          console.log(txHash, 'txHash');
           return txHash;
         // }
         case Network.NEAR:
@@ -477,7 +477,7 @@ const useNetwork = (
               depositAddress: depositAddress,
             });
           transactions.push(...storageBalanceTx);
-          if (selectedToken.contractAddress === "wrap.near") {
+          if (selectedToken.contractAddress === 'wrap.near') {
             const wrappedNearBalance =
               balance.balance - (balance?.nearBalance ?? 0n);
             const nearToWrap =
@@ -492,9 +492,9 @@ const useNetwork = (
                 receiverId: selectedToken.contractAddress,
                 functionCalls: [
                   {
-                    methodName: "near_deposit",
+                    methodName: 'near_deposit',
                     args: {},
-                    gas: convertGas("100"),
+                    gas: convertGas('100'),
                     amount: formatTokenAmount(nearToWrap.toString(), 24, 24),
                   },
                 ],
@@ -506,11 +506,11 @@ const useNetwork = (
             receiverId: selectedToken.contractAddress,
             functionCalls: [
               {
-                methodName: "ft_transfer",
+                methodName: 'ft_transfer',
                 args: {
                   amount: parseTokenAmount(amount, selectedToken.decimals),
                   receiver_id: depositAddress,
-                  msg: "",
+                  msg: '',
                 },
                 amount: ONE_YOCTO_NEAR,
               },
@@ -522,7 +522,7 @@ const useNetwork = (
               signerId: accountId,
               receiverId: transaction.receiverId,
               actions: transaction.functionCalls.map((fc) => ({
-                type: "FunctionCall",
+                type: 'FunctionCall',
                 params: {
                   methodName: fc.methodName,
                   args: fc.args || {},
@@ -530,7 +530,7 @@ const useNetwork = (
                   deposit: getAmount(fc.amount).toFixed(),
                 },
               })),
-            })
+            }),
           );
 
           const trx = await wallet.signAndSendTransactions({
@@ -541,7 +541,7 @@ const useNetwork = (
             const lastOutcome = trx[trx.length - 1];
             const successStatus = Object.prototype.hasOwnProperty.call(
               lastOutcome.status,
-              "SuccessValue"
+              'SuccessValue',
             );
             if (successStatus) {
               return true;
@@ -555,16 +555,16 @@ const useNetwork = (
             tonWallet?.account?.address,
             depositAddress,
             BigInt(parseTokenAmount(amount, decimals)),
-            selectedToken
+            selectedToken,
           );
           if (!transaction) return false;
 
           try {
             await tonConnectUI.sendTransaction(transaction);
-            alert("Transaction sent!");
+            alert('Transaction sent!');
           } catch (err) {
             console.error(err);
-            alert("Transaction failed.");
+            alert('Transaction failed.');
           }
           return true;
         case Network.TRON:
@@ -575,7 +575,7 @@ const useNetwork = (
             const transaction = await tronWeb.transactionBuilder.sendTrx(
               depositAddress,
               Big(tronWeb.toSun(Number(amount)).toString()).toNumber(),
-              addressTron
+              addressTron,
             );
 
             const signedTransaction = await signTransactionTron(transaction);
@@ -583,16 +583,30 @@ const useNetwork = (
             const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
             return res.result;
           } else if (selectedToken.contractAddress) {
-            const transaction = await tronWeb.transactionBuilder.sendToken(
-              depositAddress,
-              Big(parseTokenAmount(amount, decimals)).toNumber(),
-              selectedToken.contractAddress as string,
-              addressTron
-            );
+            const functionSelector = 'transfer(address,uint256)';
+            const params = [
+              { type: 'address', value: depositAddress },
+              {
+                type: 'uint256',
+                value: Big(
+                  parseTokenAmount(amount, selectedToken.decimals),
+                ).toNumber(),
+              },
+            ];
+            const transaction =
+              await tronWeb.transactionBuilder.triggerSmartContract(
+                selectedToken.contractAddress,
+                functionSelector,
+                {
+                  feeLimit: 20 * 1e6,
+                  callValue: 0,
+                },
+                params,
+                addressTron,
+              );
+            const signedTx = await signTransactionTron(transaction.transaction);
+            const res = await tronWeb.trx.sendRawTransaction(signedTx);
 
-            const signedTransaction = await signTransactionTron(transaction);
-
-            const res = await tronWeb.trx.sendRawTransaction(signedTransaction);
             return res.result;
           }
           return false;
@@ -615,7 +629,7 @@ const useNetwork = (
 
           return signTypedData(wagmiAdapter.wagmiConfig, {
             types,
-            primaryType: "Permit",
+            primaryType: 'Permit',
             domain: {
               name: domain.name,
               version: domain.version,
