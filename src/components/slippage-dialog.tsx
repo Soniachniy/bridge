@@ -3,34 +3,34 @@ import {
   DialogClose,
   DialogContent,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import { useState } from 'react';
-import { useForm, useFormContext } from 'react-hook-form';
-import { createSlippageDialogValidationSchema } from '@/lib/validation';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from "react";
+import { useForm, useFormContext } from "react-hook-form";
+import { createSlippageDialogValidationSchema } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import X from '@/assets/close-icon.svg?react';
+import X from "@/assets/close-icon.svg?react";
 
 export default function SlippageDialog() {
   const slippageOptions = [500, 1000, 1500, 2000];
   const [open, setOpen] = useState(false);
   const { watch: internalWatch, setValue: internalSetValue } = useFormContext();
-  const slippageValue = internalWatch('slippageValue');
+  const slippageValue = internalWatch("slippageValue");
 
   const { register, setValue, trigger, formState, handleSubmit, watch } =
     useForm({
       resolver: zodResolver(createSlippageDialogValidationSchema()),
-      mode: 'onChange',
-      reValidateMode: 'onChange',
+      mode: "onChange",
+      reValidateMode: "onChange",
       defaultValues: {
         slippageValue: slippageValue / 100,
       },
     });
-  const slippageValueInternal = watch('slippageValue');
+  const slippageValueInternal = watch("slippageValue");
 
   const onSubmit = (data: any) => {
-    internalSetValue('slippageValue', data.slippageValue * 100);
+    internalSetValue("slippageValue", data.slippageValue * 100);
     setOpen(false);
   };
 
@@ -71,7 +71,7 @@ export default function SlippageDialog() {
               <div className="flex grow-1 relative w-24 flex-row gap-2 h-10 border-element hover:border-main_light focus-within:border-main_light border-2 rounded-xl p-2">
                 <input
                   type="number"
-                  {...register('slippageValue', {
+                  {...register("slippageValue", {
                     valueAsNumber: true,
                   })}
                   id="slippageValue"
@@ -85,13 +85,13 @@ export default function SlippageDialog() {
                     className={` px-4 py-[10px] cursor-pointer bg-element hover:bg-zinc-700 active:bg-zinc-700  rounded-3xl inline-flex justify-center items-center gap-2
                       ${
                         slippageValueInternal === option
-                          ? 'bg-main_light text-main'
-                          : 'bg-element text-white'
+                          ? "bg-main_light text-main"
+                          : "bg-element text-white"
                       }`}
                     key={option}
                     onClick={() => {
-                      setValue('slippageValue', option / 100);
-                      trigger('slippageValue');
+                      setValue("slippageValue", option / 100);
+                      trigger("slippageValue");
                     }}
                   >
                     <div className="text-center justify-center  text-xs font-semibold font-['Inter'] leading-none">

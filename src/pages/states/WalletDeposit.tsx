@@ -3,40 +3,40 @@ import {
   CHAIN_TITLE,
   getTokenIcon,
   translateNetwork,
-} from '@/lib/1clickHelper';
-import { useFormContext } from 'react-hook-form';
-import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
-import { ActionButton } from '@/components/ActionButtons';
-import ArrowDown from '@/assets/arrow-down.svg?react';
+} from "@/lib/1clickHelper";
+import { useFormContext } from "react-hook-form";
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
+import { ActionButton } from "@/components/ActionButtons";
+import ArrowDown from "@/assets/arrow-down.svg?react";
 
-import { formatTokenAmount, truncateAddress } from '@/lib/utils';
-import { USDC_DECIMALS } from '@/lib/constants';
+import { formatTokenAmount, truncateAddress } from "@/lib/utils";
+import { USDC_DECIMALS } from "@/lib/constants";
 
-import HyperliquidIcon from '@/assets/hyperliquid-icon.svg?react';
-import LoadingIcon from '@/assets/loading-icon.svg?react';
-import useNetwork from '@/hooks/useNetworkHandler';
-import { useTokens } from '@/providers/token-context';
-import { FormInterface } from '@/lib/validation';
-import { BridgeFormMachineContext } from '@/providers/machine-provider';
-import { useState } from 'react';
-import { useLocalStoreTimer } from '@/hooks/useLocalStoreTimer';
+import HyperliquidIcon from "@/assets/hyperliquid-icon.svg?react";
+import LoadingIcon from "@/assets/loading-icon.svg?react";
+import useNetwork from "@/hooks/useNetworkHandler";
+import { useTokens } from "@/providers/token-context";
+import { FormInterface } from "@/lib/validation";
+import { BridgeFormMachineContext } from "@/providers/machine-provider";
+import { useState } from "react";
+import { useLocalStoreTimer } from "@/hooks/useLocalStoreTimer";
 
 export const WalletDepositView = () => {
   const actorRef = BridgeFormMachineContext.useActorRef();
   const [isLoading, setIsLoading] = useState(false);
   const { watch } = useFormContext<FormInterface>();
   const { tokens } = useTokens();
-  const selectedToken = watch('selectedToken');
+  const selectedToken = watch("selectedToken");
   const { makeDeposit } = useNetwork(
-    translateNetwork(selectedToken?.blockchain),
+    translateNetwork(selectedToken?.blockchain)
   );
-  const amountOut = watch('amountOut');
-  const amountIn: string = watch('amount');
-  const depositAddress = watch('depositAddress');
-  const platformFee = watch('platformFee');
-  const gasFee = watch('gasFee');
-  const refundAddress = watch('refundAddress');
-  const hyperliquidAddress: string = watch('hyperliquidAddress');
+  const amountOut = watch("amountOut");
+  const amountIn: string = watch("amount");
+  const depositAddress = watch("depositAddress");
+  const platformFee = watch("platformFee");
+  const gasFee = watch("gasFee");
+  const refundAddress = watch("refundAddress");
+  const hyperliquidAddress: string = watch("hyperliquidAddress");
   const { timeLeftFormatted, timeLeft } = useLocalStoreTimer();
 
   return (
@@ -54,7 +54,7 @@ export const WalletDepositView = () => {
           {timeLeft > 0 && (
             <>
               <span className="text-gray_text text-sm font-normal font-['Inter'] leading-none">
-                Complete within:{' '}
+                Complete within:{" "}
               </span>
               <span className="text-white text-sm font-semibold font-['Inter'] leading-none">
                 {timeLeftFormatted}
@@ -71,14 +71,14 @@ export const WalletDepositView = () => {
                   <div className="size-10 flex items-center justify-center rounded-full bg-white">
                     <img
                       src={getTokenIcon(selectedToken)}
-                      alt={selectedToken?.assetId ?? 'token'}
+                      alt={selectedToken?.assetId ?? "token"}
                       className="size-8 rounded-full"
                     />
                   </div>
 
                   <img
                     src={CHAIN_ICON[selectedToken?.blockchain]}
-                    alt={selectedToken?.blockchain ?? 'blockchain'}
+                    alt={selectedToken?.blockchain ?? "blockchain"}
                     className="absolute size-4 bottom-0 right-0 border border-input-custom rounded-full"
                   />
                 </div>
@@ -103,8 +103,8 @@ export const WalletDepositView = () => {
               <div className="relative flex  items-center ">
                 <div className="size-10 flex items-center justify-center rounded-full bg-white">
                   <img
-                    src={getTokenIcon({ symbol: 'USDC' } as TokenResponse)}
-                    alt={selectedToken?.assetId ?? 'token'}
+                    src={getTokenIcon({ symbol: "USDC" } as TokenResponse)}
+                    alt={selectedToken?.assetId ?? "token"}
                     className="size-8 rounded-full"
                   />
                 </div>
@@ -181,7 +181,7 @@ export const WalletDepositView = () => {
             variant="secondary"
             className="flex-1"
             onClick={() => {
-              actorRef.send({ type: 'back_to_asset_selection' });
+              actorRef.send({ type: "back_to_asset_selection" });
             }}
           >
             Back
@@ -203,7 +203,7 @@ export const WalletDepositView = () => {
                 {
                   balance: selectedToken.balance,
                   nearBalance: selectedToken.balanceNear,
-                },
+                }
               );
 
               if (!result) {
@@ -214,10 +214,10 @@ export const WalletDepositView = () => {
             {isLoading ? (
               <div className="flex flex-row  gap-2 items-center">
                 Confirming deposit
-                <LoadingIcon className="animate-spin" fill={'#0F1A20'} />
+                <LoadingIcon className="animate-spin" fill={"#0F1A20"} />
               </div>
             ) : (
-              'Confirm & Create Transaction'
+              "Confirm & Create Transaction"
             )}
           </ActionButton>
         </div>

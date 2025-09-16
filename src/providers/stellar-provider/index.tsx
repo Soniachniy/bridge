@@ -4,7 +4,7 @@ import {
   useContext,
   useEffect,
   useState,
-} from 'react';
+} from "react";
 import {
   StellarWalletsKit,
   WalletNetwork,
@@ -17,7 +17,7 @@ import {
   HanaModule,
   RabetModule,
   KleverModule,
-} from '@creit.tech/stellar-wallets-kit';
+} from "@creit.tech/stellar-wallets-kit";
 
 interface StellarContextValue {
   kit: StellarWalletsKit | null;
@@ -34,7 +34,7 @@ const StellarContext = createContext<StellarContextValue | null>(null);
 export const useStellar = () => {
   const context = useContext(StellarContext);
   if (!context) {
-    throw new Error('useStellar must be used within a StellarProvider');
+    throw new Error("useStellar must be used within a StellarProvider");
   }
   return context;
 };
@@ -42,7 +42,7 @@ export const useStellar = () => {
 export const StellarProvider = ({ children }: PropsWithChildren) => {
   const [kit, setKit] = useState<StellarWalletsKit | null>(null);
   const [selectedWallet, setSelectedWallet] = useState<ISupportedWallet | null>(
-    null,
+    null
   );
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -50,7 +50,7 @@ export const StellarProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     const stellarKit = new StellarWalletsKit({
       network: WalletNetwork.PUBLIC,
-      selectedWalletId: '',
+      selectedWalletId: "",
       modules: [
         new HotWalletModule(),
         new LobstrModule(),
@@ -67,7 +67,7 @@ export const StellarProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const connect = async () => {
-    if (!kit) throw new Error('Stellar kit not initialized');
+    if (!kit) throw new Error("Stellar kit not initialized");
 
     try {
       await kit.openModal({
@@ -80,7 +80,7 @@ export const StellarProvider = ({ children }: PropsWithChildren) => {
         },
       });
     } catch (error) {
-      console.error('Failed to connect to Stellar wallet:', error);
+      console.error("Failed to connect to Stellar wallet:", error);
       throw error;
     }
   };
@@ -92,23 +92,23 @@ export const StellarProvider = ({ children }: PropsWithChildren) => {
       setSelectedWallet(null);
       setPublicKey(null);
       setIsConnected(false);
-      kit.setWallet('');
+      kit.setWallet("");
     } catch (error) {
-      console.error('Failed to disconnect from Stellar wallet:', error);
+      console.error("Failed to disconnect from Stellar wallet:", error);
       throw error;
     }
   };
 
   const signTransaction = async (xdr: string) => {
     if (!kit || !isConnected) {
-      throw new Error('Wallet not connected');
+      throw new Error("Wallet not connected");
     }
 
     try {
       const { signedTxXdr } = await kit.signTransaction(xdr);
       return signedTxXdr;
     } catch (error) {
-      console.error('Failed to sign transaction:', error);
+      console.error("Failed to sign transaction:", error);
       throw error;
     }
   };
@@ -128,4 +128,4 @@ export const StellarProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-export * from './stellar-utils';
+export * from "./stellar-utils";

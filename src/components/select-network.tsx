@@ -1,40 +1,40 @@
-import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
+import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from "react";
 
-import { CHAIN_TITLE, CHAIN_ICON, translateNetwork } from '@/lib/1clickHelper';
+import { CHAIN_TITLE, CHAIN_ICON, translateNetwork } from "@/lib/1clickHelper";
 
-import { Network, networkChainId } from '@/config';
+import { Network, networkChainId } from "@/config";
 
-import { useTokens } from '@/providers/token-context';
+import { useTokens } from "@/providers/token-context";
 
 import {
   formatTokenAmount,
   isSupportedNetwork,
   truncateAddress,
-} from '@/lib/utils';
-import { useFormContext } from 'react-hook-form';
-import { FormInterface } from '@/lib/validation';
-import WalletIcon from '@/assets/wallet-icon.svg?react';
-import LogoutIcon from '@/assets/logout-icon.svg?react';
-import ArrowRight from '@/assets/arrow-right.svg?react';
-import XIcon from '@/assets/close-icon.svg?react';
+} from "@/lib/utils";
+import { useFormContext } from "react-hook-form";
+import { FormInterface } from "@/lib/validation";
+import WalletIcon from "@/assets/wallet-icon.svg?react";
+import LogoutIcon from "@/assets/logout-icon.svg?react";
+import ArrowRight from "@/assets/arrow-right.svg?react";
+import XIcon from "@/assets/close-icon.svg?react";
 
-import { Loader } from 'lucide-react';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { toUserFriendlyAddress, useTonWallet } from '@tonconnect/ui-react';
-import { useAppKitAccount } from '@reown/appkit/react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletSelector } from '@/providers/near-provider';
+import { Loader } from "lucide-react";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { toUserFriendlyAddress, useTonWallet } from "@tonconnect/ui-react";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletSelector } from "@/providers/near-provider";
 
-import { AddressRow } from './connect-wallet-dialog';
+import { AddressRow } from "./connect-wallet-dialog";
 
 const SelectNetworkDialog: FC<{
   connectWallet: (network: Network) => void;
@@ -42,7 +42,7 @@ const SelectNetworkDialog: FC<{
   getPublicKey: (network: Network) => string | null | undefined;
 }> = ({ connectWallet, getPublicKey, disconnectWallet }) => {
   const { watch, setValue } = useFormContext<FormInterface>();
-  const selectedToken = watch('selectedToken');
+  const selectedToken = watch("selectedToken");
   const [isFirstDialogOpen, setIsFirstDialogOpen] = useState(false);
   const [isSecondDialogOpen, setIsSecondDialogOpen] = useState(false);
   const { tokens: allTokens } = useTokens();
@@ -50,7 +50,7 @@ const SelectNetworkDialog: FC<{
   const { blockchains, mainTokens } = useMemo(() => {
     const uniqueBlockchains = [
       ...new Set(
-        Object.values(allTokens ?? {}).map(({ blockchain }) => blockchain),
+        Object.values(allTokens ?? {}).map(({ blockchain }) => blockchain)
       ),
     ];
 
@@ -73,7 +73,7 @@ const SelectNetworkDialog: FC<{
         acc[token.blockchain] = token;
       }
       return acc;
-    }, {} as Record<TokenResponse['blockchain'], TokenResponse>);
+    }, {} as Record<TokenResponse["blockchain"], TokenResponse>);
     return { blockchains, mainTokens };
   }, [allTokens]);
 
@@ -86,10 +86,10 @@ const SelectNetworkDialog: FC<{
   const { isLoading } = useTokenBalance();
 
   const [connectedAddresses, setConnectedAddresses] = useState<AddressRow[]>(
-    [],
+    []
   );
 
-  const evmAccounts = useAppKitAccount({ namespace: 'eip155' });
+  const evmAccounts = useAppKitAccount({ namespace: "eip155" });
   const { publicKey } = useWallet();
   const tonWallet = useTonWallet();
 
@@ -116,7 +116,7 @@ const SelectNetworkDialog: FC<{
             : null,
           blockChain: Network.TON,
         },
-      ].filter((address) => address.address !== null),
+      ].filter((address) => address.address !== null)
     );
   }, [
     accountId,
@@ -143,17 +143,17 @@ const SelectNetworkDialog: FC<{
                   {formatTokenAmount(
                     selectedToken?.balance ?? 0n,
                     selectedToken?.decimals ?? 0,
-                    5,
+                    5
                   )}
                   <div
                     className="text-center justify-center text-main_light text-base font-semibold font-['Inter'] cursor-pointer"
                     onClick={() =>
                       setValue(
-                        'amount',
+                        "amount",
                         formatTokenAmount(
                           selectedToken?.balance ?? 0n,
-                          selectedToken?.decimals ?? 0,
-                        ),
+                          selectedToken?.decimals ?? 0
+                        )
                       )
                     }
                   >
@@ -210,11 +210,11 @@ const SelectNetworkDialog: FC<{
               <div
                 key={address.address}
                 onClick={() => {
-                  setValue('refundAddress', address.address ?? '');
+                  setValue("refundAddress", address.address ?? "");
                   if (networkChainId[address.blockChain]) {
-                    setValue('hyperliquidAddress', address.address ?? '');
+                    setValue("hyperliquidAddress", address.address ?? "");
                   }
-                  setValue('selectedToken', {
+                  setValue("selectedToken", {
                     ...mainTokens[
                       address.blockChain as unknown as TokenResponse.blockchain
                     ],
@@ -298,7 +298,7 @@ const SelectNetworkDialog: FC<{
                   onClick={() => {
                     setIsSecondDialogOpen(false);
                     connectWallet(translateNetwork(blockchain));
-                    setValue('selectedToken', {
+                    setValue("selectedToken", {
                       ...mainTokens[
                         blockchain as unknown as TokenResponse.blockchain
                       ],
