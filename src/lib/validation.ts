@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { TokenResponse } from "@defuse-protocol/one-click-sdk-typescript";
-import { EStrategy } from "@/pages/Form";
+import { z } from 'zod';
+import { TokenResponse } from '@defuse-protocol/one-click-sdk-typescript';
+import { EStrategy } from '@/pages/Form';
 
 export const MIN_AMOUNT = 5;
 
@@ -16,12 +16,12 @@ const tonAddressSchema = z
   .string()
   .refine((val) => tonBase64Regex.test(val) || tonHexRegex.test(val), {
     message:
-      "Invalid TON address format. Must be a valid Base64 or hex address.",
+      'Invalid TON address format. Must be a valid Base64 or hex address.',
   });
 
 export const tronHexAddress = z
   .string()
-  .regex(/^T[1-9A-HJ-NP-Za-km-z]{33}$/, "Invalid TRON hex address");
+  .regex(/^T[1-9A-HJ-NP-Za-km-z]{33}$/, 'Invalid TRON hex address');
 
 const nearAddressSchema = z.string().refine(
   (val) => {
@@ -37,8 +37,8 @@ const nearAddressSchema = z.string().refine(
   },
   {
     message:
-      "Must be a valid NEAR address: either 64 alphanumeric characters, or 2-64 characters with .near or .hot.tg suffix.",
-  }
+      'Must be a valid NEAR address: either 64 alphanumeric characters, or 2-64 characters with .near or .hot.tg suffix.',
+  },
 );
 
 export const solanaAddressSchema = z.string().refine(
@@ -48,20 +48,20 @@ export const solanaAddressSchema = z.string().refine(
     return isSolanaAddress;
   },
   {
-    message: "Must be a valid Solana address (44 characters)",
-  }
+    message: 'Must be a valid Solana address (44 characters)',
+  },
 );
 
 export const evmAddressValidation = z
   .string()
-  .min(1, "Address is required")
+  .min(1, 'Address is required')
   .refine(isValidEVMAddress, {
-    message: "Must be a valid EVM address (0x followed by 40 hex characters)",
+    message: 'Must be a valid EVM address (0x followed by 40 hex characters)',
   });
 
 export const formValidationSchema = z
   .object({
-    strategy: z.enum(["manual", "wallet"]),
+    strategy: z.enum(['manual', 'wallet']),
     hyperliquidAddress: z.string(),
     refundAddress: z.string(),
     slippageValue: z.number(),
@@ -82,11 +82,11 @@ export const formValidationSchema = z
       })
       .nullable()
       .refine((token) => token !== null, {
-        message: "Please select a token",
+        message: 'Please select a token',
       }),
 
     amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be a valid positive number",
+      message: 'Amount must be a valid positive number',
     }),
     amountOut: z.string(),
     depositAddress: z.string().optional(),
@@ -94,7 +94,7 @@ export const formValidationSchema = z
   })
   .superRefine((data, ctx) => {
     if (
-      data.strategy === "wallet" &&
+      data.strategy === 'wallet' &&
       data.selectedToken &&
       data.refundAddress
     ) {
@@ -106,125 +106,75 @@ export const formValidationSchema = z
       if (amountNumber > balanceNumber && amountNumber !== 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Amount cannot exceed your balance",
-          path: ["amount"],
+          message: 'Amount cannot exceed your balance',
+          path: ['amount'],
         });
       }
     }
 
     // Address validation based on blockchain
     if (data.refundAddress && data.selectedToken?.blockchain) {
-      if (data.selectedToken.blockchain === "near") {
+      if (data.selectedToken.blockchain === 'near') {
         const nearAddressParse = nearAddressSchema.safeParse(
-          data.refundAddress
+          data.refundAddress,
         );
         if (!nearAddressParse.success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Address is not a valid .near address",
-            path: ["refundAddress"],
+            message: 'Address is not a valid .near address',
+            path: ['refundAddress'],
           });
         }
-      } else if (data.selectedToken.blockchain === "sol") {
+      } else if (data.selectedToken.blockchain === 'sol') {
         const solanaAddressParse = solanaAddressSchema.safeParse(
-          data.refundAddress
+          data.refundAddress,
         );
         if (!solanaAddressParse.success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Address is not a valid Solana address",
-            path: ["refundAddress"],
+            message: 'Address is not a valid Solana address',
+            path: ['refundAddress'],
           });
         }
-      } else if (data.selectedToken.blockchain === "ton") {
+      } else if (data.selectedToken.blockchain === 'ton') {
         const tonAddressParse = tonAddressSchema.safeParse(data.refundAddress);
         if (!tonAddressParse.success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Address is not a valid TON address",
-            path: ["refundAddress"],
+            message: 'Address is not a valid TON address',
+            path: ['refundAddress'],
           });
         }
-      } else if (data.selectedToken.blockchain === "tron") {
+      } else if (data.selectedToken.blockchain === 'tron') {
         if (!tronHexAddress.safeParse(data.refundAddress).success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid TRON address",
+            path: ['refundAddress'],
+            message: 'Address is not a valid TRON address',
           });
         }
       } else {
         const evmAddressParse = evmAddressValidation.safeParse(
-          data.refundAddress
+          data.refundAddress,
         );
         if (!evmAddressParse.success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Address is not a valid EVM address",
-            path: ["refundAddress"],
+            message: 'Address is not a valid EVM address',
+            path: ['refundAddress'],
           });
         }
       }
     }
   });
 
-export const createSlippageDialogValidationSchema = (
-  blockchain: TokenResponse["blockchain"]
-) =>
-  z
-    .object({
-      slippageValue: z
-        .number()
-        .min(0, "Slippage value must be between 0 and 100")
-        .max(100, "Slippage value must be between 0 and 100"),
-      refundAddress: z.string(),
-    })
-    .superRefine((data, ctx) => {
-      const address = data.refundAddress?.trim() ?? "";
-      if (address === "") return; // allow empty in dialog; main form enforces required
-
-      if (blockchain === "near") {
-        if (!nearAddressSchema.safeParse(address).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid NEAR address",
-          });
-        }
-      } else if (blockchain === "sol") {
-        if (!solanaAddressSchema.safeParse(address).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid Solana address",
-          });
-        }
-      } else if (blockchain === "ton") {
-        if (!tonAddressSchema.safeParse(address).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid TON address",
-          });
-        }
-      } else if (blockchain === "tron") {
-        if (!tronHexAddress.safeParse(address).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid TRON address",
-          });
-        }
-      } else {
-        if (!evmAddressValidation.safeParse(address).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["refundAddress"],
-            message: "Address is not a valid EVM address",
-          });
-        }
-      }
-    });
+export const createSlippageDialogValidationSchema = () =>
+  z.object({
+    slippageValue: z
+      .number()
+      .min(0, 'Slippage value must be between 0 and 100')
+      .max(100, 'Slippage value must be between 0 and 100'),
+  });
 
 export const firstStepValidationSchema = formValidationSchema.pick({
   selectedToken: true,
