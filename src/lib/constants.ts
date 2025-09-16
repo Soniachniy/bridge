@@ -1,6 +1,6 @@
 /* COMMON */
 export const USDC_DECIMALS = 6;
-export const SLIPPAGE = 5;
+export const SLIPPAGE = 500;
 
 /* NEAR */
 export const NEAR_TOKEN_ID = 'NEAR';

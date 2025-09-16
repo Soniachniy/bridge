@@ -118,7 +118,8 @@ export const TOKEN_ICON_BY_DEFUSE_ASSET_ID: Record<string, string> = {
     'https://s2.coinmarketcap.com/static/img/coins/128x128/825.png',
   'nep141:tron-d28a265909efecdcee7c5028585214ea0b96f015.omft.near':
     'https://s2.coinmarketcap.com/static/img/coins/128x128/825.png',
-
+  'nep141:jambo-1679.meme-cooking.near':
+    'https://assets.coingecko.com/coins/images/68744/standard/jambo.png',
   'nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.omft.near':
     'https://s2.coinmarketcap.com/static/img/coins/128x128/3408.png',
   'nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1':

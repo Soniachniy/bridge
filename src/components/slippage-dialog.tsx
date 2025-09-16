@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import X from '@/assets/close-icon.svg?react';
 
 export default function SlippageDialog() {
-  const slippageOptions = [5, 10, 15, 20];
+  const slippageOptions = [500, 1000, 1500, 2000];
   const [open, setOpen] = useState(false);
   const { watch: internalWatch, setValue: internalSetValue } = useFormContext();
   const slippageValue = internalWatch('slippageValue');
@@ -24,25 +24,24 @@ export default function SlippageDialog() {
       mode: 'onChange',
       reValidateMode: 'onChange',
       defaultValues: {
-        slippageValue: slippageValue,
+        slippageValue: slippageValue / 100,
       },
     });
   const slippageValueInternal = watch('slippageValue');
 
   const onSubmit = (data: any) => {
-    console.log('data', data);
-    internalSetValue('slippageValue', data.slippageValue);
+    internalSetValue('slippageValue', data.slippageValue * 100);
     setOpen(false);
   };
 
   const { errors } = formState;
-  console.log('errors', errors);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="absolute left-0 h-full my-auto">
         <div className="flex flex-row  gap-2 align-center justify-start cursor-pointer">
           <div className="select-none flex align-center justify-center opacity-60 justify-center text-main_light text-sm font-normal font-['Inter'] font-['Inter']">
-            Slippage Tolerance {slippageValue}%
+            Slippage Tolerance {slippageValue / 100}%
           </div>
         </div>
       </DialogTrigger>
@@ -91,12 +90,12 @@ export default function SlippageDialog() {
                       }`}
                     key={option}
                     onClick={() => {
-                      setValue('slippageValue', option);
+                      setValue('slippageValue', option / 100);
                       trigger('slippageValue');
                     }}
                   >
                     <div className="text-center justify-center  text-xs font-semibold font-['Inter'] leading-none">
-                      {option}%
+                      {option / 100}%
                     </div>
                   </div>
                 ))}
